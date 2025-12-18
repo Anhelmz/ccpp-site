@@ -44,14 +44,6 @@
           </router-link>
         </div>
 
-        <section class="text-center space-y-6">
-          <p class="text-sm uppercase tracking-[0.35em] text-gray-400">{{ intro.eyebrow }}</p>
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900">{{ intro.title }}</h2>
-          <div class="space-y-4 text-left text-lg text-gray-700 leading-relaxed max-w-3xl mx-auto">
-            <p v-for="(paragraph, idx) in intro.body" :key="idx" v-html="paragraph"></p>
-          </div>
-        </section>
-
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <article
             v-for="card in cards"
@@ -104,14 +96,6 @@ export default {
           upcoming: 'Upcoming Events',
           calendar: 'View Calendar'
         },
-        intro: {
-          eyebrow: 'Question',
-          title: 'What happens each week?',
-          body: [
-            'Our weekly rhythm keeps us rooted in <span class="font-semibold text-brand-orange">Scripture, prayer, and community</span>. Gatherings happen in the sanctuary, homes, and neighborhoods across Phnom Penh.',
-            'Sundays and Wednesdays anchor the church, while smaller circles—youth, prayer, and house churches—carry grace throughout the week.'
-          ]
-        },
         cards: [
           { id: 'sunday', tag: 'Sunday', title: '9:00 AM Worship', body: 'Verse-by-verse teaching, bilingual worship, kids ministry, and hospitality every Sunday morning.' },
           { id: 'wednesday', tag: 'Wednesday', title: 'Bible study & prayer', body: '7:00 PM midweek gathering focused on teaching, table discussion, and intercession for Phnom Penh.' },
@@ -133,14 +117,6 @@ export default {
           upcoming: 'ព្រឹត្តិការណ៍ជិតមកដល់',
           calendar: 'មើលប្រតិទិន'
         },
-        intro: {
-          eyebrow: 'សំណួរ',
-          title: 'អ្វីកើតឡើងរៀងរាល់សប្ដាហ៍?',
-          body: [
-            'កាលវិភាគប្រចាំសប្ដាហ៍រក្សាយើងជាប់នឹង <span class="font-semibold text-brand-orange">ព្រះវចនៈ ការអធិស្ឋាន និងសហគមន៍</span>។ ការជួបជុំកើតឡើងនៅសាលធំ គេហដ្ឋាន និងសង្កាត់ទូទាំងទីក្រុងភ្នំពេញ។',
-            'ថ្ងៃអាទិត្យ និងថ្ងៃពុធជាគ្រឹះសាសនាចក្រ ខណៈពេលព្រឺត្រីតូចៗ—យុវជន ការអធិស្ឋាន និងក្រុមផ្ទះ—នាំព្រះគុណឆ្លងកាត់មួយសប្ដាហ៍។'
-          ]
-        },
         cards: [
           { id: 'sunday', tag: 'ថ្ងៃអាទិត្យ', title: 'ការថ្វាយបង្គំ ម៉ោង 9 ព្រឹក', body: 'ការបង្រៀនតាមជួរ ការថ្វាយបង្គំពីរភាសា សេវាកម្មកុមារ និងការស្វាគមន៍រៀងរាល់ព្រឹកថ្ងៃអាទិត្យ។' },
           { id: 'wednesday', tag: 'ថ្ងៃពុធ', title: 'សិក្សាព្រះគម្ពីរ និងអធិស្ឋាន', body: 'ការជួបកណ្ដាលសប្ដាហ៍ ម៉ោង 7 ល្ងាច ផ្ដោតលើការបង្រៀន ការពិភាក្សាតាមតុ និងការអធិស្ឋានសម្រាប់ទីក្រុងភ្នំពេញ។' },
@@ -159,7 +135,6 @@ export default {
     return {
       hero: computed(() => content.value.hero),
       nav: computed(() => content.value.nav),
-      intro: computed(() => content.value.intro),
       cards: computed(() => content.value.cards),
       footerNote: computed(() => content.value.footer),
       cta: computed(() => content.value.cta)

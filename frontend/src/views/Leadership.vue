@@ -56,6 +56,28 @@
           </article>
         </div>
 
+        <div class="mt-16">
+          <div class="text-center mb-10">
+            <p class="text-sm uppercase tracking-[0.3em] text-gray-500">{{ team.eyebrow }}</p>
+            <h3 class="text-2xl font-semibold text-gray-900">{{ team.title }}</h3>
+          </div>
+          <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <article
+              v-for="member in team.members"
+              :key="member.name"
+              class="rounded-3xl border border-gray-100 bg-white shadow-lg p-6 text-center flex flex-col items-center gap-3"
+            >
+              <div class="h-16 w-16 rounded-full bg-brand-blue/5 border border-brand-blue/15 flex items-center justify-center shadow-inner">
+                <img :src="member.photo" :alt="`${member.name} icon`" class="h-8 w-8 object-contain" />
+              </div>
+              <div>
+                <p class="text-base font-semibold text-gray-900">{{ member.name }}</p>
+                <p class="text-sm uppercase tracking-[0.25em] text-brand-blue/80">{{ member.role }}</p>
+              </div>
+            </article>
+          </div>
+        </div>
+
         <div class="text-center mt-16">
           <p class="text-gray-600 mb-3 text-sm uppercase tracking-[0.3em]">{{ cta.eyebrow }}</p>
           <h4 class="text-2xl font-semibold text-gray-900 mb-6">{{ cta.title }}</h4>
@@ -79,11 +101,12 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useLanguageStore } from '@/stores/language'
-import pastorRithPhoto from '@/assets/leadership/rith.jpg'
-import pastorLongPhoto from '@/assets/leadership/Paster Long.jpg'
+import rithPhoto from '@/assets/leadership/rith.jpg'
+import longPhoto from '@/assets/leadership/long.jpeg'
 import randyPhoto from '@/assets/leadership/randy.jpg'
-import vuthaPhoto from '@/assets/leadership/longdee.jpg'
-import chengPhoto from '@/assets/leadership/Paster Borin.jpg'
+import vuthaPhoto from '@/assets/leadership/vutha.jpg'
+import curtisPhoto from '@/assets/leadership/curtis.jpg'
+import teamIcon from '@/assets/leadership/team-icon.svg'
 
 export default {
   name: 'Leadership',
@@ -106,36 +129,52 @@ export default {
           title: 'Connect with our leadership team',
           button: 'Contact Us'
         },
+        team: {
+          eyebrow: 'Team Leaders',
+          title: 'Serving across ministries every week',
+          members: [
+            { name: 'Kuyeng Khat', role: 'Childrens Ministry', photo: teamIcon },
+            { name: 'Channy Saing', role: 'Youth Group', photo: teamIcon },
+            { name: 'Daro Chim', role: 'Tech Team', photo: teamIcon },
+            { name: 'Curtis Johnson', role: 'Worship', photo: teamIcon },
+            { name: 'Sokhom Norn', role: 'Welcome Team', photo: teamIcon },
+            { name: 'Savary Sang', role: 'Areyksat Outreach', photo: teamIcon },
+            { name: 'Chanthy Chom', role: 'Accounting', photo: teamIcon },
+            { name: 'Eva-Maria Sang', role: 'Administration', photo: teamIcon },
+            { name: 'Vutha Ven', role: 'Translation', photo: teamIcon },
+            { name: 'Long Sann', role: 'Facilities Service', photo: teamIcon }
+          ]
+        },
         leaders: [
           {
-            name: 'Pastor Rith',
-            role: 'Senior Pastor',
-            photo: pastorRithPhoto,
-            bio: "With over 15 years of pastoral experience, Pastor Rith leads our congregation with wisdom and compassion. He faithfully teaches God's Word and shepherds our church family."
+            name: 'Rith Sang',
+            role: 'Lead Pastor',
+            photo: rithPhoto,
+            bio: 'Leads Calvary Chapel Phnom Penh with steady Bible teaching, prayer, and pastoral care that keeps the church centered on Jesus.'
           },
           {
-            name: 'Pastor Long',
-            role: 'Associate Pastor',
-            photo: pastorLongPhoto,
-            bio: 'Pastor Long brings energy to youth and community outreach. He is passionate about discipleship and seeing lives transformed by the Gospel.'
+            name: 'Long Sann',
+            role: 'Pastor',
+            photo: longPhoto,
+            bio: 'Shepherds families and outreach teams, walking with people in discipleship and teaching Scripture in everyday life.'
           },
           {
-            name: 'Randy',
-            role: 'Leadership Team',
-            photo: randyPhoto,
-            bio: 'Randy supports the church family through faithful service and a commitment to caring for every ministry area.'
-          },
-          {
-            name: 'Vutha',
-            role: 'Leadership Team',
+            name: 'Vutha Ven',
+            role: 'Pastor',
             photo: vuthaPhoto,
-            bio: 'Vutha encourages meaningful worship and helps guide teams that cultivate fellowship and spiritual growth.'
+            bio: 'Guides worship and prayer gatherings, encouraging the church to seek God together and serve neighbors across the city.'
           },
           {
-            name: 'Cheng',
-            role: 'Leadership Team',
-            photo: chengPhoto,
-            bio: 'Cheng invests in discipleship and helps coordinate opportunities for members to grow together in faith.'
+            name: 'Randy Fleming',
+            role: 'Elder',
+            photo: randyPhoto,
+            bio: 'Serves as an elder with wise counsel, supporting teaching, pastoral care, and hospitality for the church family.'
+          },
+          {
+            name: 'Curtis Johnson',
+            role: 'Elder',
+            photo: curtisPhoto,
+            bio: 'Elder focused on encouragement and prayer, helping leaders and teams stay aligned to the gospel and mission.'
           }
         ]
       },
@@ -154,36 +193,52 @@ export default {
           title: 'ទាក់ទងជាមួយក្រុមភាពជាអ្នកដឹកនាំ',
           button: 'ទាក់ទងមកកាន់ពួកយើង'
         },
+        team: {
+          eyebrow: 'Team Leaders',
+          title: 'Serving across ministries every week',
+          members: [
+            { name: 'Kuyeng Khat', role: 'Childrens Ministry', photo: teamIcon },
+            { name: 'Channy Saing', role: 'Youth Group', photo: teamIcon },
+            { name: 'Daro Chim', role: 'Tech Team', photo: teamIcon },
+            { name: 'Curtis Johnson', role: 'Worship', photo: teamIcon },
+            { name: 'Sokhom Norn', role: 'Welcome Team', photo: teamIcon },
+            { name: 'Savary Sang', role: 'Areyksat Outreach', photo: teamIcon },
+            { name: 'Chanthy Chom', role: 'Accounting', photo: teamIcon },
+            { name: 'Eva-Maria Sang', role: 'Administration', photo: teamIcon },
+            { name: 'Vutha Ven', role: 'Translation', photo: teamIcon },
+            { name: 'Long Sann', role: 'Facilities Service', photo: teamIcon }
+          ]
+        },
         leaders: [
           {
-            name: 'Pastor Rith',
-            role: 'គ្រូគង្វាលជាន់ខ្ពស់',
-            photo: pastorRithPhoto,
-            bio: 'ដោយបទពិសោធន៍ជាគ្រូគង្វាលជាង 15 ឆ្នាំ លោកបណ្ដុះបណ្តាលសហគមន៍ដោយប្រាជ្ញា និងមេត្តា បង្រៀនព្រះបន្ទូលយ៉ាងស្មោះត្រង់ និងថែរក្សាគ្រួសារគ្រឹស្ត។'
+            name: 'Rith Sang',
+            role: 'Lead Pastor',
+            photo: rithPhoto,
+            bio: 'ដឹកនាំ Calvary Chapel Phnom Penh ជាមួយការបង្រៀនព្រះគម្ពីរ ការអធិស្ឋាន និងការថែរក្សាសមាជិក ដើម្បីរក្សាសាសនាចក្រ​កណ្ដាលទៅលើព្រះយេស៊ូវ។'
           },
           {
-            name: 'Pastor Long',
-            role: 'គ្រូគង្វាលជំនួយ',
-            photo: pastorLongPhoto,
-            bio: 'លោកផ្តល់ថាមពលដល់យុវជន និងការចេញផ្សាយសហគមន៍ មានចំណង់ចំណូលចិត្តក្នុងការបណ្តុះសិស្ស និងឃើញជីវិតបម្លែងដោយព្រះវស្សនា។'
+            name: 'Long Sann',
+            role: 'Pastor',
+            photo: longPhoto,
+            bio: 'ថែរក្សាគ្រួសារ និងក្រុមចេញផ្សាយ ដើរជាមួយមនុស្សក្នុងការបណ្តុះសិស្ស និងបង្រៀនព្រះវចនៈក្នុងជីវិតប្រចាំថ្ងៃ។'
           },
           {
-            name: 'Randy',
-            role: 'ក្រុមភាពជាអ្នកដឹកនាំ',
-            photo: randyPhoto,
-            bio: 'គាំទ្រគ្រួសារគ្រឹស្តដោយសេវាស្មោះត្រង់ និងការយកចិត្តទុកដាក់ចំពោះវិស័យសេវាកម្មទាំងអស់។'
-          },
-          {
-            name: 'Vutha',
-            role: 'ក្រុមភាពជាអ្នកដឹកនាំ',
+            name: 'Vutha Ven',
+            role: 'Pastor',
             photo: vuthaPhoto,
-            bio: 'លើកទឹកចិត្តការថ្វាយបង្គំមានន័យ និងជួយណែនាំក្រុមដើម្បីបង្កើតការរួបរួម និងកំណើនฝ่ายវិញ្ញាណ។'
+            bio: 'ណែនាំការថ្វាយបង្គំ និងការអធិស្ឋាន លើកទឹកចិត្តឲ្យសាសនាចក្រ​ស្វែងរកព្រះជាមួយគ្នា និងបម្រើអ្នកជិតខាងទូទាំងទីក្រុង។'
           },
           {
-            name: 'Cheng',
-            role: 'ក្រុមភាពជាអ្នកដឹកនាំ',
-            photo: chengPhoto,
-            bio: 'វិនិយោគក្នុងការបណ្តុះសិស្ស និងសហការ​រៀបចំឱកាសឲ្យសមាជិកលូតលាស់រួមគ្នានៅក្នុងជំនឿ។'
+            name: 'Randy Fleming',
+            role: 'Elder',
+            photo: randyPhoto,
+            bio: 'បម្រើជាអធិការក្រុមជាមួយប្រាជ្ញា គាំទ្រការបង្រៀន ការថែរក្សា និងការស្វាគមន៍សមាជិក។'
+          },
+          {
+            name: 'Curtis Johnson',
+            role: 'Elder',
+            photo: curtisPhoto,
+            bio: 'ផ្តោតលើការលើកទឹកចិត្ត និងការអធិស្ឋាន ជួយក្រុមដឹកនាំឲ្យស្ថិតស្របនឹងព្រះវចនៈ និងបេសកកម្ម។'
           }
         ]
       }
@@ -195,6 +250,7 @@ export default {
       hero: computed(() => content.value.hero),
       labels: computed(() => content.value.labels),
       cta: computed(() => content.value.cta),
+      team: computed(() => content.value.team),
       leaders: computed(() => content.value.leaders)
     }
   }
