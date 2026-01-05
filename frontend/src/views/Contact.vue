@@ -65,7 +65,6 @@
             </p>
             <div class="space-y-6">
               <div class="flex gap-4">
-                <div class="rounded-2xl bg-brand-blue/10 text-brand-blue flex items-center justify-center h-14 w-14 text-2xl">📍</div>
                 <div>
                   <h3 class="font-semibold text-gray-900">{{ info.address.label }}</h3>
                   <p class="text-gray-600 leading-relaxed">
@@ -76,14 +75,12 @@
                 </div>
               </div>
               <div class="flex gap-4">
-                <div class="rounded-2xl bg-brand-blue/10 text-brand-blue flex items-center justify-center h-14 w-14 text-2xl">📞</div>
                 <div>
                   <h3 class="font-semibold text-gray-900">{{ info.phone.label }}</h3>
                   <p class="text-gray-600">{{ info.phone.value }}</p>
                 </div>
               </div>
               <div class="flex gap-4">
-                <div class="rounded-2xl bg-brand-blue/10 text-brand-blue flex items-center justify-center h-14 w-14 text-2xl">📧</div>
                 <div>
                   <h3 class="font-semibold text-gray-900">{{ info.email.label }}</h3>
                   <p class="text-gray-600">{{ info.email.value }}</p>

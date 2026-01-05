@@ -167,7 +167,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const requiresAdmin = to.matched.some(record => record.meta?.requiresAdmin)
-  const token = localStorage.getItem('authToken')
+  const token = localStorage.getItem('authToken') || localStorage.getItem('auth_token')
   const userRaw = localStorage.getItem('authUser')
   const user = userRaw ? JSON.parse(userRaw) : null
 

@@ -1,6 +1,9 @@
 # CCPP Full-Stack Application Makefile
 
-.PHONY: help install-backend install-frontend install dev-backend dev-frontend dev build clean test-backend test-frontend
+.PHONY: help install-backend install-frontend install dev-backend dev-frontend dev build clean test-backend test-frontend up stop
+
+FRONTEND_PID_FILE := $(CURDIR)/.frontend_dev.pid
+FRONTEND_LOG := $(CURDIR)/frontend-dev.log
 
 # Default target
 help:
@@ -16,6 +19,8 @@ help:
 	@echo "  clean             - Clean build artifacts and dependencies"
 	@echo "  test-backend      - Run backend tests"
 	@echo "  test-frontend     - Run frontend tests"
+	@echo "  up                - Start all Docker services"
+	@echo "  stop              - Stop all Docker services"
 
 # Install dependencies
 install-backend:
@@ -97,6 +102,36 @@ db-reset:
 db-logs:
 	@echo "Showing PostgreSQL logs..."
 	docker-compose logs -f postgres
+
+# Docker Compose lifecycle
+up:
+	@echo "Starting all Docker services..."
+	docker-compose up -d
+	@echo "Installing frontend dependencies..."
+	cd frontend && npm install
+	@echo "Starting frontend development server..."
+	@if [ -f $(FRONTEND_PID_FILE) ] && kill -0 $$(cat $(FRONTEND_PID_FILE)) 2>/dev/null; then \
+		echo "Frontend dev server already running with PID $$(cat $(FRONTEND_PID_FILE))"; \
+	else \
+		cd frontend && nohup npm run dev > $(FRONTEND_LOG) 2>&1 & echo $$! > $(FRONTEND_PID_FILE); \
+		echo "Frontend dev server started with PID $$(cat $(FRONTEND_PID_FILE)). Logs: $(FRONTEND_LOG)"; \
+	fi
+
+stop:
+	@echo "Stopping frontend development server..."
+	@if [ -f $(FRONTEND_PID_FILE) ]; then \
+		PID=$$(cat $(FRONTEND_PID_FILE)); \
+		if kill -0 $$PID 2>/dev/null; then \
+			kill $$PID && echo "Killed frontend dev server (PID $$PID)"; \
+		else \
+			echo "Frontend dev server not running (stale PID $$PID)"; \
+		fi; \
+		rm -f $(FRONTEND_PID_FILE); \
+	else \
+		echo "No frontend dev server PID file found"; \
+	fi
+	@echo "Stopping all Docker services..."
+	docker-compose down
 
 # Quick start (install and run in development)
 start: install dev

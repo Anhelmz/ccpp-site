@@ -82,6 +82,7 @@ export default {
       try {
         const { token, user } = await login(email.value, password.value)
         localStorage.setItem('authToken', token)
+        localStorage.setItem('auth_token', token)
         localStorage.setItem('authUser', JSON.stringify(user))
 
         const redirectTo = route.query.redirect || '/admin/dashboard'

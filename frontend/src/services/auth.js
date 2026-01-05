@@ -10,6 +10,7 @@ export async function fetchCurrentUser() {
 
 export function clearAuth() {
   localStorage.removeItem('authToken')
+  localStorage.removeItem('auth_token')
   localStorage.removeItem('authUser')
 }
 

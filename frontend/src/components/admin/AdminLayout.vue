@@ -208,6 +208,7 @@ export default {
 
     const handleLogout = () => {
       localStorage.removeItem('authToken')
+      localStorage.removeItem('auth_token')
       localStorage.removeItem('authUser')
       router.push('/admin/login')
     }

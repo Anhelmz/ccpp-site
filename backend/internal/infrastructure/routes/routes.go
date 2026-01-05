@@ -10,6 +10,77 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// registerAPIRoutes mounts all API endpoints under the provided group (e.g., /api or /api/v1)
+func registerAPIRoutes(
+	api *gin.RouterGroup,
+	authHandler *handlers.AuthHandler,
+	userHandler *handlers.UserHandler,
+	contactHandler *handlers.ContactHandler,
+	contactRequestHandler *handlers.ContactRequestHandler,
+	galleryHandler *handlers.GalleryHandler,
+	eventHandler *handlers.EventHandler,
+) {
+	// Auth routes
+	auth := api.Group("/auth")
+	{
+		auth.POST("/login", authHandler.Login)
+		auth.GET("/logout", authHandler.Logout)
+		auth.GET("/profile", middleware.Auth0Middleware(), authHandler.Profile)
+	}
+
+	// Contact requests (public create, protected list/detail/delete)
+	contactRequests := api.Group("/contact-requests")
+	{
+		contactRequests.POST("", contactRequestHandler.CreateContactRequest)
+
+		protectedContactRequests := contactRequests.Group("")
+		protectedContactRequests.Use(middleware.Auth0Middleware())
+		{
+			protectedContactRequests.GET("", contactRequestHandler.GetContactRequests)
+			protectedContactRequests.GET("/:id", contactRequestHandler.GetContactRequest)
+			protectedContactRequests.DELETE("/:id", contactRequestHandler.DeleteContactRequest)
+		}
+	}
+
+	// Protected routes
+	protected := api.Group("")
+	protected.Use(middleware.Auth0Middleware())
+
+	users := protected.Group("/users")
+	{
+		users.POST("", userHandler.CreateUser)
+		users.GET("", userHandler.GetAllUsers)
+		users.GET("/:id", userHandler.GetUser)
+		users.PUT("/:id", userHandler.UpdateUser)
+		users.DELETE("/:id", userHandler.DeleteUser)
+	}
+
+	contacts := protected.Group("/contacts")
+	{
+		contacts.POST("", contactHandler.CreateContact)
+		contacts.GET("", contactHandler.GetAllContacts)
+		contacts.GET("/:id", contactHandler.GetContactByID)
+		contacts.DELETE("/:id", contactHandler.DeleteContact)
+	}
+
+	gallery := api.Group("/gallery")
+	{
+		gallery.POST("/upload", middleware.Auth0Middleware(), galleryHandler.UploadGallery)
+		gallery.GET("", galleryHandler.GetAllGalleries)
+		gallery.GET("/:id", galleryHandler.GetGalleryByID)
+		gallery.DELETE("/:id", middleware.Auth0Middleware(), galleryHandler.DeleteGallery)
+	}
+
+	events := api.Group("/events")
+	{
+		events.POST("", middleware.Auth0Middleware(), eventHandler.CreateEvent)
+		events.GET("", eventHandler.GetAllEvents)
+		events.GET("/:id", eventHandler.GetEventByID)
+		events.PUT("/:id", middleware.Auth0Middleware(), eventHandler.UpdateEvent)
+		events.DELETE("/:id", middleware.Auth0Middleware(), eventHandler.DeleteEvent)
+	}
+}
+
 func SetupRoutes(
 	router *gin.Engine,
 	userService services.UserService,
@@ -25,77 +96,13 @@ func SetupRoutes(
 	eventHandler := handlers.NewEventHandler(eventService)
 	authHandler := handlers.NewAuthHandler()
 
-	// Legacy-free routes copied from Rolston HVAC for contact requests
-	contactRequests := router.Group("/api/contact-requests")
-	{
-		contactRequests.POST("", contactRequestHandler.CreateContactRequest)
-	}
-	legacyProtected := contactRequests.Group("")
-	legacyProtected.Use(middleware.Auth0Middleware())
-	{
-		legacyProtected.GET("", contactRequestHandler.GetContactRequests)
-		legacyProtected.GET("/:id", contactRequestHandler.GetContactRequest)
-		legacyProtected.DELETE("/:id", contactRequestHandler.DeleteContactRequest)
-	}
+	// Versioned API (existing)
+	apiV1 := router.Group("/api/v1")
+	registerAPIRoutes(apiV1, authHandler, userHandler, contactHandler, contactRequestHandler, galleryHandler, eventHandler)
 
-	api := router.Group("/api/v1")
-	{
-		auth := api.Group("/auth")
-		{
-			auth.POST("/login", authHandler.Login)
-			auth.GET("/logout", authHandler.Logout)
-			auth.GET("/profile", middleware.Auth0Middleware(), authHandler.Profile)
-		}
-
-		protected := api.Group("")
-		protected.Use(middleware.Auth0Middleware())
-
-		users := protected.Group("/users")
-		{
-			users.POST("", userHandler.CreateUser)
-			users.GET("", userHandler.GetAllUsers)
-			users.GET("/:id", userHandler.GetUser)
-			users.PUT("/:id", userHandler.UpdateUser)
-			users.DELETE("/:id", userHandler.DeleteUser)
-		}
-
-		contactRequestsV1 := api.Group("/contact-requests")
-		{
-			contactRequestsV1.POST("", contactRequestHandler.CreateContactRequest)
-			protectedContactRequests := contactRequestsV1.Group("")
-			protectedContactRequests.Use(middleware.Auth0Middleware())
-			{
-				protectedContactRequests.GET("", contactRequestHandler.GetContactRequests)
-				protectedContactRequests.GET("/:id", contactRequestHandler.GetContactRequest)
-				protectedContactRequests.DELETE("/:id", contactRequestHandler.DeleteContactRequest)
-			}
-		}
-
-		contacts := protected.Group("/contacts")
-		{
-			contacts.POST("", contactHandler.CreateContact)
-			contacts.GET("", contactHandler.GetAllContacts)
-			contacts.GET("/:id", contactHandler.GetContactByID)
-			contacts.DELETE("/:id", contactHandler.DeleteContact)
-		}
-
-		gallery := api.Group("/gallery")
-		{
-			gallery.POST("/upload", middleware.Auth0Middleware(), galleryHandler.UploadGallery)
-			gallery.GET("", galleryHandler.GetAllGalleries)
-			gallery.GET("/:id", galleryHandler.GetGalleryByID)
-			gallery.DELETE("/:id", middleware.Auth0Middleware(), galleryHandler.DeleteGallery)
-		}
-
-		events := api.Group("/events")
-		{
-			events.POST("", middleware.Auth0Middleware(), eventHandler.CreateEvent)
-			events.GET("", eventHandler.GetAllEvents)
-			events.GET("/:id", eventHandler.GetEventByID)
-			events.PUT("/:id", middleware.Auth0Middleware(), eventHandler.UpdateEvent)
-			events.DELETE("/:id", middleware.Auth0Middleware(), eventHandler.DeleteEvent)
-		}
-	}
+	// Unversioned API (go-vue-base compatibility)
+	api := router.Group("/api")
+	registerAPIRoutes(api, authHandler, userHandler, contactHandler, contactRequestHandler, galleryHandler, eventHandler)
 
 	// Health check endpoint
 	router.GET("/health", func(c *gin.Context) {
