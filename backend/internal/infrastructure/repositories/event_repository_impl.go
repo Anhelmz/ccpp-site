@@ -22,14 +22,17 @@ func (r *eventRepositoryImpl) Create(event *models.Event) error {
 
 func (r *eventRepositoryImpl) FindAll() ([]models.Event, error) {
 	var events []models.Event
-	err := r.db.Order("date asc, time asc").Find(&events).Error
+	err := r.db.Order("start_time asc, end_time asc").Find(&events).Error
 	return events, err
 }
 
 func (r *eventRepositoryImpl) FindUpcoming() ([]models.Event, error) {
 	var events []models.Event
 	now := time.Now()
-	err := r.db.Where("date >= ?", now.Format("2006-01-02")).Order("date asc, time asc").Find(&events).Error
+	err := r.db.
+		Where("start_time >= ?", now).
+		Order("start_time asc, end_time asc").
+		Find(&events).Error
 	return events, err
 }
 

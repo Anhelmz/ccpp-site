@@ -5,7 +5,7 @@ export async function login(email, password) {
 }
 
 export async function fetchCurrentUser() {
-  return api.get('/auth/me')
+  return api.get('/auth/profile')
 }
 
 export function clearAuth() {

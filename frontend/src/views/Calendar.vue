@@ -125,7 +125,7 @@
                 </button>
                 <button 
                   @click="resetToCurrentMonth"
-                  class="px-6 py-2 bg-main text-white font-semibold rounded-full hover:bg-main/90 transition-colors shadow-md shadow-main/30"
+                  class="px-6 py-2 bg-main text-black font-semibold rounded-full hover:bg-main/90 transition-colors shadow-md shadow-main/30"
                 >
                   {{ calendarCopy.today }}
                 </button>
@@ -184,7 +184,7 @@
                 <div v-if="day.events && day.events.length > 0" class="space-y-1">
                   <div 
                     v-for="event in day.events.slice(0, 2)" 
-                    :key="event.id"
+                    :key="event.occurrenceId || event.id"
                     class="text-xs bg-brand-orange/15 text-brand-orange rounded-full px-2 py-1 truncate font-medium"
                   >
                     {{ event.title }}
@@ -205,18 +205,18 @@
             <div class="space-y-4">
               <div 
                 v-for="event in selectedDateEvents" 
-                :key="event.id"
+                  :key="event.occurrenceId || event.id"
                 class="border-l-4 border-main pl-6 py-4 hover:bg-gray-50 transition-all rounded-r-lg cursor-pointer group bg-white"
                 @click="openModal(event)"
               >
                 <h4 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-main transition-colors">{{ event.title }}</h4>
                 <p class="text-gray-600 mb-3">{{ event.summary }}</p>
                 <div class="flex flex-wrap items-center gap-4 text-sm">
-                  <div v-if="event.time" class="flex items-center text-gray-600">
+                  <div v-if="event.timeRange" class="flex items-center text-gray-600">
                     <svg class="w-4 h-4 mr-2 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span class="font-medium">{{ event.time }}</span>
+                    <span class="font-medium">{{ event.timeRange }}</span>
                   </div>
                   <div v-if="event.location" class="flex items-center text-gray-600">
                     <svg class="w-4 h-4 mr-2 text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -252,13 +252,13 @@
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <span class="font-medium">{{ formatFullDate(selectedEvent.date) }}</span>
+                <span class="font-medium">{{ formatFullDate(selectedEvent.startTime) }}</span>
               </div>
-              <div v-if="selectedEvent.time" class="flex items-center gap-2 text-white/90 px-3 py-1 rounded-full bg-white/10 border border-white/10">
+              <div v-if="selectedEvent.timeRange" class="flex items-center gap-2 text-white/90 px-3 py-1 rounded-full bg-white/10 border border-white/10">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span class="font-medium">{{ selectedEvent.time }}</span>
+                <span class="font-medium">{{ selectedEvent.timeRange }}</span>
               </div>
               <div v-if="selectedEvent.location" class="flex items-center gap-2 text-white/90 px-3 py-1 rounded-full bg-white/10 border border-white/10">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -294,6 +294,7 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useLanguageStore } from '@/stores/language'
+import { eventService } from '@/services/eventService'
 
 export default {
   name: 'Calendar',
@@ -499,135 +500,170 @@ export default {
       return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
     }
 
-    const generateEvents = (copy) => {
-      const today = new Date()
-      const currentYearValue = today.getFullYear()
-      const currentMonthValue = today.getMonth()
-      const nextMonth = currentMonthValue === 11 ? 0 : currentMonthValue + 1
-      const nextYear = currentMonthValue === 11 ? currentYearValue + 1 : currentYearValue
-      
-      const generated = []
-      let id = 1
-
-      for (let month = 0; month <= 1; month++) {
-        const year = month === 0 ? currentYearValue : nextYear
-        const monthIndex = month === 0 ? currentMonthValue : nextMonth
-        
-        const daysInMonth = new Date(year, monthIndex + 1, 0).getDate()
-        
-        for (let day = 1; day <= daysInMonth; day++) {
-          const date = new Date(year, monthIndex, day)
-          const dayOfWeek = date.getDay()
-          
-          if (dayOfWeek === 0) {
-            generated.push({
-              id: id++,
-              title: copy.sunday.title,
-              summary: copy.sunday.summary,
-              content: copy.sunday.content,
-              date,
-              time: copy.sunday.time,
-              location: copy.sunday.location
-            })
-            
-            generated.push({
-              id: id++,
-              title: copy.sundaySchool.title,
-              summary: copy.sundaySchool.summary,
-              content: copy.sundaySchool.content,
-              date,
-              time: copy.sundaySchool.time,
-              location: copy.sundaySchool.location
-            })
-          }
-          
-          if (dayOfWeek === 6) {
-            generated.push({
-              id: id++,
-              title: copy.youth.title,
-              summary: copy.youth.summary,
-              content: copy.youth.content,
-              date,
-              time: copy.youth.time,
-              location: copy.youth.location
-            })
-          }
-          
-          if (dayOfWeek === 6 && day <= 7) {
-            generated.push({
-              id: id++,
-              title: copy.prayerNight.title,
-              summary: copy.prayerNight.summary,
-              content: copy.prayerNight.content,
-              date,
-              time: copy.prayerNight.time,
-              location: copy.prayerNight.location
-            })
-          }
-          
-          if (dayOfWeek === 0 && day >= 15 && day <= 21) {
-            generated.push({
-              id: id++,
-              title: copy.baptism.title,
-              summary: copy.baptism.summary,
-              content: copy.baptism.content,
-              date,
-              time: copy.baptism.time,
-              location: copy.baptism.location
-            })
-          }
-        }
-      }
-
-      return generated
+    const formatTimeRange = (start, end) => {
+      if (!start) return ''
+      const opts = { hour: '2-digit', minute: '2-digit' }
+      const startStr = start.toLocaleTimeString([], opts)
+      const endStr = end ? end.toLocaleTimeString([], opts) : ''
+      return endStr && endStr !== startStr ? `${startStr} - ${endStr}` : startStr
     }
 
-    const loadEvents = () => {
-      events.value = generateEvents(content.value.events)
+    const normalizeEvents = (apiEvents) =>
+      apiEvents.map((event) => {
+        const start = new Date(event.startTime || event.date)
+        const end = event.endTime ? new Date(event.endTime) : start
+
+        return {
+          ...event,
+          startTime: start,
+          endTime: end,
+          recurrence: (event.recurrence || 'none').toLowerCase(),
+          recurrenceEndsAt: event.recurrenceEndsAt ? new Date(event.recurrenceEndsAt) : null,
+          timeRange: formatTimeRange(start, end),
+          category: event.category || '',
+          color: event.color || '',
+          content: event.description || event.summary || event.content || ''
+        }
+      })
+
+    const addInterval = (date, recurrence) => {
+      const next = new Date(date)
+      switch (recurrence) {
+        case 'daily':
+          next.setDate(next.getDate() + 1)
+          break
+        case 'weekly':
+          next.setDate(next.getDate() + 7)
+          break
+        case 'monthly':
+          next.setMonth(next.getMonth() + 1)
+          break
+        case 'yearly':
+          next.setFullYear(next.getFullYear() + 1)
+          break
+        default:
+          break
+      }
+      return next
+    }
+
+    const expandEventOccurrences = (event, rangeStart, rangeEnd) => {
+      const occurrences = []
+      const recurrence = event.recurrence || 'none'
+      const recurrenceEnd = event.recurrenceEndsAt ? new Date(event.recurrenceEndsAt) : null
+      const maxIterations = 500
+
+      let currentStart = new Date(event.startTime)
+      let currentEnd = new Date(event.endTime)
+      let iterations = 0
+
+      const pushIfInRange = (start, end) => {
+        if (end < rangeStart || start > rangeEnd) {
+          return
+        }
+
+        occurrences.push({
+          ...event,
+          occurrenceId: `${event.id}-${start.toISOString()}`,
+          startTime: start,
+          endTime: end,
+          timeRange: formatTimeRange(start, end),
+        })
+      }
+
+      while (iterations < maxIterations && currentStart <= rangeEnd) {
+        if (!recurrenceEnd || currentStart <= recurrenceEnd) {
+          pushIfInRange(new Date(currentStart), new Date(currentEnd))
+        }
+
+        if (recurrence === 'none') {
+          break
+        }
+
+        currentStart = addInterval(currentStart, recurrence)
+        currentEnd = addInterval(currentEnd, recurrence)
+        iterations++
+      }
+
+      return occurrences
     }
 
     const fetchEvents = async () => {
       loading.value = true
       
       try {
-        await new Promise(resolve => setTimeout(resolve, 200))
-        loadEvents()
+        const response = await eventService.getEvents(false)
+        const apiEvents = response.events || []
+        events.value = normalizeEvents(apiEvents)
         loading.value = false
       } catch (err) {
         console.error('Error loading events:', err)
-        error.value = content.value.error
+        error.value = err.message || content.value.error
         loading.value = false
       }
     }
 
     watch(selectedLanguage, () => {
-      loadEvents()
       error.value = ''
+      fetchEvents()
+    })
+
+    const calendarRange = computed(() => {
+      const year = currentYear.value
+      const month = currentMonth.value
+
+      const firstDayOfMonth = new Date(year, month, 1)
+      const lastDayOfMonth = new Date(year, month + 1, 0)
+
+      const startDate = new Date(firstDayOfMonth)
+      startDate.setDate(startDate.getDate() - firstDayOfMonth.getDay())
+
+      const endDate = new Date(lastDayOfMonth)
+      endDate.setDate(endDate.getDate() + (6 - lastDayOfMonth.getDay()))
+
+      return { startDate, endDate }
+    })
+
+    const expandedEvents = computed(() => {
+      const { startDate, endDate } = calendarRange.value
+      const list = []
+
+      events.value.forEach((event) => {
+        list.push(...expandEventOccurrences(event, startDate, endDate))
+      })
+
+      return list
+    })
+
+    const eventsByDate = computed(() => {
+      const map = {}
+
+      expandedEvents.value.forEach((event) => {
+        const dateKey = event.startTime.toISOString().split('T')[0]
+        if (!map[dateKey]) {
+          map[dateKey] = []
+        }
+        map[dateKey].push(event)
+      })
+
+      Object.values(map).forEach((list) => {
+        list.sort((a, b) => a.startTime - b.startTime)
+      })
+
+      return map
     })
 
     const calendarDays = computed(() => {
-      const year = currentYear.value
+      const { startDate, endDate } = calendarRange.value
       const month = currentMonth.value
-      
-      const firstDayOfMonth = new Date(year, month, 1)
-      const lastDayOfMonth = new Date(year, month + 1, 0)
-      
-      const startDate = new Date(firstDayOfMonth)
-      startDate.setDate(startDate.getDate() - firstDayOfMonth.getDay())
-      
-      const endDate = new Date(lastDayOfMonth)
-      endDate.setDate(endDate.getDate() + (6 - lastDayOfMonth.getDay()))
-      
+
       const days = []
       const currentDate = new Date(startDate)
-      
+
       while (currentDate <= endDate) {
         const dateKey = currentDate.toISOString().split('T')[0]
-        const dayEvents = events.value.filter(event => {
-          const eventDate = event.date.toISOString().split('T')[0]
-          return eventDate === dateKey
-        })
-        
+        const dayEvents = eventsByDate.value[dateKey] || []
+
         days.push({
           date: dateKey,
           day: currentDate.getDate(),
@@ -636,21 +672,18 @@ export default {
           hasEvents: dayEvents.length > 0,
           events: dayEvents
         })
-        
+
         currentDate.setDate(currentDate.getDate() + 1)
       }
-      
+
       return days
     })
 
     const selectedDateEvents = computed(() => {
       if (!selectedDay.value) return []
-      
+
       const dateKey = selectedDay.value.toISOString().split('T')[0]
-      return events.value.filter(event => {
-        const eventDate = event.date.toISOString().split('T')[0]
-        return eventDate === dateKey
-      })
+      return eventsByDate.value[dateKey] || []
     })
 
     const currentMonthName = computed(() => content.value.months[currentMonth.value])

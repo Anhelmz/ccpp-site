@@ -1,11 +1,15 @@
 package handlers
 
 import (
-	"ccpp-backend/internal/domain/models"
-	"ccpp-backend/internal/domain/services"
+	"errors"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
+
+	"ccpp-backend/internal/domain/models"
+	"ccpp-backend/internal/domain/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,12 +22,75 @@ func NewEventHandler(eventService services.EventService) *EventHandler {
 	return &EventHandler{eventService: eventService}
 }
 
+func normalizeEvent(event *models.Event) error {
+	if event.Title == "" {
+		return errors.New("title is required")
+	}
+
+	if event.StartTime.IsZero() {
+		return errors.New("startTime is required")
+	}
+
+	if event.EndTime.IsZero() {
+		event.EndTime = event.StartTime
+	}
+
+	if event.EndTime.Before(event.StartTime) {
+		return errors.New("endTime must be after startTime")
+	}
+
+	allowedRecurrences := map[string]bool{
+		"none":   true,
+		"daily":  true,
+		"weekly": true,
+		"monthly": true,
+		"yearly": true,
+		"":       true,
+	}
+
+	event.Recurrence = strings.ToLower(strings.TrimSpace(event.Recurrence))
+	if event.Recurrence == "" {
+		event.Recurrence = "none"
+	}
+
+	if !allowedRecurrences[event.Recurrence] {
+		return errors.New("recurrence must be one of: none, daily, weekly, monthly, yearly")
+	}
+
+	if event.RecurrenceEndsAt != nil && event.RecurrenceEndsAt.Before(event.StartTime) {
+		return errors.New("recurrenceEndsAt must be after startTime")
+	}
+
+	if event.Timezone == "" {
+		if tz := os.Getenv("DEFAULT_TIMEZONE"); tz != "" {
+			event.Timezone = tz
+		} else {
+			event.Timezone = "UTC"
+		}
+	}
+
+	// Normalize times to UTC for storage while preserving provided instants
+	event.StartTime = event.StartTime.UTC()
+	event.EndTime = event.EndTime.UTC()
+	if event.RecurrenceEndsAt != nil {
+		t := event.RecurrenceEndsAt.UTC()
+		event.RecurrenceEndsAt = &t
+	}
+
+	return nil
+}
+
 // CreateEvent handles POST /api/events
 func (h *EventHandler) CreateEvent(c *gin.Context) {
 	var event models.Event
 
 	if err := c.ShouldBindJSON(&event); err != nil {
 		log.Printf("Error binding JSON: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := normalizeEvent(&event); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -97,6 +164,11 @@ func (h *EventHandler) UpdateEvent(c *gin.Context) {
 	}
 
 	event.ID = uint(id)
+
+	if err := normalizeEvent(&event); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	if err := h.eventService.UpdateEvent(&event); err != nil {
 		log.Printf("Error updating event: %v", err)

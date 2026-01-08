@@ -20,9 +20,17 @@ type Auth0Claims struct {
 	jwt.RegisteredClaims
 }
 
+// Toggle to bypass auth for testing; set to false to enforce tokens.
+const bypassAuth = false
+
 // Auth0Middleware validates our signed JWT and enforces role/site access.
 func Auth0Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if bypassAuth {
+			c.Next()
+			return
+		}
+
 		tokenString := extractToken(c)
 		if tokenString == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "authorization token required"})
@@ -69,6 +77,11 @@ func Auth0Middleware() gin.HandlerFunc {
 // OptionalAuth allows requests without auth but attaches user if token is valid.
 func OptionalAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if bypassAuth {
+			c.Next()
+			return
+		}
+
 		tokenString := extractToken(c)
 		if tokenString == "" {
 			c.Next()

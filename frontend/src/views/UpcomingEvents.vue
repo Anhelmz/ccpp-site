@@ -57,9 +57,9 @@
             >
               <div class="relative h-44 bg-gradient-to-br from-brand-blue/90 to-brand-blue flex items-center justify-center">
                 <div class="text-center text-white space-y-1">
-                  <p class="text-sm uppercase tracking-[0.35em] text-white/80">{{ formatMonth(event.date) }}</p>
-                  <p class="text-5xl font-bold leading-none">{{ formatDay(event.date) }}</p>
-                  <p class="text-xs uppercase tracking-[0.35em] text-white/70">{{ event.date.getFullYear() }}</p>
+                  <p class="text-sm uppercase tracking-[0.35em] text-white/80">{{ formatMonth(event.startTime) }}</p>
+                  <p class="text-5xl font-bold leading-none">{{ formatDay(event.startTime) }}</p>
+                  <p class="text-xs uppercase tracking-[0.35em] text-white/70">{{ event.startTime.getFullYear() }}</p>
                 </div>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
               </div>
@@ -75,13 +75,13 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a 2 2 0 00-2-2H5a 2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    {{ formatFullDate(event.date) }}
+                    {{ formatFullDate(event.startTime) }}
                   </span>
-                  <span v-if="event.time" class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-brand-orange/10 text-brand-orange font-medium">
+                  <span v-if="event.timeRange" class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-brand-orange/10 text-brand-orange font-medium">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    {{ event.time }}
+                    {{ event.timeRange }}
                   </span>
                   <span v-if="event.location" class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 text-gray-700 font-medium">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,13 +124,13 @@
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <span class="font-medium">{{ formatFullDate(selectedEvent.date) }}</span>
+                <span class="font-medium">{{ formatFullDate(selectedEvent.startTime) }}</span>
               </div>
-              <div v-if="selectedEvent.time" class="flex items-center text-white/90">
+              <div v-if="selectedEvent.timeRange" class="flex items-center text-white/90">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span class="font-medium">{{ selectedEvent.time }}</span>
+                <span class="font-medium">{{ selectedEvent.timeRange }}</span>
               </div>
               <div v-if="selectedEvent.location" class="flex items-center text-white/90">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,6 +189,14 @@ export default {
       return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
     }
 
+    const formatTimeRange = (start, end) => {
+      if (!start) return ''
+      const opts = { hour: '2-digit', minute: '2-digit' }
+      const startStr = start.toLocaleTimeString([], opts)
+      const endStr = end ? end.toLocaleTimeString([], opts) : ''
+      return endStr && endStr !== startStr ? `${startStr} - ${endStr}` : startStr
+    }
+
     const fetchEvents = async () => {
       loading.value = true
       error.value = ''
@@ -198,16 +206,21 @@ export default {
         const apiEvents = response.events || []
         
         // Convert API events to the format expected by the component
-        events.value = apiEvents.map(event => ({
-          id: event.id,
-          title: event.title,
-          summary: event.summary || event.description || '',
-          content: event.description || event.summary || '',
-          description: event.description || '',
-          date: new Date(event.date),
-          time: event.time || '',
-          location: event.location || ''
-        })).sort((a, b) => a.date - b.date)
+        events.value = apiEvents.map(event => {
+          const start = new Date(event.startTime || event.date)
+          const end = event.endTime ? new Date(event.endTime) : start
+          return {
+            id: event.id,
+            title: event.title,
+            summary: event.summary || event.description || '',
+            content: event.description || event.summary || '',
+            description: event.description || '',
+            startTime: start,
+            endTime: end,
+            timeRange: formatTimeRange(start, end),
+            location: event.location || ''
+          }
+        }).sort((a, b) => a.startTime - b.startTime)
         
         loading.value = false
       } catch (err) {

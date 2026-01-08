@@ -77,9 +77,9 @@
           <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
@@ -94,13 +94,13 @@
                 <div v-if="event.summary" class="text-sm text-gray-500 truncate max-w-xs">{{ event.summary }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900">{{ formatDate(event.date) }}</div>
+                <div class="text-sm text-gray-900">{{ formatDateTime(event.startTime) }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900">{{ event.time || 'N/A' }}</div>
+                <div class="text-sm text-gray-900">{{ formatDateTime(event.endTime) }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900">{{ event.location || 'N/A' }}</div>
+                <div class="text-sm text-gray-900">{{ event.category || '—' }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button 
@@ -177,39 +177,92 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
-                Date *
+                Start date & time *
               </label>
               <input
-                v-model="eventForm.date"
-                type="date"
+                v-model="eventForm.start"
+                type="datetime-local"
                 required
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
               />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
-                Time
+                End date & time *
               </label>
               <input
-                v-model="eventForm.time"
-                type="time"
+                v-model="eventForm.end"
+                type="datetime-local"
+                required
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
               />
             </div>
           </div>
-          
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Location
+              </label>
+              <input
+                v-model="eventForm.location"
+                type="text"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
+                placeholder="Main hall"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Category
+              </label>
+              <input
+                v-model="eventForm.category"
+                type="text"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
+                placeholder="Worship, Youth, Outreach..."
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Color (badge)
+              </label>
+              <input
+                v-model="eventForm.color"
+                type="color"
+                class="w-full h-11 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Recurrence
+              </label>
+              <select
+                v-model="eventForm.recurrence"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
+              >
+                <option value="none">Does not repeat</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+          </div>
+
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Location
+              Recurrence ends (optional)
             </label>
             <input
-              v-model="eventForm.location"
-              type="text"
+              v-model="eventForm.recurrenceEndsAt"
+              type="datetime-local"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
-              placeholder="Church Main Hall"
             />
           </div>
-          
+
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
               Description
@@ -274,17 +327,32 @@ export default {
       title: '',
       summary: '',
       description: '',
-      date: '',
-      time: '',
-      location: ''
+      start: '',
+      end: '',
+      location: '',
+      category: '',
+      color: '#f97316',
+      recurrence: 'none',
+      recurrenceEndsAt: ''
     })
 
-    const formatDate = (dateString) => {
+    const toDateTimeLocal = (value) => {
+      if (!value) return ''
+      const date = new Date(value)
+      const offset = date.getTimezoneOffset()
+      const local = new Date(date.getTime() - offset * 60000)
+      return local.toISOString().slice(0, 16)
+    }
+
+    const formatDateTime = (dateString) => {
+      if (!dateString) return '—'
       const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', {
+      return date.toLocaleString('en-US', {
         year: 'numeric',
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
       })
     }
 
@@ -294,7 +362,15 @@ export default {
       try {
         const upcoming = filterType.value === 'upcoming'
         const response = await eventService.getEvents(upcoming)
-        events.value = response.events || []
+        const apiEvents = response.events || []
+
+        events.value = apiEvents.map((event) => ({
+          ...event,
+          startTime: event.startTime || event.start || event.date,
+          endTime: event.endTime || event.end || event.startTime || event.date,
+          recurrence: event.recurrence || 'none',
+          color: event.color || '#f97316',
+        }))
       } catch (err) {
         console.error('Error loading events:', err)
         error.value = err.message || 'Failed to load events'
@@ -324,10 +400,10 @@ export default {
       // Apply past filter
       if (filterType.value === 'past') {
         const now = new Date()
-        filtered = filtered.filter(event => new Date(event.date) < now)
+        filtered = filtered.filter(event => new Date(event.startTime) < now)
       }
 
-      return filtered.sort((a, b) => new Date(a.date) - new Date(b.date))
+      return filtered.sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
     })
 
     const openCreateModal = () => {
@@ -336,9 +412,13 @@ export default {
         title: '',
         summary: '',
         description: '',
-        date: '',
-        time: '',
-        location: ''
+        start: '',
+        end: '',
+        location: '',
+        category: '',
+        color: '#f97316',
+        recurrence: 'none',
+        recurrenceEndsAt: ''
       }
       formError.value = ''
       showModal.value = true
@@ -346,14 +426,17 @@ export default {
 
     const openEditModal = (event) => {
       editingEvent.value = event
-      const eventDate = new Date(event.date)
       eventForm.value = {
         title: event.title,
         summary: event.summary || '',
         description: event.description || '',
-        date: eventDate.toISOString().split('T')[0],
-        time: event.time || '',
-        location: event.location || ''
+        start: toDateTimeLocal(event.startTime || event.start || event.date),
+        end: toDateTimeLocal(event.endTime || event.end || event.startTime || event.date),
+        location: event.location || '',
+        category: event.category || '',
+        color: event.color || '#f97316',
+        recurrence: event.recurrence || 'none',
+        recurrenceEndsAt: event.recurrenceEndsAt ? toDateTimeLocal(event.recurrenceEndsAt) : ''
       }
       formError.value = ''
       showModal.value = true
@@ -369,10 +452,42 @@ export default {
       saving.value = true
       formError.value = ''
 
+      const parseDateTime = (value) => (value ? new Date(value) : null)
+
       try {
+        const start = parseDateTime(eventForm.value.start)
+        const end = parseDateTime(eventForm.value.end) || start
+        const recurrenceEndsAt = parseDateTime(eventForm.value.recurrenceEndsAt)
+
+        if (!start || !end) {
+          formError.value = 'Start and end date/time are required.'
+          saving.value = false
+          return
+        }
+
+        if (end < start) {
+          formError.value = 'End time must be after the start time.'
+          saving.value = false
+          return
+        }
+
+        if (recurrenceEndsAt && recurrenceEndsAt < start) {
+          formError.value = 'Recurrence end must be after the start time.'
+          saving.value = false
+          return
+        }
+
         const eventData = {
-          ...eventForm.value,
-          date: new Date(eventForm.value.date).toISOString()
+          title: eventForm.value.title,
+          summary: eventForm.value.summary || '',
+          description: eventForm.value.description || '',
+          startTime: start.toISOString(),
+          endTime: end.toISOString(),
+          location: eventForm.value.location || '',
+          category: eventForm.value.category || '',
+          color: eventForm.value.color || '',
+          recurrence: eventForm.value.recurrence || 'none',
+          recurrenceEndsAt: recurrenceEndsAt ? recurrenceEndsAt.toISOString() : null,
         }
 
         if (editingEvent.value) {
@@ -421,7 +536,7 @@ export default {
       searchQuery,
       eventForm,
       filteredEvents,
-      formatDate,
+      formatDateTime,
       loadEvents,
       filterEvents,
       openCreateModal,

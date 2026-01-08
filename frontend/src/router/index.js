@@ -123,6 +123,10 @@ const routes = [
     component: AdminLogin
   },
   {
+    path: '/admin',
+    redirect: '/admin/dashboard'
+  },
+  {
     path: '/admin/dashboard',
     name: 'AdminDashboard',
     component: AdminDashboard,
@@ -165,7 +169,14 @@ const router = createRouter({
   routes
 })
 
+// Temporary bypass to allow admin views without login while testing.
+const BYPASS_ADMIN_GUARD = false
+
 router.beforeEach((to, from, next) => {
+  if (BYPASS_ADMIN_GUARD) {
+    return next()
+  }
+
   const requiresAdmin = to.matched.some(record => record.meta?.requiresAdmin)
   const token = localStorage.getItem('authToken') || localStorage.getItem('auth_token')
   const userRaw = localStorage.getItem('authUser')
