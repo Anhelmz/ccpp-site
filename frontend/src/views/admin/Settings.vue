@@ -4,8 +4,10 @@
       <div class="space-y-6">
         <!-- Account Settings -->
         <div class="bg-white rounded-lg shadow p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-6">Account Settings</h2>
-          
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">
+            Account Settings
+          </h2>
+
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -17,7 +19,7 @@
                 placeholder="admin@example.com"
               />
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Change Password
@@ -28,7 +30,7 @@
                 placeholder="Enter new password"
               />
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Confirm Password
@@ -39,8 +41,10 @@
                 placeholder="Confirm new password"
               />
             </div>
-            
-            <button class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+
+            <button
+              class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
               Update Account
             </button>
           </div>
@@ -48,8 +52,10 @@
 
         <!-- Site Settings -->
         <div class="bg-white rounded-lg shadow p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-6">Site Settings</h2>
-          
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">
+            Site Settings
+          </h2>
+
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -61,7 +67,7 @@
                 value="Calvary Chapel Phnom Penh"
               />
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Contact Email
@@ -72,8 +78,10 @@
                 placeholder="contact@example.com"
               />
             </div>
-            
-            <button class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+
+            <button
+              class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
               Save Settings
             </button>
           </div>
@@ -82,24 +90,38 @@
         <!-- Danger Zone -->
         <div class="bg-white rounded-lg shadow p-6 border-2 border-red-200">
           <h2 class="text-xl font-semibold text-red-900 mb-6">Danger Zone</h2>
-          
+
           <div class="space-y-4">
-            <div class="flex items-center justify-between p-4 bg-red-50 rounded-lg">
+            <div
+              class="flex items-center justify-between p-4 bg-red-50 rounded-lg"
+            >
               <div>
-                <h3 class="font-medium text-red-900">Clear All Gallery Images</h3>
-                <p class="text-sm text-red-700">This will permanently delete all gallery images</p>
+                <h3 class="font-medium text-red-900">
+                  Clear All Gallery Images
+                </h3>
+                <p class="text-sm text-red-700">
+                  This will permanently delete all gallery images
+                </p>
               </div>
-              <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+              <button
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
                 Clear Gallery
               </button>
             </div>
-            
-            <div class="flex items-center justify-between p-4 bg-red-50 rounded-lg">
+
+            <div
+              class="flex items-center justify-between p-4 bg-red-50 rounded-lg"
+            >
               <div>
                 <h3 class="font-medium text-red-900">Reset All Settings</h3>
-                <p class="text-sm text-red-700">Reset all settings to default values</p>
+                <p class="text-sm text-red-700">
+                  Reset all settings to default values
+                </p>
               </div>
-              <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+              <button
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
                 Reset Settings
               </button>
             </div>
@@ -107,17 +129,16 @@
         </div>
       </div>
     </div>
-    </AdminLayout>
-  </template>
+  </AdminLayout>
+</template>
 
 <script>
-import AdminLayout from '@/components/admin/AdminLayout.vue'
+import AdminLayout from "@/components/admin/AdminLayout.vue";
 
 export default {
-  name: 'Settings',
+  name: "Settings",
   components: {
-    AdminLayout
-  }
-}
+    AdminLayout,
+  },
+};
 </script>
-

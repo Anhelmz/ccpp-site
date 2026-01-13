@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 relative">
+  <div
+    class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 relative"
+  >
     <!-- Watermark -->
     <div class="absolute bottom-6 left-6 flex items-center">
       <div class="w-4 h-4 flex flex-col items-center justify-center mr-2">
@@ -9,7 +11,9 @@
         </div>
         <div class="w-1 h-1 bg-cyan-400 rounded-full"></div>
       </div>
-      <span class="text-xs font-light text-zinc-500 tracking-wider">ANHELM</span>
+      <span class="text-xs font-light text-zinc-500 tracking-wider"
+        >ANHELM</span
+      >
     </div>
 
     <div class="max-w-md w-full space-y-6">
@@ -23,7 +27,9 @@
               </div>
               <div class="w-1.5 h-1.5 bg-cyan-400 rounded-full"></div>
             </div>
-            <h1 class="text-2xl font-light text-zinc-700 tracking-wider">ANHELM</h1>
+            <h1 class="text-2xl font-light text-zinc-700 tracking-wider">
+              ANHELM
+            </h1>
           </div>
         </div>
         <div class="mb-2">
@@ -32,12 +38,26 @@
         </div>
       </div>
 
-      <form @submit.prevent="handleLogin" class="bg-white py-8 px-6 shadow-lg rounded-2xl border border-gray-100 space-y-6">
-        <div v-if="error" class="bg-red-50 border border-red-200 rounded-md p-4">
+      <form
+        class="bg-white py-8 px-6 shadow-lg rounded-2xl border border-gray-100 space-y-6"
+        @submit.prevent="handleLogin"
+      >
+        <div
+          v-if="error"
+          class="bg-red-50 border border-red-200 rounded-md p-4"
+        >
           <div class="flex">
             <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              <svg
+                class="h-5 w-5 text-red-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </div>
             <div class="ml-3">
@@ -47,14 +67,34 @@
         </div>
 
         <div>
-          <label for="email" class="block text-sm font-medium text-zinc-700 mb-2">
+          <label
+            for="email"
+            class="block text-sm font-medium text-zinc-700 mb-2"
+          >
             Email address
           </label>
           <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14v7m0 0h-3m3 0h3" />
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <svg
+                class="h-5 w-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 12a4 4 0 10-8 0 4 4 0 008 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 14v7m0 0h-3m3 0h3"
+                />
               </svg>
             </div>
             <input
@@ -70,14 +110,34 @@
         </div>
 
         <div>
-          <label for="password" class="block text-sm font-medium text-zinc-700 mb-2">
+          <label
+            for="password"
+            class="block text-sm font-medium text-zinc-700 mb-2"
+          >
             Password
           </label>
           <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9 9 0 1118.88 17.8L12 21l-6.879-3.196z" />
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <svg
+                class="h-5 w-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5.121 17.804A9 9 0 1118.88 17.8L12 21l-6.879-3.196z"
+                />
               </svg>
             </div>
             <input
@@ -97,19 +157,52 @@
           :disabled="loading"
           class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-1 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out"
         >
-          <span v-if="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
-            <svg class="animate-spin h-5 w-5 text-cyan-500" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+          <span
+            v-if="loading"
+            class="absolute left-0 inset-y-0 flex items-center pl-3"
+          >
+            <svg
+              class="animate-spin h-5 w-5 text-cyan-500"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8z"
+              ></path>
             </svg>
           </span>
           <span v-else class="absolute left-0 inset-y-0 flex items-center pl-3">
-            <svg class="h-5 w-5 text-cyan-500 group-hover:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9 9 0 1118.88 17.8L12 21l-6.879-3.196z" />
+            <svg
+              class="h-5 w-5 text-cyan-500 group-hover:text-cyan-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5.121 17.804A9 9 0 1118.88 17.8L12 21l-6.879-3.196z"
+              />
             </svg>
           </span>
-          {{ loading ? 'Signing in...' : 'Sign in' }}
+          {{ loading ? "Signing in..." : "Sign in" }}
         </button>
       </form>
 
@@ -123,47 +216,45 @@
 </template>
 
 <script>
-import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { login } from '@/services/auth'
+import { ref } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { login } from "@/services/auth";
 
 export default {
-  name: 'AdminLogin',
+  name: "AdminLogin",
   setup() {
-    const router = useRouter()
-    const route = useRoute()
-    const email = ref('')
-    const password = ref('')
-    const loading = ref(false)
-    const error = ref('')
+    const router = useRouter();
+    const route = useRoute();
+    const email = ref("");
+    const password = ref("");
+    const loading = ref(false);
+    const error = ref("");
 
     const handleLogin = async () => {
-      error.value = ''
-      loading.value = true
+      error.value = "";
+      loading.value = true;
       try {
-        const { token, user } = await login(email.value, password.value)
-        localStorage.setItem('authToken', token)
-        localStorage.setItem('auth_token', token)
-        localStorage.setItem('authUser', JSON.stringify(user))
+        const { token, user } = await login(email.value, password.value);
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("auth_token", token);
+        localStorage.setItem("authUser", JSON.stringify(user));
 
-        const redirectTo = route.query.redirect || '/admin/dashboard'
-        router.push(redirectTo)
+        const redirectTo = route.query.redirect || "/admin/dashboard";
+        router.push(redirectTo);
       } catch (err) {
-        error.value = err.message || 'Unable to sign in'
+        error.value = err.message || "Unable to sign in";
       } finally {
-        loading.value = false
+        loading.value = false;
       }
-    }
+    };
 
     return {
       email,
       password,
       loading,
       error,
-      handleLogin
-    }
-  }
-}
+      handleLogin,
+    };
+  },
+};
 </script>
-
-

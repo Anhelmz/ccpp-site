@@ -1,16 +1,15 @@
-import api from './api'
+import api from "./api";
 
 export async function login(email, password) {
-  return api.post('/auth/login', { email, password })
+  return api.post("/auth/login", { email, password });
 }
 
 export async function fetchCurrentUser() {
-  return api.get('/auth/profile')
+  return api.get("/auth/profile");
 }
 
 export function clearAuth() {
-  localStorage.removeItem('authToken')
-  localStorage.removeItem('auth_token')
-  localStorage.removeItem('authUser')
+  localStorage.removeItem("authToken");
+  localStorage.removeItem("auth_token");
+  localStorage.removeItem("authUser");
 }
-

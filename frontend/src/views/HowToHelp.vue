@@ -17,33 +17,59 @@
         <div class="prose prose-lg max-w-none">
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">Prayer</h2>
           <p class="text-lg text-gray-700 mb-6">
-            Prayer is the foundation of everything we do. We believe in the power of prayer to transform lives, heal communities, and bring people closer to God. You can help through prayer by joining our weekly prayer meetings, signing up for our prayer chain, committing to pray for our missionaries and outreach programs, and participating in our monthly prayer and fasting days.
+            Prayer is the foundation of everything we do. We believe in the
+            power of prayer to transform lives, heal communities, and bring
+            people closer to God. You can help through prayer by joining our
+            weekly prayer meetings, signing up for our prayer chain, committing
+            to pray for our missionaries and outreach programs, and
+            participating in our monthly prayer and fasting days.
           </p>
 
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">Donation</h2>
           <p class="text-lg text-gray-700 mb-6">
-            Your generous donations help us continue our mission of spreading the Gospel, serving our community, and supporting those in need. Every contribution, no matter the size, makes a significant difference. We have several funds including General Fund, Mission Fund, Building Fund, and Benevolence Fund.
+            Your generous donations help us continue our mission of spreading
+            the Gospel, serving our community, and supporting those in need.
+            Every contribution, no matter the size, makes a significant
+            difference. We have several funds including General Fund, Mission
+            Fund, Building Fund, and Benevolence Fund.
           </p>
 
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">Service</h2>
           <p class="text-lg text-gray-700 mb-6">
-            God has given each of us unique gifts and talents to serve His church and community. We invite you to use your abilities to make a difference. Ministry opportunities include Worship Team, Children's Ministry, Youth Ministry, Hospitality Team, Outreach & Evangelism, Facilities & Maintenance, Communications & Media, and Administrative Support.
+            God has given each of us unique gifts and talents to serve His
+            church and community. We invite you to use your abilities to make a
+            difference. Ministry opportunities include Worship Team, Children's
+            Ministry, Youth Ministry, Hospitality Team, Outreach & Evangelism,
+            Facilities & Maintenance, Communications & Media, and Administrative
+            Support.
           </p>
 
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">Needs List</h2>
-          <p class="text-lg text-gray-700 mb-4">We are grateful for the support of our community. Current ministry needs include:</p>
+          <p class="text-lg text-gray-700 mb-4">
+            We are grateful for the support of our community. Current ministry
+            needs include:
+          </p>
           <ul class="space-y-3 text-gray-700 mb-8">
             <li class="flex items-start">
               <span class="text-main mr-2">•</span>
-              <span>Audio/Visual equipment, musical instruments, chairs and tables, Bibles and study materials, office supplies</span>
+              <span
+                >Audio/Visual equipment, musical instruments, chairs and tables,
+                Bibles and study materials, office supplies</span
+              >
             </li>
             <li class="flex items-start">
               <span class="text-main mr-2">•</span>
-              <span>Food and hygiene items, children's ministry supplies, school supplies, transportation support, volunteers</span>
+              <span
+                >Food and hygiene items, children's ministry supplies, school
+                supplies, transportation support, volunteers</span
+              >
             </li>
             <li class="flex items-start">
               <span class="text-main mr-2">•</span>
-              <span>Monthly financial support for missionaries, care packages, technology for communication, translation services</span>
+              <span
+                >Monthly financial support for missionaries, care packages,
+                technology for communication, translation services</span
+              >
             </li>
           </ul>
         </div>
@@ -64,12 +90,11 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
 export default {
-  name: 'HowToHelp',
+  name: "HowToHelp",
 };
 </script>
