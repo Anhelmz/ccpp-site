@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-screen bg-gray-50" :class="isDarkMode ? 'bg-slate-900 text-slate-100' : ''">
+  <div :class="['admin-root flex flex-col h-screen', isDarkMode ? 'bg-slate-900 text-slate-100 admin-dark' : 'bg-gray-50']">
     <!-- Top Bar -->
     <nav class="bg-gray-50 border-b border-gray-200 shadow-sm" :class="isDarkMode ? 'bg-slate-900 border-slate-800' : ''">
       <div class="px-4 sm:px-6 flex items-center justify-between h-12">
@@ -88,7 +88,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16l4-4m-8 4h.01" />
                 </svg>
               </span>
-              Collections
+              Galleries
             </router-link>
 
             <router-link
@@ -102,6 +102,19 @@
                 </svg>
               </span>
               Events
+            </router-link>
+
+            <router-link
+              to="/admin/videos"
+              @click="closeSidebarOnMobile"
+              :class="linkClass('VideoManagement')"
+            >
+              <span class="mr-3 inline-flex items-center justify-center">
+                <svg class="h-5 w-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276a1 1 0 010 1.788L15 12.222M9 10L4.447 7.724a1 1 0 000 1.788L9 12.222m6 0l4.553 2.276a1 1 0 010 1.788L15 18m-6-5.778l-4.553 2.276a1 1 0 000 1.788L9 18m0-8l6 3m-6 0l6 3" />
+                </svg>
+              </span>
+              Videos
             </router-link>
 
             <router-link
@@ -182,7 +195,7 @@
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden">
-        <main class="flex-1 bg-white overflow-y-auto" :class="isDarkMode ? 'bg-slate-900 text-slate-100' : ''">
+        <main :class="['flex-1 overflow-y-auto', isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-white']">
           <div class="py-4 sm:py-6">
             <div class="px-4 sm:px-6">
               <slot />
@@ -215,7 +228,18 @@ export default {
     const route = useRoute()
     const sidebarOpen = ref(false)
     const localUser = ref(null)
-    const isDarkMode = ref(props.isDark)
+    const loadStoredTheme = () => {
+      try {
+        const stored = typeof window !== 'undefined' ? localStorage.getItem('adminDarkMode') : null
+        if (stored === 'true') return true
+        if (stored === 'false') return false
+      } catch {
+        /* ignore storage errors */
+      }
+      return null
+    }
+
+    const isDarkMode = ref(loadStoredTheme() ?? props.isDark)
 
     const currentUser = computed(() => props.user || localUser.value)
     const userEmail = computed(() => currentUser.value?.email || 'admin@ccpp.org')
@@ -223,9 +247,17 @@ export default {
 
     const linkClass = (name, extraNames = []) => {
       const active = route.name === name || extraNames.includes(route.name)
+      const base = 'group flex items-center px-4 sm:px-6 py-3 text-sm font-medium border-l-4 transition-all duration-200 ease-in-out'
+
+      if (isDarkMode.value) {
+        return active
+          ? `${base} bg-slate-800 text-slate-100 border-cyan-400`
+          : `${base} text-slate-300 border-transparent hover:bg-slate-800 hover:text-white hover:border-cyan-400`
+      }
+
       return active
-        ? 'bg-white text-zinc-700 group flex items-center px-4 sm:px-6 py-3 text-sm font-medium border-l-4 border-cyan-500 transition-all duration-200 ease-in-out'
-        : 'text-zinc-600 hover:bg-white hover:text-zinc-700 hover:border-l-4 hover:border-cyan-500 group flex items-center px-4 sm:px-6 py-3 text-sm font-medium border-l-4 border-transparent transition-all duration-200 ease-in-out'
+        ? `${base} bg-white text-zinc-700 border-cyan-500`
+        : `${base} text-zinc-600 border-transparent hover:bg-white hover:text-zinc-700 hover:border-cyan-500`
     }
 
     const toggleSidebar = () => {
@@ -252,6 +284,11 @@ export default {
 
     const toggleTheme = () => {
       isDarkMode.value = !isDarkMode.value
+      try {
+        localStorage.setItem('adminDarkMode', isDarkMode.value ? 'true' : 'false')
+      } catch {
+        /* ignore storage errors */
+      }
       emit('toggle-theme', isDarkMode.value)
     }
 

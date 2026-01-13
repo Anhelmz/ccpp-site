@@ -293,7 +293,7 @@
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <div
-            v-for="teaching in teachingsList"
+            v-for="teaching in displayedTeachings"
             :key="teaching.id"
             class="bg-white/10 border border-white/15 rounded-2xl backdrop-blur-xl shadow-2xl hover:bg-white/15 transition-all duration-300 overflow-hidden flex flex-col"
           >
@@ -330,19 +330,54 @@
             </div>
           </div>
         </div>
+
+        <div
+          v-if="storedVideos.length > videosPerPage"
+          class="mt-8 flex items-center justify-center gap-3"
+        >
+          <button
+            type="button"
+            class="px-4 py-2 rounded-full border border-white/30 text-white/80 hover:text-white hover:border-white/60 disabled:opacity-40 disabled:cursor-not-allowed"
+            :disabled="currentVideoPage === 1"
+            @click="prevVideoPage"
+          >
+            Prev
+          </button>
+          <div class="flex items-center gap-2">
+            <button
+              v-for="page in totalVideoPages"
+              :key="page"
+              type="button"
+              class="w-9 h-9 rounded-full border border-white/20 text-sm font-semibold"
+              :class="page === currentVideoPage ? 'bg-white text-brand-blue border-white' : 'text-white/70 hover:text-white hover:border-white/50'"
+              @click="goToVideoPage(page)"
+            >
+              {{ page }}
+            </button>
+          </div>
+          <button
+            type="button"
+            class="px-4 py-2 rounded-full border border-white/30 text-white/80 hover:text-white hover:border-white/60 disabled:opacity-40 disabled:cursor-not-allowed"
+            :disabled="currentVideoPage === totalVideoPages"
+            @click="nextVideoPage"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useLanguageStore } from '@/stores/language'
 import heroImageCommunity from '@/assets/background/about-bg.jpg'
 import heroImageTeaching from '@/assets/background/hero-bg.jpg'
 import heroImageServe from '@/assets/background/bg-hero2.jpg'
 import heroImageYouth from '@/assets/background/bg-hero3.jpg'
+import { videoStore } from '@/services/videoStore'
 
 export default {
   name: 'Home',
@@ -498,7 +533,7 @@ export default {
         heroSlides: [
           {
             id: 'community',
-            eyebrow: 'ព្រះវិហារកាល់វ៉ារីឆាបផលភ្នំពេញ',
+            eyebrow: 'Calvary Chapel Phnom Penh',
             title: 'សហគមន៍ថ្វាយបង្គំដែលជិតស្និទ្ធនឹងព្រះវចនៈ និងស្ថិតសម្រាប់ទីក្រុងភ្នំពេញ។',
             description:
               'យើងជួបជុំគ្នាដើម្បីបង្រៀនតាមជួរព្រះគម្ពីរ បង្កើតទំនាក់ទំនងពិតប្រាកដ និងបម្រើទីក្រុងដោយសេចក្តីសង្ឃឹមនៅក្នុងព្រះយេស៊ូវ។',
@@ -650,7 +685,27 @@ export default {
     const upcoming = computed(() => content.value.upcoming)
     const upcomingItems = computed(() => upcoming.value.items)
     const teachings = computed(() => content.value.teachings)
-    const teachingsList = computed(() => teachings.value.list)
+
+    const storedVideos = ref([])
+    const videosPerPage = 3
+    const currentVideoPage = ref(1)
+
+    const totalVideoPages = computed(() =>
+      storedVideos.value.length ? Math.ceil(storedVideos.value.length / videosPerPage) : 1
+    )
+
+    const displayedTeachings = computed(() => {
+      if (storedVideos.value.length) {
+        const start = (currentVideoPage.value - 1) * videosPerPage
+        return storedVideos.value.slice(start, start + videosPerPage).map((video) => ({
+          id: video.youtubeId,
+          title: video.title,
+          description: video.description,
+          url: video.youtubeUrl || `https://www.youtube.com/watch?v=${video.youtubeId}`
+        }))
+      }
+      return teachings.value.list
+    })
 
     const nextSlide = () => {
       currentSlideIndex.value = (currentSlideIndex.value + 1) % heroSlides.value.length
@@ -668,6 +723,38 @@ export default {
       currentSlideIndex.value = 0
     })
 
+    onMounted(() => {
+      storedVideos.value = videoStore.getAll()
+      if (currentVideoPage.value > totalVideoPages.value) {
+        currentVideoPage.value = 1
+      }
+    })
+
+    watch(
+      () => storedVideos.value.length,
+      () => {
+        if (currentVideoPage.value > totalVideoPages.value) {
+          currentVideoPage.value = 1
+        }
+      }
+    )
+
+    const nextVideoPage = () => {
+      if (currentVideoPage.value < totalVideoPages.value) {
+        currentVideoPage.value += 1
+      }
+    }
+
+    const prevVideoPage = () => {
+      if (currentVideoPage.value > 1) {
+        currentVideoPage.value -= 1
+      }
+    }
+
+    const goToVideoPage = (page) => {
+      currentVideoPage.value = page
+    }
+
     return {
       heroSlides,
       activeSlide,
@@ -681,7 +768,14 @@ export default {
       upcoming,
       upcomingItems,
       teachings,
-      teachingsList
+      storedVideos,
+      displayedTeachings,
+      videosPerPage,
+      currentVideoPage,
+      totalVideoPages,
+      nextVideoPage,
+      prevVideoPage,
+      goToVideoPage
     }
   }
 }

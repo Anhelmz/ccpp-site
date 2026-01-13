@@ -87,3 +87,133 @@
     background-image: radial-gradient(circle, var(--tw-gradient-stops));
   }
 }
+
+@layer components {
+  /* Admin layout theme tokens */
+  .admin-root {
+    --admin-bg: #f8fafc;
+    --admin-surface: #ffffff;
+    --admin-surface-alt: #f1f5f9;
+    --admin-border: #e2e8f0;
+    --admin-ink: #0f172a;
+    --admin-ink-soft: #475569;
+    --admin-ink-muted: #64748b;
+  }
+
+  .admin-root.admin-dark {
+    --admin-bg: #0b1220;
+    --admin-surface: #0f172a;
+    --admin-surface-alt: #0b162a;
+    --admin-border: #1f2937;
+    --admin-ink: #e2e8f0;
+    --admin-ink-soft: #cbd5e1;
+    --admin-ink-muted: #94a3b8;
+    background-color: var(--admin-bg);
+    color: var(--admin-ink);
+  }
+
+  /* Surface + border overrides */
+  .admin-root.admin-dark .bg-white,
+  .admin-root.admin-dark .bg-white\/95,
+  .admin-root.admin-dark .bg-gray-50,
+  .admin-root.admin-dark .bg-gray-100 {
+    background-color: var(--admin-surface) !important;
+  }
+
+  .admin-root.admin-dark .bg-gray-200 {
+    background-color: #1f2937 !important;
+  }
+
+  .admin-root.admin-dark .border-gray-100,
+  .admin-root.admin-dark .border-gray-200,
+  .admin-root.admin-dark .border-gray-300,
+  .admin-root.admin-dark .divide-gray-200 {
+    border-color: var(--admin-border) !important;
+  }
+
+  /* Text colors */
+  .admin-root.admin-dark .text-gray-900,
+  .admin-root.admin-dark .text-gray-800,
+  .admin-root.admin-dark .text-gray-700,
+  .admin-root.admin-dark .text-zinc-800,
+  .admin-root.admin-dark .text-zinc-700 {
+    color: var(--admin-ink) !important;
+  }
+
+  .admin-root.admin-dark .text-gray-600,
+  .admin-root.admin-dark .text-zinc-600 {
+    color: var(--admin-ink-soft) !important;
+  }
+
+  .admin-root.admin-dark .text-gray-500,
+  .admin-root.admin-dark .text-gray-400,
+  .admin-root.admin-dark .text-zinc-500 {
+    color: var(--admin-ink-muted) !important;
+  }
+
+  /* Form fields */
+  .admin-root.admin-dark input,
+  .admin-root.admin-dark select,
+  .admin-root.admin-dark textarea {
+    background-color: #0b162a;
+    color: var(--admin-ink);
+    border-color: var(--admin-border);
+  }
+
+  .admin-root.admin-dark input::placeholder,
+  .admin-root.admin-dark textarea::placeholder {
+    color: var(--admin-ink-muted);
+  }
+
+  .admin-root.admin-dark select option {
+    background-color: #0b162a;
+    color: var(--admin-ink);
+  }
+
+  /* Tables */
+  .admin-root.admin-dark table {
+    color: var(--admin-ink);
+  }
+
+  .admin-root.admin-dark thead {
+    background-color: var(--admin-surface-alt) !important;
+  }
+
+  .admin-root.admin-dark tbody {
+    background-color: var(--admin-surface) !important;
+  }
+
+  .admin-root.admin-dark tbody tr:hover {
+    background-color: #111827 !important;
+  }
+
+  /* Status backgrounds */
+  .admin-root.admin-dark .bg-red-50 {
+    background-color: rgba(248, 113, 113, 0.12) !important;
+  }
+
+  .admin-root.admin-dark .bg-green-50 {
+    background-color: rgba(34, 197, 94, 0.12) !important;
+  }
+
+  .admin-root.admin-dark .bg-blue-50 {
+    background-color: rgba(59, 130, 246, 0.12) !important;
+  }
+
+  /* Hover helpers */
+  .admin-root.admin-dark .hover\:bg-gray-50:hover,
+  .admin-root.admin-dark .hover\:bg-white:hover {
+    background-color: #111827 !important;
+    color: var(--admin-ink);
+  }
+
+  /* Accent text tweaks */
+  .admin-root.admin-dark .text-red-900,
+  .admin-root.admin-dark .text-red-700 {
+    color: #fecdd3 !important;
+  }
+
+  .admin-root.admin-dark .text-green-600 {
+    color: #86efac !important;
+  }
+}

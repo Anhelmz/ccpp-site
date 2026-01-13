@@ -24,6 +24,7 @@ import EventManagement from '@/views/admin/EventManagement.vue'
 import ContentManagement from '@/views/admin/ContentManagement.vue'
 import ContactMessages from '@/views/admin/ContactMessages.vue'
 import Settings from '@/views/admin/Settings.vue'
+import VideoManagement from '@/views/admin/VideoManagement.vue'
 
 const routes = [
   {
@@ -142,6 +143,12 @@ const routes = [
     path: '/admin/events',
     name: 'EventManagement',
     component: EventManagement,
+    meta: { requiresAdmin: true }
+  },
+  {
+    path: '/admin/videos',
+    name: 'VideoManagement',
+    component: VideoManagement,
     meta: { requiresAdmin: true }
   },
   {
