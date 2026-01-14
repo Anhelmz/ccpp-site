@@ -1,15 +1,15 @@
 <template>
   <AdminLayout>
     <!-- Upload Section -->
-    <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-100">
-      <h2 class="text-xl font-bold text-gray-900 mb-6">Upload New Images</h2>
+    <div class="bg-white dark:bg-[#0c0f14] rounded-xl shadow-lg p-6 mb-8 border border-gray-100 dark:border-[#0c94ab40]">
+      <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Upload New Images</h2>
 
       <div
         :class="[
-          'border-2 border-dashed rounded-xl p-12 text-center transition-all bg-gray-50 cursor-pointer',
+          'border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer',
           isDragging
-            ? 'border-main bg-primary'
-            : 'border-gray-300 hover:border-main hover:bg-primary',
+            ? 'border-main bg-primary/30 dark:border-[#0C94AB] dark:bg-[#0C94AB33]'
+            : 'border-gray-300 bg-gray-100 hover:border-main hover:bg-primary/20 dark:border-[#0c94ab40] dark:bg-[#0c0f14] dark:hover:border-[#0C94AB] dark:hover:bg-[#0C94AB26]',
         ]"
         @drop.prevent="handleDrop"
         @dragover.prevent="isDragging = true"
@@ -41,10 +41,10 @@
             ></path>
           </svg>
         </div>
-        <p class="text-gray-700 font-medium mb-2">
+        <p class="text-gray-700 dark:text-gray-200 font-medium mb-2">
           Drag and drop images here, or click to select
         </p>
-        <p class="text-sm text-gray-500 mb-6">
+        <p class="text-sm text-gray-500 dark:text-gray-300 mb-6">
           Supports JPG, PNG, GIF (Max 10MB per image)
         </p>
         <button
@@ -57,19 +57,23 @@
 
       <!-- Category Selection -->
       <div class="mt-6">
-        <label class="block text-sm font-medium text-gray-700 mb-2">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
           Category
         </label>
-        <select
-          v-model="selectedCategory"
-          class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main bg-white"
-        >
-          <option value="about">About Page</option>
-          <option value="youth">Youth Ministry</option>
-          <option value="grace-church">Grace Church</option>
-          <option value="outreaches">Outreaches</option>
-          <option value="general">General</option>
-        </select>
+        <div class="flex flex-wrap gap-2">
+          <button
+            v-for="cat in categories"
+            :key="cat.value"
+            type="button"
+            class="px-3 py-2 rounded-full text-sm font-semibold border transition-colors"
+            :class="selectedCategory === cat.value
+              ? 'bg-main text-white border-main'
+              : 'bg-white dark:bg-[#0c0f14] dark:text-gray-200 border-gray-300 dark:border-[#0c94ab40] hover:border-main hover:text-main'"
+            @click="selectedCategory = cat.value"
+          >
+            {{ cat.label }}
+          </button>
+        </div>
       </div>
 
       <!-- Upload Progress -->
@@ -102,31 +106,25 @@
     </div>
 
     <!-- Gallery Images Grid -->
-    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-      <div
-        class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4"
-      >
-        <h2 class="text-xl font-bold text-gray-900">Gallery Images</h2>
-        <div class="flex items-center space-x-4 w-full sm:w-auto">
-          <select
-            v-model="filterCategory"
-            class="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-main focus:border-main"
-            @change="loadGalleries"
-          >
-            <option value="">All Categories</option>
-            <option value="about">About Page</option>
-            <option value="youth">Youth Ministry</option>
-            <option value="grace-church">Grace Church</option>
-            <option value="outreaches">Outreaches</option>
-            <option value="general">General</option>
-          </select>
-          <button
-            v-if="selectedImages.length > 0"
-            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium shadow-md"
-            @click="deleteSelected"
-          >
-            Delete Selected ({{ selectedImages.length }})
-          </button>
+    <div class="bg-white dark:bg-[#0c0f14] rounded-xl shadow-lg p-6 border border-gray-100 dark:border-[#0c94ab40]">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Gallery Images</h2>
+        <div class="flex items-center flex-wrap gap-2">
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Section:</span>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="cat in categories"
+              :key="cat.value"
+              type="button"
+              class="px-3 py-2 rounded-md text-sm font-semibold border transition-colors"
+              :class="filterCategory === cat.value
+                ? 'bg-main text-white border-main'
+                : 'bg-white dark:bg-[#0c0f14] dark:text-gray-200 border-gray-300 dark:border-[#0c94ab40] hover:border-main hover:text-main'"
+              @click="setFilter(cat.value)"
+            >
+              {{ cat.label }}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -171,37 +169,39 @@
       </div>
 
       <!-- Image Grid -->
-      <div v-else class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        <div
-          v-for="gallery in galleries"
-          :key="gallery.id"
-          class="relative group"
-        >
-          <input
-            v-model="selectedImages"
-            type="checkbox"
-            :value="gallery.id"
-            class="absolute top-2 left-2 z-10 w-5 h-5 text-main focus:ring-main border-gray-300 rounded"
-          />
-          <img
-            :src="getImageUrl(gallery.path)"
-            :alt="gallery.filename"
-            class="w-full h-32 object-cover rounded-lg"
-            @error="handleImageError"
-          />
-          <div
-            class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity rounded-lg flex items-center justify-center"
-          >
-            <button
-              class="text-white opacity-0 group-hover:opacity-100 px-3 py-1 bg-red-600 rounded hover:bg-red-700 transition-colors text-sm font-medium"
-              @click="deleteGallery(gallery.id)"
+      <div v-else>
+        <div class="mb-8">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white capitalize">
+              {{ currentCategory.label }}
+            </h3>
+            <span class="text-sm text-gray-500 dark:text-gray-300">{{ currentImages.length }} image(s)</span>
+          </div>
+          <div v-if="currentImages.length" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div
+              v-for="gallery in currentImages"
+              :key="gallery.id"
+              class="relative group rounded-lg overflow-hidden border border-gray-200 dark:border-[#0c94ab40] bg-white dark:bg-[#0c0f14]"
             >
-              Delete
-            </button>
+              <img
+                :src="getImageUrl(gallery.path)"
+                :alt="gallery.filename"
+                class="w-full h-32 object-cover"
+                @error="handleImageError"
+              />
+              <div
+                class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity flex items-center justify-center"
+              >
+                <button
+                  class="text-white opacity-0 group-hover:opacity-100 px-3 py-1 bg-red-600 rounded hover:bg-red-700 transition-colors text-sm font-medium"
+                  @click="deleteGallery(gallery.id)"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           </div>
-          <div class="mt-2 text-xs text-gray-500 truncate">
-            {{ gallery.category }}
-          </div>
+          <div v-else class="text-sm text-gray-500 dark:text-gray-300">No images in this category yet.</div>
         </div>
       </div>
     </div>
@@ -209,7 +209,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import AdminLayout from "@/components/admin/AdminLayout.vue";
 import { galleryService } from "@/services/galleryService";
 
@@ -224,13 +224,20 @@ export default {
     const selectedCategory = ref("about");
     const filterCategory = ref("");
     const galleries = ref([]);
-    const selectedImages = ref([]);
     const loading = ref(false);
     const error = ref("");
     const uploading = ref(false);
     const uploadingCount = ref(0);
     const uploadError = ref("");
     const uploadSuccess = ref("");
+
+    const categories = [
+      { value: "about", label: "About" },
+      { value: "outreaches", label: "Outreaches" },
+      { value: "youth", label: "Youth Ministry" },
+      { value: "grace-church", label: "Grace Church" },
+      { value: "general", label: "General" },
+    ];
 
     const getImageUrl = (path) => {
       // If path already starts with http, return as is
@@ -319,7 +326,6 @@ export default {
           filterCategory.value || null,
         );
         galleries.value = response.galleries || [];
-        selectedImages.value = [];
       } catch (err) {
         console.error("Error loading galleries:", err);
         error.value = err.message || "Failed to load galleries";
@@ -342,30 +348,27 @@ export default {
       }
     };
 
-    const deleteSelected = async () => {
-      if (selectedImages.value.length === 0) {
-        return;
-      }
-
-      if (
-        !confirm(
-          `Are you sure you want to delete ${selectedImages.value.length} image(s)?`,
-        )
-      ) {
-        return;
-      }
-
-      try {
-        const deletePromises = selectedImages.value.map((id) =>
-          galleryService.deleteGallery(id),
-        );
-        await Promise.all(deletePromises);
-        await loadGalleries();
-      } catch (err) {
-        console.error("Error deleting galleries:", err);
-        alert(`Failed to delete some images: ${err.message}`);
-      }
+    const setFilter = (value) => {
+      filterCategory.value = value;
+      loadGalleries();
     };
+
+    const groupedGalleries = computed(() => {
+      const map = {};
+      galleries.value.forEach((g) => {
+        const cat = g.category || "general";
+        if (!map[cat]) map[cat] = [];
+        map[cat].push(g);
+      });
+      return map;
+    });
+
+    const currentCategory = computed(() => {
+      const found = categories.find((c) => c.value === filterCategory.value);
+      return found || categories[0];
+    });
+
+    const currentImages = computed(() => groupedGalleries.value[currentCategory.value] || []);
 
     onMounted(() => {
       loadGalleries();
@@ -377,13 +380,16 @@ export default {
       selectedCategory,
       filterCategory,
       galleries,
-      selectedImages,
       loading,
       error,
       uploading,
       uploadingCount,
       uploadError,
       uploadSuccess,
+      categories,
+      groupedGalleries,
+      currentCategory,
+      currentImages,
       getImageUrl,
       handleImageError,
       triggerFileInput,
@@ -391,7 +397,7 @@ export default {
       handleDrop,
       loadGalleries,
       deleteGallery,
-      deleteSelected,
+      setFilter,
     };
   },
 };

@@ -33,13 +33,9 @@ func registerAPIRoutes(
 	{
 		contactRequests.POST("", contactRequestHandler.CreateContactRequest)
 
-		protectedContactRequests := contactRequests.Group("")
-		protectedContactRequests.Use(middleware.Auth0Middleware())
-		{
-			protectedContactRequests.GET("", contactRequestHandler.GetContactRequests)
-			protectedContactRequests.GET("/:id", contactRequestHandler.GetContactRequest)
-			protectedContactRequests.DELETE("/:id", contactRequestHandler.DeleteContactRequest)
-		}
+		contactRequests.GET("", contactRequestHandler.GetContactRequests)
+		contactRequests.GET("/:id", contactRequestHandler.GetContactRequest)
+		contactRequests.DELETE("/:id", contactRequestHandler.DeleteContactRequest)
 	}
 
 	// Protected routes
@@ -65,10 +61,11 @@ func registerAPIRoutes(
 
 	gallery := api.Group("/gallery")
 	{
-		gallery.POST("/upload", middleware.Auth0Middleware(), galleryHandler.UploadGallery)
+		// Auth removed to allow uploads without token
+		gallery.POST("/upload", galleryHandler.UploadGallery)
 		gallery.GET("", galleryHandler.GetAllGalleries)
 		gallery.GET("/:id", galleryHandler.GetGalleryByID)
-		gallery.DELETE("/:id", middleware.Auth0Middleware(), galleryHandler.DeleteGallery)
+		gallery.DELETE("/:id", galleryHandler.DeleteGallery)
 	}
 
 	events := api.Group("/events")

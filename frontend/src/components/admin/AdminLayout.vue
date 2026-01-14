@@ -1,14 +1,17 @@
 <template>
-  <div :class="['admin-root flex flex-col h-screen', isDarkMode ? 'bg-slate-900 text-slate-100 admin-dark' : 'bg-gray-50']">
+  <div :class="['admin-root flex flex-col h-screen', isDarkMode ? 'bg-[#050505] text-white admin-dark-mode' : 'bg-gray-50']">
     <!-- Top Bar -->
-    <nav class="bg-gray-50 border-b border-gray-200 shadow-sm" :class="isDarkMode ? 'bg-slate-900 border-slate-800' : ''">
+    <nav
+      class="border-b shadow-sm"
+      :class="isDarkMode ? 'bg-[#000000] border-[#0C94AB] text-white' : 'bg-gray-50 border-gray-200'"
+    >
       <div class="px-4 sm:px-6 flex items-center justify-between h-12">
         <div class="flex items-center">
           <button
             @click="toggleSidebar"
-            class="lg:hidden mr-3 p-2 text-zinc-600 hover:text-zinc-900 hover:bg-gray-100 rounded-md transition-colors"
+            class="lg:hidden mr-3 p-2 rounded-md transition-colors"
             aria-label="Toggle menu"
-            :class="isDarkMode ? 'text-slate-200 hover:text-white hover:bg-slate-800' : ''"
+            :class="isDarkMode ? 'text-white hover:bg-[#0C94AB1A]' : 'text-zinc-600 hover:text-zinc-900 hover:bg-gray-100'"
           >
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -22,7 +25,7 @@
               </div>
               <div class="w-1 sm:w-1.5 h-1 sm:h-1.5 bg-cyan-400 rounded-full"></div>
             </div>
-            <h1 class="text-xl sm:text-2xl font-light text-zinc-700 tracking-wider leading-tight" :class="isDarkMode ? 'text-slate-100' : ''">
+            <h1 class="text-xl sm:text-2xl font-light tracking-wider leading-tight" :class="isDarkMode ? 'text-white' : 'text-zinc-700'">
               ANHELM
             </h1>
           </div>
@@ -33,8 +36,8 @@
             type="button"
             @click="toggleTheme"
             :aria-pressed="isDarkMode"
-            class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md border border-gray-200 text-zinc-600 hover:text-zinc-800 hover:bg-white transition-colors"
-            :class="isDarkMode ? 'bg-gray-900 border-gray-700 text-zinc-100 hover:bg-gray-800 hover:text-white' : ''"
+            class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md border transition-colors"
+            :class="isDarkMode ? 'bg-[#0a0a0a] border-[#0C94AB] text-white hover:bg-[#0C94AB26]' : 'border-gray-200 text-zinc-600 hover:text-zinc-800 hover:bg-white'"
           >
             <svg v-if="isDarkMode" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -58,9 +61,9 @@
       <!-- Sidebar -->
       <nav
         :class="[
-          'fixed lg:static inset-y-0 left-0 z-50 w-64 bg-gray-50 shadow-sm border-r border-gray-200 flex flex-col transform transition-transform duration-300 ease-in-out',
+          'fixed lg:static inset-y-0 left-0 z-50 w-64 shadow-sm border-r flex flex-col transform transition-transform duration-300 ease-in-out',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
-          isDarkMode ? 'bg-slate-900 border-slate-800 shadow-lg' : ''
+          isDarkMode ? 'bg-[#000000] border-[#0C94AB] shadow-lg' : 'bg-gray-50 border-gray-200'
         ]"
       >
         <div class="flex-1 py-4 overflow-y-auto">
@@ -71,7 +74,7 @@
               :class="linkClass('AdminDashboard')"
             >
               <span class="mr-3 inline-flex items-center justify-center">
-                <svg class="h-5 w-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5" :class="isDarkMode ? 'text-[#0C94AB]' : 'text-cyan-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2 7-7 7 7 2 2v7a1 1 0 01-1 1h-4v-4a2 2 0 00-2-2h-4a2 2 0 00-2 2v4H4a1 1 0 01-1-1v-7z" />
                 </svg>
               </span>
@@ -84,7 +87,7 @@
               :class="linkClass('GalleryManagement')"
             >
               <span class="mr-3 inline-flex items-center justify-center">
-                <svg class="h-5 w-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5" :class="isDarkMode ? 'text-[#0C94AB]' : 'text-cyan-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16l4-4m-8 4h.01" />
                 </svg>
               </span>
@@ -97,7 +100,7 @@
               :class="linkClass('EventManagement')"
             >
               <span class="mr-3 inline-flex items-center justify-center">
-                <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5" :class="isDarkMode ? 'text-[#0C94AB]' : 'text-green-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </span>
@@ -110,7 +113,7 @@
               :class="linkClass('AdminCalendar')"
             >
               <span class="mr-3 inline-flex items-center justify-center">
-                <svg class="h-5 w-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5" :class="isDarkMode ? 'text-[#0C94AB]' : 'text-amber-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </span>
@@ -123,7 +126,7 @@
               :class="linkClass('VideoManagement')"
             >
               <span class="mr-3 inline-flex items-center justify-center">
-                <svg class="h-5 w-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5" :class="isDarkMode ? 'text-[#0C94AB]' : 'text-purple-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276a1 1 0 010 1.788L15 12.222M9 10L4.447 7.724a1 1 0 000 1.788L9 12.222m6 0l4.553 2.276a1 1 0 010 1.788L15 18m-6-5.778l-4.553 2.276a1 1 0 000 1.788L9 18m0-8l6 3m-6 0l6 3" />
                 </svg>
               </span>
@@ -136,7 +139,7 @@
               :class="linkClass('ContentManagement')"
             >
               <span class="mr-3 inline-flex items-center justify-center">
-                <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5" :class="isDarkMode ? 'text-[#0C94AB]' : 'text-blue-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </span>
@@ -149,7 +152,7 @@
               :class="linkClass('ContactMessages', ['contact-requests', 'contact-request-detail'])"
             >
               <span class="mr-3 inline-flex items-center justify-center">
-                <svg class="h-5 w-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5" :class="isDarkMode ? 'text-[#0C94AB]' : 'text-cyan-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-4 8H7" />
                 </svg>
               </span>
@@ -162,7 +165,7 @@
               :class="linkClass('Settings')"
             >
               <span class="mr-3 inline-flex items-center justify-center">
-                <svg class="h-5 w-5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5" :class="isDarkMode ? 'text-[#0C94AB]' : 'text-zinc-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
@@ -173,27 +176,27 @@
         </div>
 
         <!-- User Section -->
-        <div class="border-t border-gray-200" :class="isDarkMode ? 'border-slate-800' : ''">
+        <div class="border-t" :class="isDarkMode ? 'border-[#0C94AB]' : 'border-gray-200'">
           <div class="p-4">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                <div class="w-8 h-8 bg-cyan-100 rounded-full flex items-center justify-center" :class="isDarkMode ? 'bg-slate-800 text-slate-100' : ''">
-                  <span class="text-sm font-medium text-cyan-600" :class="isDarkMode ? 'text-cyan-300' : ''">{{ userInitial }}</span>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center" :class="isDarkMode ? 'bg-[#0C94AB] text-black' : 'bg-cyan-100'">
+                  <span class="text-sm font-medium" :class="isDarkMode ? 'text-black' : 'text-cyan-600'">{{ userInitial }}</span>
                 </div>
               </div>
               <div class="ml-3 flex-1 min-w-0">
-                <p class="text-sm font-medium text-zinc-700 truncate" :class="isDarkMode ? 'text-slate-100' : ''">{{ userEmail }}</p>
+                <p class="text-sm font-medium truncate" :class="isDarkMode ? 'text-white' : 'text-zinc-700'">{{ userEmail }}</p>
                 <button
                   @click="handleLogout"
-                  class="text-xs text-zinc-500 hover:text-zinc-700"
-                  :class="isDarkMode ? 'text-slate-300 hover:text-white' : ''"
+                  class="text-xs"
+                  :class="isDarkMode ? 'text-slate-300 hover:text-white' : 'text-zinc-500 hover:text-zinc-700'"
                 >
                   Sign out
                 </button>
               </div>
             </div>
           </div>
-          <div class="flex items-center justify-center pt-3 pb-4 border-t border-gray-200 px-4" :class="isDarkMode ? 'border-slate-800' : ''">
+          <div class="flex items-center justify-center pt-3 pb-4 border-t px-4" :class="isDarkMode ? 'border-[#0C94AB]' : 'border-gray-200'">
             <div class="w-5 flex flex-col items-center justify-center mr-1 mb-0.5">
               <div class="flex gap-1 mb-0.5">
                 <div class="w-1 h-1 bg-cyan-400 rounded-full"></div>
@@ -208,7 +211,7 @@
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden">
-        <main :class="['flex-1 overflow-y-auto', isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-white']">
+        <main :class="['flex-1 overflow-y-auto', isDarkMode ? 'bg-[#000000] text-white' : 'bg-white']">
           <div class="py-4 sm:py-6">
             <div class="px-4 sm:px-6">
               <slot />
@@ -331,4 +334,47 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.admin-dark-mode :deep(.bg-white) {
+  background-color: #0c0f14 !important;
+  border-color: #0c94ab40 !important;
+}
+
+.admin-dark-mode :deep(.border-gray-200) {
+  border-color: #0c94ab40 !important;
+}
+
+.admin-dark-mode {
+  color: #f5f7fb;
+}
+
+.admin-dark-mode :deep(.text-gray-500),
+.admin-dark-mode :deep(.text-gray-600),
+.admin-dark-mode :deep(.text-gray-700),
+.admin-dark-mode :deep(.text-zinc-500),
+.admin-dark-mode :deep(.text-zinc-600),
+.admin-dark-mode :deep(.text-zinc-700) {
+  color: #cfd7e3 !important;
+}
+
+.admin-dark-mode :deep(.text-gray-900),
+.admin-dark-mode :deep(.text-zinc-900),
+.admin-dark-mode :deep(.font-semibold) {
+  color: #f8fbff !important;
+}
+
+.admin-dark-mode :deep(a),
+.admin-dark-mode :deep(button),
+.admin-dark-mode :deep(.router-link-active),
+.admin-dark-mode :deep(.router-link-exact-active) {
+  color: #f5f7fb;
+}
+
+.admin-dark-mode :deep(.router-link-active),
+.admin-dark-mode :deep(.router-link-exact-active) {
+  background-color: #0c94ab1a !important;
+  border-color: #0c94ab !important;
+}
+</style>
 
