@@ -19,6 +19,7 @@ type Event struct {
 	Recurrence       string         `gorm:"type:text;default:none" json:"recurrence"`
 	RecurrenceEndsAt *time.Time     `json:"recurrenceEndsAt"`
 	Timezone         string         `gorm:"type:text;default:UTC" json:"timezone"`
+	Date             time.Time      `gorm:"not null" json:"date"`
 	CreatedAt        time.Time      `json:"createdAt"`
 	UpdatedAt        time.Time      `json:"updatedAt"`
 	DeletedAt        gorm.DeletedAt `gorm:"index" json:"-"`

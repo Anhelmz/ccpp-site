@@ -35,17 +35,22 @@ func normalizeEvent(event *models.Event) error {
 		event.EndTime = event.StartTime
 	}
 
+	// Maintain legacy date column for compatibility
+	if event.Date.IsZero() {
+		event.Date = event.StartTime
+	}
+
 	if event.EndTime.Before(event.StartTime) {
 		return errors.New("endTime must be after startTime")
 	}
 
 	allowedRecurrences := map[string]bool{
-		"none":   true,
-		"daily":  true,
-		"weekly": true,
+		"none":    true,
+		"daily":   true,
+		"weekly":  true,
 		"monthly": true,
-		"yearly": true,
-		"":       true,
+		"yearly":  true,
+		"":        true,
 	}
 
 	event.Recurrence = strings.ToLower(strings.TrimSpace(event.Recurrence))
@@ -198,7 +203,3 @@ func (h *EventHandler) DeleteEvent(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Event deleted successfully"})
 }
-
-
-
-

@@ -25,6 +25,7 @@ import ContentManagement from '@/views/admin/ContentManagement.vue'
 import ContactMessages from '@/views/admin/ContactMessages.vue'
 import Settings from '@/views/admin/Settings.vue'
 import VideoManagement from '@/views/admin/VideoManagement.vue'
+import AdminCalendar from '@/views/admin/AdminCalendar.vue'
 
 const routes = [
   {
@@ -143,6 +144,12 @@ const routes = [
     path: '/admin/events',
     name: 'EventManagement',
     component: EventManagement,
+    meta: { requiresAdmin: true }
+  },
+  {
+    path: '/admin/calendar',
+    name: 'AdminCalendar',
+    component: AdminCalendar,
     meta: { requiresAdmin: true }
   },
   {
