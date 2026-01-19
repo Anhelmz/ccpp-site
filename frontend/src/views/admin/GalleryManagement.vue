@@ -55,26 +55,15 @@
         </button>
       </div>
 
-      <!-- Category Selection -->
-      <div class="mt-6">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
-          Category
-        </label>
-        <div class="flex flex-wrap gap-2">
-          <button
-            v-for="cat in categories"
-            :key="cat.value"
-            type="button"
-            class="px-3 py-2 rounded-full text-sm font-semibold border transition-colors"
-            :class="selectedCategory === cat.value
-              ? 'bg-main text-white border-main'
-              : 'bg-white dark:bg-[#0c0f14] dark:text-gray-200 border-gray-300 dark:border-[#0c94ab40] hover:border-main hover:text-main'"
-            @click="selectedCategory = cat.value"
-          >
-            {{ cat.label }}
-          </button>
-        </div>
-      </div>
+    <!-- Category Display -->
+    <div class="mt-6">
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+        Category
+      </label>
+      <p class="text-base font-semibold text-gray-900 dark:text-white capitalize">
+        {{ currentCategory.label }}
+      </p>
+    </div>
 
       <!-- Upload Progress -->
       <div v-if="uploading" class="mt-6">
@@ -108,23 +97,9 @@
     <!-- Gallery Images Grid -->
     <div class="bg-white dark:bg-[#0c0f14] rounded-xl shadow-lg p-6 border border-gray-100 dark:border-[#0c94ab40]">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Gallery Images</h2>
-        <div class="flex items-center flex-wrap gap-2">
-          <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Section:</span>
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="cat in categories"
-              :key="cat.value"
-              type="button"
-              class="px-3 py-2 rounded-md text-sm font-semibold border transition-colors"
-              :class="filterCategory === cat.value
-                ? 'bg-main text-white border-main'
-                : 'bg-white dark:bg-[#0c0f14] dark:text-gray-200 border-gray-300 dark:border-[#0c94ab40] hover:border-main hover:text-main'"
-              @click="setFilter(cat.value)"
-            >
-              {{ cat.label }}
-            </button>
-          </div>
+        <div>
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white">Gallery Images</h2>
+          <p class="text-sm text-gray-600 dark:text-gray-300">Section: {{ currentCategory.label }}</p>
         </div>
       </div>
 
@@ -209,7 +184,8 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import AdminLayout from "@/components/admin/AdminLayout.vue";
 import { galleryService } from "@/services/galleryService";
 
@@ -219,18 +195,6 @@ export default {
     AdminLayout,
   },
   setup() {
-    const fileInput = ref(null);
-    const isDragging = ref(false);
-    const selectedCategory = ref("about");
-    const filterCategory = ref("");
-    const galleries = ref([]);
-    const loading = ref(false);
-    const error = ref("");
-    const uploading = ref(false);
-    const uploadingCount = ref(0);
-    const uploadError = ref("");
-    const uploadSuccess = ref("");
-
     const categories = [
       { value: "about", label: "About" },
       { value: "outreaches", label: "Outreaches" },
@@ -238,6 +202,33 @@ export default {
       { value: "grace-church", label: "Grace Church" },
       { value: "general", label: "General" },
     ];
+    const defaultCategory = categories[0].value;
+
+    const fileInput = ref(null);
+    const isDragging = ref(false);
+    const selectedCategory = ref(defaultCategory);
+    const filterCategory = ref(defaultCategory);
+    const galleries = ref([]);
+    const loading = ref(false);
+    const error = ref("");
+    const uploading = ref(false);
+    const uploadingCount = ref(0);
+    const uploadError = ref("");
+    const uploadSuccess = ref("");
+    const route = useRoute();
+    const router = useRouter();
+
+    const applyRouteCategory = () => {
+      const routeCategory = route.params.category;
+      const validValues = categories.map((c) => c.value);
+      const isValid = routeCategory && validValues.includes(routeCategory);
+      const nextCategory = isValid ? routeCategory : defaultCategory;
+
+      selectedCategory.value = nextCategory;
+      filterCategory.value = nextCategory;
+
+      return isValid || !routeCategory;
+    };
 
     const getImageUrl = (path) => {
       // If path already starts with http, return as is
@@ -348,9 +339,11 @@ export default {
       }
     };
 
-    const setFilter = (value) => {
-      filterCategory.value = value;
-      loadGalleries();
+    const setFilter = async (value) => {
+      const target = value
+        ? { name: "GalleryCategory", params: { category: value } }
+        : { name: "GalleryManagement" };
+      await router.push(target);
     };
 
     const groupedGalleries = computed(() => {
@@ -370,9 +363,26 @@ export default {
 
     const currentImages = computed(() => groupedGalleries.value[currentCategory.value] || []);
 
-    onMounted(() => {
-      loadGalleries();
+    onMounted(async () => {
+      const valid = applyRouteCategory();
+      if (!valid && route.params.category) {
+        await router.replace({ name: "GalleryManagement" });
+        return;
+      }
+      await loadGalleries();
     });
+
+    watch(
+      () => route.params.category,
+      async (newCategory) => {
+        const valid = applyRouteCategory();
+        if (!valid && newCategory) {
+          await router.replace({ name: "GalleryManagement" });
+          return;
+        }
+        await loadGalleries();
+      },
+    );
 
     return {
       fileInput,

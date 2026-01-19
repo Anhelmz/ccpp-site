@@ -103,7 +103,7 @@
               type="email"
               autocomplete="email"
               required
-              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 transition duration-150 ease-in-out text-sm"
+              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 transition duration-150 ease-in-out text-sm"
               placeholder="admin@example.com"
             />
           </div>
@@ -146,7 +146,7 @@
               type="password"
               autocomplete="current-password"
               required
-              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 transition duration-150 ease-in-out text-sm"
+              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 transition duration-150 ease-in-out text-sm"
               placeholder="Enter your password"
             />
           </div>

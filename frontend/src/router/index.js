@@ -141,6 +141,12 @@ const routes = [
     meta: { requiresAdmin: true }
   },
   {
+    path: '/admin/gallery/:category',
+    name: 'GalleryCategory',
+    component: GalleryManagement,
+    meta: { requiresAdmin: true }
+  },
+  {
     path: '/admin/events',
     name: 'EventManagement',
     component: EventManagement,

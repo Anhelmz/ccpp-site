@@ -84,7 +84,7 @@
             <router-link
               to="/admin/gallery"
               @click="closeSidebarOnMobile"
-              :class="linkClass('GalleryManagement')"
+              :class="linkClass('GalleryManagement', ['GalleryCategory'])"
             >
               <span class="mr-3 inline-flex items-center justify-center">
                 <svg class="h-5 w-5" :class="isDarkMode ? 'text-[#0C94AB]' : 'text-cyan-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,6 +93,20 @@
               </span>
               Galleries
             </router-link>
+            <div class="ml-6 space-y-0.5">
+              <router-link
+                v-for="section in gallerySections"
+                :key="section.value"
+                :to="section.to"
+                @click="closeSidebarOnMobile"
+                :class="subLinkClass(section.value)"
+              >
+                <span class="mr-2 inline-flex items-center justify-center h-5 w-3">
+                  <span class="h-1 w-1 rounded-full" :class="isDarkMode ? 'bg-[#0C94AB]' : 'bg-cyan-500'"></span>
+                </span>
+                {{ section.label }}
+              </router-link>
+            </div>
 
             <router-link
               to="/admin/events"
@@ -260,6 +274,13 @@ export default {
     const currentUser = computed(() => props.user || localUser.value)
     const userEmail = computed(() => currentUser.value?.email || 'admin@ccpp.org')
     const userInitial = computed(() => (currentUser.value?.email || 'A').charAt(0).toUpperCase())
+    const gallerySections = [
+      { value: 'about', label: 'About', to: { name: 'GalleryCategory', params: { category: 'about' } } },
+      { value: 'outreaches', label: 'Outreaches', to: { name: 'GalleryCategory', params: { category: 'outreaches' } } },
+      { value: 'youth', label: 'Youth Ministry', to: { name: 'GalleryCategory', params: { category: 'youth' } } },
+      { value: 'grace-church', label: 'Grace Church', to: { name: 'GalleryCategory', params: { category: 'grace-church' } } },
+      { value: 'general', label: 'General', to: { name: 'GalleryCategory', params: { category: 'general' } } }
+    ]
 
     const linkClass = (name, extraNames = []) => {
       const active = route.name === name || extraNames.includes(route.name)
@@ -274,6 +295,21 @@ export default {
       return active
         ? `${base} bg-white text-zinc-700 border-cyan-500`
         : `${base} text-zinc-600 border-transparent hover:bg-white hover:text-zinc-700 hover:border-cyan-500`
+    }
+
+    const subLinkClass = (value) => {
+      const active = route.name === 'GalleryCategory' && route.params.category === value
+      const base = 'group flex items-center px-6 sm:px-8 py-2 text-sm font-medium transition-all duration-200 ease-in-out rounded-r-md'
+
+      if (isDarkMode.value) {
+        return active
+          ? `${base} bg-slate-800 text-slate-100`
+          : `${base} text-slate-300 hover:bg-slate-800 hover:text-white`
+      }
+
+      return active
+        ? `${base} bg-white text-zinc-700`
+        : `${base} text-zinc-600 hover:bg-white hover:text-zinc-700`
     }
 
     const toggleSidebar = () => {
@@ -324,7 +360,9 @@ export default {
       isDarkMode,
       userEmail,
       userInitial,
+      gallerySections,
       linkClass,
+      subLinkClass,
       toggleSidebar,
       closeSidebar,
       closeSidebarOnMobile,
