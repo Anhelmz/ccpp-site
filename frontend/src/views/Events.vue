@@ -84,19 +84,19 @@
             :key="card.id"
             class="rounded-[28px] border border-gray-100 bg-white shadow-2xl p-8 space-y-3"
           >
-            <p class="text-xs uppercase tracking-[0.35em] text-brand-blue/70">
+            <p class="text-xs uppercase tracking-[0.35em]" style="color: #000000 !important;">
               {{ card.tag }}
             </p>
-            <h3 class="text-2xl font-semibold text-gray-900">
+            <h3 class="text-2xl font-semibold" style="color: #000000 !important;">
               {{ card.title }}
             </h3>
-            <p class="text-gray-600">
+            <p style="color: #000000 !important;">
               {{ card.body }}
             </p>
           </article>
         </div>
 
-        <div class="text-center text-gray-700 text-base">
+        <div class="text-center text-base" style="color: #000000 !important;">
           {{ footerNote }}
         </div>
 

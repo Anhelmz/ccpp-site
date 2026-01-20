@@ -124,11 +124,12 @@
               <div class="p-6 flex flex-col gap-4 flex-1">
                 <div>
                   <h2
-                    class="text-xl font-semibold text-gray-900 mb-2 group-hover:text-brand-orange transition-colors"
+                    class="text-xl font-semibold mb-2 group-hover:text-brand-orange transition-colors"
+                    style="color: #000000 !important;"
                   >
                     {{ event.title }}
                   </h2>
-                  <p class="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                  <p class="text-sm leading-relaxed line-clamp-3" style="color: #000000 !important;">
                     {{ event.summary }}
                   </p>
                 </div>
@@ -203,10 +204,10 @@
           <!-- Empty State -->
           <div v-else class="card text-center py-16">
             <div class="text-6xl mb-6">📅</div>
-            <h3 class="text-3xl font-bold text-gray-900 mb-3">
+            <h3 class="text-3xl font-bold mb-3" style="color: #000000 !important;">
               No Upcoming Events
             </h3>
-            <p class="text-gray-600 text-lg">
+            <p class="text-lg" style="color: #000000 !important;">
               Check back soon for upcoming church events and activities.
             </p>
           </div>
@@ -221,19 +222,19 @@
       @click="closeModal"
     >
       <div
-        class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all"
+        class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all"
         @click.stop
       >
         <!-- Modal Header -->
         <div
-          class="sticky top-0 bg-gradient-to-r from-main to-secondary px-8 py-6 flex justify-between items-start z-10"
+          class="sticky top-0 bg-white px-8 py-6 flex justify-between items-start z-10 border-b border-gray-200"
         >
           <div class="flex-1">
-            <h2 class="text-3xl font-bold text-white mb-4 pr-8">
+            <h2 class="text-3xl font-bold mb-4 pr-8" style="color: #000000 !important;">
               {{ selectedEvent.title }}
             </h2>
             <div class="flex flex-wrap items-center gap-4 text-sm">
-              <div class="flex items-center text-white/90">
+              <div class="flex items-center px-4 py-2 rounded-full bg-blue-500 text-white">
                 <svg
                   class="w-5 h-5 mr-2"
                   fill="none"
@@ -253,7 +254,7 @@
               </div>
               <div
                 v-if="selectedEvent.timeRange"
-                class="flex items-center text-white/90"
+                class="flex items-center px-4 py-2 rounded-full bg-brand-orange text-white"
               >
                 <svg
                   class="w-5 h-5 mr-2"
@@ -272,7 +273,7 @@
               </div>
               <div
                 v-if="selectedEvent.location"
-                class="flex items-center text-white/90"
+                class="flex items-center px-4 py-2 rounded-full bg-green-500 text-white"
               >
                 <svg
                   class="w-5 h-5 mr-2"
@@ -298,14 +299,16 @@
             </div>
           </div>
           <button
-            class="text-white hover:text-gray-200 transition-colors p-2 hover:bg-white/10 rounded-lg"
+            class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             @click="closeModal"
+            style="color: #000000 !important;"
           >
             <svg
               class="w-6 h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              style="color: #000000 !important;"
             >
               <path
                 stroke-linecap="round"
@@ -318,10 +321,11 @@
         </div>
 
         <!-- Modal Content -->
-        <div class="px-8 py-8 overflow-y-auto max-h-[calc(90vh-180px)]">
-          <div class="prose prose-lg max-w-none">
+        <div class="px-8 py-8 overflow-y-auto max-h-[calc(90vh-180px)] bg-white" style="color: #000000 !important;">
+          <div class="max-w-none" style="color: #000000 !important;">
             <p
-              class="text-gray-700 whitespace-pre-line leading-relaxed text-lg"
+              class="whitespace-pre-line leading-relaxed text-lg"
+              style="color: #000000 !important;"
             >
               {{ selectedEvent.content }}
             </p>

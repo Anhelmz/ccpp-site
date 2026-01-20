@@ -377,19 +377,19 @@
       @click="closeModal"
     >
       <div
-        class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all"
+        class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all"
         @click.stop
       >
         <!-- Modal Header -->
         <div
-          class="sticky top-0 bg-gradient-to-r from-main to-secondary px-8 py-6 flex justify-between items-start z-10"
+          class="sticky top-0 bg-white px-8 py-6 flex justify-between items-start z-10 border-b border-gray-200"
         >
           <div class="flex-1">
-            <h2 class="text-3xl font-bold text-white mb-4 pr-8">
+            <h2 class="text-3xl font-bold mb-4 pr-8" style="color: #000000 !important;">
               {{ selectedEvent.title }}
             </h2>
             <div class="flex flex-wrap items-center gap-4 text-sm">
-              <div class="flex items-center text-white/90">
+              <div class="flex items-center px-4 py-2 rounded-full bg-blue-500 text-white">
                 <svg
                   class="w-5 h-5 mr-2"
                   fill="none"
@@ -409,7 +409,7 @@
               </div>
               <div
                 v-if="selectedEvent.timeRange"
-                class="flex items-center text-white/90"
+                class="flex items-center px-4 py-2 rounded-full bg-brand-orange text-white"
               >
                 <svg
                   class="w-5 h-5 mr-2"
@@ -428,7 +428,7 @@
               </div>
               <div
                 v-if="selectedEvent.location"
-                class="flex items-center text-white/90"
+                class="flex items-center px-4 py-2 rounded-full bg-green-500 text-white"
               >
                 <svg
                   class="w-5 h-5 mr-2"
@@ -454,14 +454,16 @@
             </div>
           </div>
           <button
-            class="text-white hover:text-gray-200 transition-colors p-2 hover:bg-white/10 rounded-lg"
+            class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             @click="closeModal"
+            style="color: #000000 !important;"
           >
             <svg
               class="w-6 h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              style="color: #000000 !important;"
             >
               <path
                 stroke-linecap="round"
@@ -474,28 +476,30 @@
         </div>
 
         <!-- Modal Content -->
-        <div class="px-8 py-8 overflow-y-auto max-h-[calc(90vh-180px)]">
-          <div class="prose prose-lg max-w-none">
+        <div class="px-8 py-8 overflow-y-auto max-h-[calc(90vh-180px)] bg-white" style="color: #000000 !important;">
+          <div class="max-w-none" style="color: #000000 !important;">
             <div v-if="selectedEvent.summary" class="mb-6">
-              <p class="text-gray-600 text-lg font-medium leading-relaxed">
+              <p class="text-lg font-medium leading-relaxed" style="color: #000000 !important;">
                 {{ selectedEvent.summary }}
               </p>
             </div>
             <div v-if="selectedEvent.content">
               <p
-                class="text-gray-700 whitespace-pre-line leading-relaxed text-lg"
+                class="whitespace-pre-line leading-relaxed text-lg"
+                style="color: #000000 !important;"
               >
                 {{ selectedEvent.content }}
               </p>
             </div>
             <div v-else-if="selectedEvent.description">
               <p
-                class="text-gray-700 whitespace-pre-line leading-relaxed text-lg"
+                class="whitespace-pre-line leading-relaxed text-lg"
+                style="color: #000000 !important;"
               >
                 {{ selectedEvent.description }}
               </p>
             </div>
-            <div v-else class="text-gray-500 italic">
+            <div v-else class="italic" style="color: #000000 !important;">
               No additional details available.
             </div>
           </div>
