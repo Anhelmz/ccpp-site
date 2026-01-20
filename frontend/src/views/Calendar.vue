@@ -270,9 +270,9 @@
                 v-for="day in calendarDays"
                 :key="day.date"
                 :class="[
-                  'min-h-24 md:min-h-32 p-3 border rounded-2xl cursor-pointer transition-all hover:-translate-y-[1px]',
+                  'min-h-24 md:min-h-32 p-3 border rounded-2xl cursor-pointer transition-all hover:-translate-y-[1px] hover:shadow-md relative',
                   day.isToday
-                    ? 'bg-main text-white border-main shadow-lg shadow-main/20'
+                    ? 'bg-main text-gray-900 border-main shadow-lg shadow-main/20'
                     : day.isCurrentMonth
                       ? 'bg-white hover:bg-gray-50 border-gray-200 hover:border-main/30'
                       : 'bg-gray-50 text-gray-400 border-gray-100 opacity-70',
@@ -287,7 +287,7 @@
                     :class="[
                       'text-sm md:text-base font-semibold',
                       day.isToday
-                        ? 'text-white'
+                        ? 'text-gray-900'
                         : day.isCurrentMonth
                           ? 'text-gray-900'
                           : 'text-gray-400',
@@ -300,7 +300,7 @@
                     class="text-[11px] font-semibold rounded-full px-2 py-0.5"
                     :class="
                       day.isToday
-                        ? 'bg-white/20 text-white'
+                        ? 'bg-gray-900/10 text-gray-900'
                         : 'bg-brand-orange/10 text-brand-orange'
                     "
                   >
@@ -314,13 +314,15 @@
                   <div
                     v-for="event in day.events.slice(0, 2)"
                     :key="event.occurrenceId || event.id"
-                    class="text-xs bg-brand-orange/15 text-brand-orange rounded-full px-2 py-1 truncate font-medium"
+                    class="text-xs bg-brand-orange/15 text-brand-orange rounded-full px-2 py-1 truncate font-medium cursor-pointer hover:bg-brand-orange/25 transition-colors"
+                    @click.stop="openModal(event)"
                   >
                     {{ event.title }}
                   </div>
                   <div
                     v-if="day.events.length > 2"
-                    class="text-xs text-gray-500 font-medium"
+                    class="text-xs text-gray-500 font-medium cursor-pointer hover:text-gray-700 transition-colors"
+                    @click.stop="selectDate(day)"
                   >
                     +{{ day.events.length - 2 }} {{ calendarCopy.moreLabel }}
                   </div>
@@ -338,64 +340,28 @@
               {{ calendarCopy.selectedPrefix }}
               {{ formatFullDate(selectedDay) }}
             </h3>
-            <div class="space-y-4">
+            <div class="space-y-3">
               <div
                 v-for="event in selectedDateEvents"
                 :key="event.occurrenceId || event.id"
-                class="border-l-4 border-main pl-6 py-4 hover:bg-gray-50 transition-all rounded-r-lg cursor-pointer group bg-white"
+                class="border-l-4 border-main pl-4 md:pl-6 py-3 md:py-4 hover:bg-gray-50 transition-all rounded-r-lg cursor-pointer group bg-white"
                 @click="openModal(event)"
               >
                 <h4
-                  class="text-xl font-bold text-gray-900 mb-2 group-hover:text-main transition-colors"
+                  class="text-lg md:text-xl font-bold text-gray-900 mb-1 group-hover:text-main transition-colors"
                 >
                   {{ event.title }}
                 </h4>
-                <p class="text-gray-600 mb-3">{{ event.summary }}</p>
-                <div class="flex flex-wrap items-center gap-4 text-sm">
-                  <div
-                    v-if="event.timeRange"
-                    class="flex items-center text-gray-600"
-                  >
-                    <svg
-                      class="w-4 h-4 mr-2 text-brand-orange"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <span class="font-medium">{{ event.timeRange }}</span>
-                  </div>
-                  <div
-                    v-if="event.location"
-                    class="flex items-center text-gray-600"
-                  >
-                    <svg
-                      class="w-4 h-4 mr-2 text-main"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                    <span class="font-medium">{{ event.location }}</span>
-                  </div>
+                <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                  <span v-if="event.timeRange" class="font-medium">
+                    {{ event.timeRange }}
+                  </span>
+                  <span v-if="event.location" class="font-medium">
+                    {{ event.location }}
+                  </span>
+                  <span v-if="event.summary" class="text-gray-500 text-xs">
+                    {{ event.summary }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -422,10 +388,8 @@
             <h2 class="text-3xl font-bold text-white mb-4 pr-8">
               {{ selectedEvent.title }}
             </h2>
-            <div class="flex flex-wrap items-center gap-3 text-sm">
-              <div
-                class="flex items-center gap-2 text-white/90 px-3 py-1 rounded-full bg-white/10 border border-white/10"
-              >
+            <div class="flex flex-wrap items-center gap-4 text-sm">
+              <div class="flex items-center text-white/90">
                 <svg
                   class="w-5 h-5 mr-2"
                   fill="none"
@@ -445,10 +409,10 @@
               </div>
               <div
                 v-if="selectedEvent.timeRange"
-                class="flex items-center gap-2 text-white/90 px-3 py-1 rounded-full bg-white/10 border border-white/10"
+                class="flex items-center text-white/90"
               >
                 <svg
-                  class="w-5 h-5"
+                  class="w-5 h-5 mr-2"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -464,10 +428,10 @@
               </div>
               <div
                 v-if="selectedEvent.location"
-                class="flex items-center gap-2 text-white/90 px-3 py-1 rounded-full bg-white/10 border border-white/10"
+                class="flex items-center text-white/90"
               >
                 <svg
-                  class="w-5 h-5"
+                  class="w-5 h-5 mr-2"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -510,15 +474,30 @@
         </div>
 
         <!-- Modal Content -->
-        <div
-          class="px-8 py-8 overflow-y-auto max-h-[calc(90vh-180px)] bg-gray-50"
-        >
+        <div class="px-8 py-8 overflow-y-auto max-h-[calc(90vh-180px)]">
           <div class="prose prose-lg max-w-none">
-            <p
-              class="text-gray-700 whitespace-pre-line leading-relaxed text-lg"
-            >
-              {{ selectedEvent.content }}
-            </p>
+            <div v-if="selectedEvent.summary" class="mb-6">
+              <p class="text-gray-600 text-lg font-medium leading-relaxed">
+                {{ selectedEvent.summary }}
+              </p>
+            </div>
+            <div v-if="selectedEvent.content">
+              <p
+                class="text-gray-700 whitespace-pre-line leading-relaxed text-lg"
+              >
+                {{ selectedEvent.content }}
+              </p>
+            </div>
+            <div v-else-if="selectedEvent.description">
+              <p
+                class="text-gray-700 whitespace-pre-line leading-relaxed text-lg"
+              >
+                {{ selectedEvent.description }}
+              </p>
+            </div>
+            <div v-else class="text-gray-500 italic">
+              No additional details available.
+            </div>
           </div>
         </div>
       </div>
@@ -792,8 +771,11 @@ export default {
     const loadingText = computed(() => content.value.loading);
 
     const formatFullDate = (date) => {
+      if (!date) return "";
+      const dateObj = date instanceof Date ? date : new Date(date);
+      if (isNaN(dateObj.getTime())) return "";
       const months = content.value.months;
-      return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+      return `${months[dateObj.getMonth()]} ${dateObj.getDate()}, ${dateObj.getFullYear()}`;
     };
 
     const formatTimeRange = (start, end) => {
@@ -996,6 +978,11 @@ export default {
       if (!day.isCurrentMonth) return;
       const [year, month, date] = day.date.split("-").map(Number);
       selectedDay.value = new Date(year, month - 1, date);
+      
+      // If the day has events, open the modal with the first event
+      if (day.events && day.events.length > 0) {
+        openModal(day.events[0]);
+      }
     };
 
     const previousMonth = () => {

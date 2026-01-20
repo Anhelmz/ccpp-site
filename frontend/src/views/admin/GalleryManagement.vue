@@ -57,20 +57,30 @@
         </button>
       </div>
 
-      <!-- Category Selection -->
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-          Category <span class="text-red-500">*</span>
+      <!-- Category Selection for Upload -->
+      <div class="mb-6">
+        <label class="block text-base font-semibold text-gray-900 dark:text-white mb-3">
+          Upload Category <span class="text-red-500">*</span>
         </label>
-        <select
-          v-model="formData.category"
-          required
-          class="w-full px-4 py-2 border border-gray-300 dark:border-[#0c94ab40] rounded-lg bg-white dark:bg-[#0c0f14] text-gray-900 dark:text-white focus:ring-2 focus:ring-main focus:border-transparent"
-        >
-          <option v-for="cat in categories" :key="cat.value" :value="cat.value">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <button
+            v-for="cat in categories"
+            :key="cat.value"
+            type="button"
+            @click="formData.category = cat.value"
+            :class="[
+              'px-4 py-4 rounded-lg font-medium text-sm transition-all duration-200 border-2 shadow-sm',
+              formData.category === cat.value
+                ? 'bg-brand-blue dark:bg-main text-white border-brand-blue dark:border-main shadow-md shadow-brand-blue/20 dark:shadow-main/20'
+                : 'bg-white dark:bg-[#1a1f2e] text-gray-700 dark:text-gray-300 border-gray-300 dark:border-[#0c94ab40] hover:border-brand-blue/50 dark:hover:border-main/50 hover:bg-gray-50 dark:hover:bg-[#252a3a] hover:shadow-md'
+            ]"
+          >
             {{ cat.label }}
-          </option>
-        </select>
+          </button>
+        </div>
+        <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">
+          Currently selected: <span class="font-semibold text-gray-900 dark:text-white">{{ categories.find(c => c.value === formData.category)?.label }}</span>
+        </p>
       </div>
 
       <!-- Selected Files Preview -->
@@ -78,17 +88,17 @@
         <p class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
           Selected Files ({{ selectedFiles.length }})
         </p>
-        <div class="max-h-40 overflow-y-auto space-y-1">
+        <div class="max-h-40 overflow-y-auto space-y-1 border border-gray-200 dark:border-gray-700 rounded-lg p-2 bg-gray-50 dark:bg-[#1a1f2e]">
           <div
             v-for="(file, index) in selectedFiles"
             :key="index"
-            class="flex items-center justify-between p-2 bg-gray-50 dark:bg-[#1a1f2e] rounded text-sm"
+            class="flex items-center justify-between p-2 bg-white dark:bg-[#0c0f14] rounded text-sm border border-gray-200 dark:border-gray-700 hover:shadow-sm transition-shadow"
           >
             <span class="text-gray-700 dark:text-gray-300 truncate flex-1">{{ file.name }}</span>
             <button
               type="button"
               @click="removeFile(index)"
-              class="ml-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+              class="ml-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium"
             >
               Remove
             </button>
@@ -101,7 +111,7 @@
         type="button"
         :disabled="submitting || selectedFiles.length === 0"
         @click="uploadFiles"
-        class="w-full px-6 py-3 bg-main text-white rounded-lg hover:opacity-90 transition-colors font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full px-6 py-3 bg-brand-blue dark:bg-main text-white rounded-lg hover:bg-brand-blue/90 dark:hover:opacity-90 transition-colors font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span v-if="submitting" class="flex items-center justify-center space-x-2">
           <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
@@ -128,27 +138,45 @@
     </div>
 
     <!-- Category Selector -->
-    <div class="bg-white dark:bg-[#0c0f14] rounded-xl shadow-lg p-6 mb-8 border border-gray-100 dark:border-[#0c94ab40]">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Select Category</h2>
-      <div class="flex flex-wrap gap-2">
+    <div class="bg-white dark:bg-[#0c0f14] rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-[#0c94ab40]">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Gallery Category</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Select a category to view and manage images</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <button
           v-for="cat in categories"
           :key="cat.value"
           @click="selectCategory(cat.value)"
           :class="[
-            'px-4 py-2 rounded-lg font-medium transition-colors',
+            'relative px-6 py-8 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:scale-105',
+            'border-2 flex flex-col items-center justify-center min-h-[120px] shadow-sm',
             filterCategory === cat.value
-              ? 'bg-main text-white shadow-md'
-              : 'bg-gray-100 dark:bg-[#1a1f2e] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#252a3a]'
+              ? 'bg-brand-blue dark:bg-main text-white border-brand-blue dark:border-main shadow-lg shadow-brand-blue/30 dark:shadow-main/30 scale-105'
+              : 'bg-white dark:bg-[#1a1f2e] text-gray-700 dark:text-gray-300 border-gray-300 dark:border-[#0c94ab40] hover:border-brand-blue/50 dark:hover:border-main/50 hover:bg-gray-50 dark:hover:bg-[#252a3a] hover:shadow-md'
           ]"
         >
-          {{ cat.label }}
+          <div v-if="filterCategory === cat.value" class="absolute top-2 right-2">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <span class="text-center">{{ cat.label }}</span>
+          <span 
+            v-if="groupedGalleries[cat.value] && groupedGalleries[cat.value].length > 0"
+            :class="[
+              'text-sm mt-2 font-normal',
+              filterCategory === cat.value ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'
+            ]"
+          >
+            {{ groupedGalleries[cat.value].length }} image(s)
+          </span>
         </button>
       </div>
     </div>
 
     <!-- Gallery Images Grid -->
-    <div class="bg-white dark:bg-[#0c0f14] rounded-xl shadow-lg p-6 border border-gray-100 dark:border-[#0c94ab40]">
+    <div class="bg-white dark:bg-[#0c0f14] rounded-xl shadow-lg p-6 border border-gray-200 dark:border-[#0c94ab40]">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
           <h2 class="text-xl font-bold text-gray-900 dark:text-white">Gallery Images</h2>
@@ -159,7 +187,7 @@
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <div
-          class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-main border-t-transparent mb-4"
+          class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-brand-blue dark:border-main border-t-transparent mb-4"
         ></div>
         <p class="text-gray-600">Loading gallery...</p>
       </div>
@@ -176,7 +204,7 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="galleries.length === 0" class="text-center py-12">
+      <div v-else-if="currentImages.length === 0" class="text-center py-12">
         <svg
           class="mx-auto h-12 w-12 text-gray-400 mb-4"
           fill="none"
@@ -190,9 +218,9 @@
             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
           ></path>
         </svg>
-        <p class="text-gray-600 mb-2">No images uploaded yet</p>
-        <p class="text-sm text-gray-500">
-          Upload your first image to get started
+        <p class="text-gray-600 dark:text-gray-300 mb-2">No images in this category yet</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          Upload images to the "{{ currentCategory.label }}" category to get started
         </p>
       </div>
 
@@ -205,31 +233,160 @@
             </h3>
             <span class="text-sm text-gray-500 dark:text-gray-300">{{ currentImages.length }} image(s)</span>
           </div>
-          <div v-if="currentImages.length" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div v-if="currentImages.length > 0" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             <div
-              v-for="gallery in currentImages"
+              v-for="(gallery, index) in currentImages"
               :key="gallery.id"
-              class="relative group rounded-lg overflow-hidden border border-gray-200 dark:border-[#0c94ab40] bg-white dark:bg-[#0c0f14]"
+              class="relative group rounded-lg overflow-hidden border border-gray-300 dark:border-[#0c94ab40] bg-white dark:bg-[#0c0f14] shadow-sm hover:shadow-lg transition-all cursor-pointer hover:border-brand-blue dark:hover:border-[#0C94AB]"
+              @click="viewImage(index)"
             >
               <img
                 :src="getImageUrl(gallery.path)"
-                :alt="gallery.filename"
+                :alt="gallery.filename || 'Gallery image'"
                 class="w-full h-32 object-cover"
                 @error="handleImageError"
               />
               <div
-                class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity flex items-center justify-center"
+                class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-opacity flex items-center justify-center gap-2"
               >
                 <button
-                  class="text-white opacity-0 group-hover:opacity-100 px-3 py-1 bg-red-600 rounded hover:bg-red-700 transition-colors text-sm font-medium"
-                  @click="deleteGallery(gallery.id)"
+                  class="text-white opacity-0 group-hover:opacity-100 px-4 py-2 bg-brand-blue dark:bg-blue-600 rounded-lg hover:bg-brand-blue/90 dark:hover:bg-blue-700 transition-all text-sm font-semibold shadow-lg transform hover:scale-105"
+                  @click.stop="viewImage(index)"
+                >
+                  View
+                </button>
+                <button
+                  class="text-white opacity-0 group-hover:opacity-100 px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-all text-sm font-semibold shadow-lg transform hover:scale-105"
+                  @click.stop="openDeleteModal(gallery.id)"
                 >
                   Delete
                 </button>
               </div>
+              <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div class="bg-black/50 text-white text-xs px-2 py-1 rounded">
+                  {{ gallery.category || 'uncategorized' }}
+                </div>
+              </div>
             </div>
           </div>
-          <div v-else class="text-sm text-gray-500 dark:text-gray-300">No images in this category yet.</div>
+          <div v-else class="text-center py-8">
+            <p class="text-sm text-gray-500 dark:text-gray-400">No images in this category yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Viewer Modal -->
+    <div
+      v-if="viewingImageIndex !== null"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 p-4"
+      @click.self="closeImageViewer"
+    >
+      <div class="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
+        <!-- Close Button -->
+        <button
+          @click="closeImageViewer"
+          class="absolute top-4 right-4 z-10 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-2 hover:bg-black/70"
+          aria-label="Close"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <!-- Delete Button -->
+        <button
+          @click="deleteCurrentImage"
+          class="absolute top-4 right-20 z-10 text-white hover:text-red-300 transition-colors bg-red-600/80 hover:bg-red-600 rounded-full px-4 py-2 text-sm font-semibold"
+          aria-label="Delete"
+        >
+          Delete Image
+        </button>
+
+        <!-- Previous Button -->
+        <button
+          v-if="currentImages.length > 1"
+          @click.stop="previousImage"
+          class="absolute left-4 z-10 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-3 hover:bg-black/70 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="viewingImageIndex === 0"
+          aria-label="Previous"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        <!-- Next Button -->
+        <button
+          v-if="currentImages.length > 1"
+          @click.stop="nextImage"
+          class="absolute right-4 z-10 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-3 hover:bg-black/70 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="viewingImageIndex === currentImages.length - 1"
+          aria-label="Next"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
+        <!-- Image -->
+        <div class="flex flex-col items-center justify-center max-w-full max-h-full">
+          <img
+            :src="getImageUrl(currentViewingImage?.path)"
+            :alt="currentViewingImage?.filename || 'Gallery image'"
+            class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+            @error="handleImageError"
+          />
+          <!-- Image Info -->
+          <div class="mt-4 text-white text-center">
+            <p class="text-sm opacity-80">
+              {{ viewingImageIndex + 1 }} of {{ currentImages.length }}
+            </p>
+            <p v-if="currentViewingImage?.filename" class="text-sm opacity-60 mt-1">
+              {{ currentViewingImage.filename }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+      v-if="showDeleteModal"
+      class="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 p-4"
+      @click.self="closeDeleteModal"
+    >
+      <div class="bg-white dark:bg-[#0c0f14] rounded-xl shadow-2xl max-w-md w-full p-6 border border-gray-200 dark:border-[#0c94ab40]">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white">Confirm Delete</h3>
+          <button
+            @click="closeDeleteModal"
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+            aria-label="Close"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <p class="text-gray-700 dark:text-gray-300 mb-6">
+          Are you sure you want to delete this image? This action cannot be undone.
+        </p>
+        
+        <div class="flex gap-3 justify-end">
+          <button
+            @click="closeDeleteModal"
+            class="px-4 py-2 bg-gray-200 dark:bg-[#1a1f2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-[#252a3a] transition-colors font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            @click="confirmDelete"
+            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+          >
+            Delete Image
+          </button>
         </div>
       </div>
     </div>
@@ -237,7 +394,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import AdminLayout from "@/components/admin/AdminLayout.vue";
 import { galleryService } from "@/services/galleryService";
@@ -253,7 +410,6 @@ export default {
       { value: "outreaches", label: "Outreaches" },
       { value: "youth", label: "Youth Ministry" },
       { value: "grace-church", label: "Grace Church" },
-      { value: "general", label: "General" },
     ];
     const defaultCategory = categories[0].value;
 
@@ -270,6 +426,9 @@ export default {
     const isDragging = ref(false);
     const selectedFiles = ref([]);
     const uploadingCount = ref(0);
+    const viewingImageIndex = ref(null);
+    const showDeleteModal = ref(false);
+    const imageToDelete = ref(null);
 
     const formData = ref({
       category: defaultCategory,
@@ -409,7 +568,13 @@ export default {
       try {
         // Load all galleries (no category filter) so we can filter on frontend
         const response = await galleryService.getGalleries(null);
-        galleries.value = response.galleries || [];
+        // API interceptor already unwraps response.data, so response is the data object
+        galleries.value = response.galleries || response.data?.galleries || [];
+        console.log("Loaded galleries:", galleries.value.length, "Total");
+        console.log("All galleries:", galleries.value);
+        console.log("Grouped by category:", groupedGalleries.value);
+        console.log("Current category filter:", filterCategory.value);
+        console.log("Current images for category:", currentImages.value.length, currentImages.value);
       } catch (err) {
         console.error("Error loading galleries:", err);
         error.value = err.message || "Failed to load galleries";
@@ -418,18 +583,49 @@ export default {
       }
     };
 
-    const deleteGallery = async (id) => {
-      if (!confirm("Are you sure you want to delete this image?")) {
-        return;
-      }
+    const openDeleteModal = (id) => {
+      imageToDelete.value = id;
+      showDeleteModal.value = true;
+    };
+
+    const closeDeleteModal = () => {
+      showDeleteModal.value = false;
+      imageToDelete.value = null;
+    };
+
+    const confirmDelete = async () => {
+      if (!imageToDelete.value) return;
+
+      const id = imageToDelete.value;
+      closeDeleteModal();
 
       try {
         await galleryService.deleteGallery(id);
+        success.value = "Image deleted successfully";
+        setTimeout(() => {
+          success.value = "";
+        }, 3000);
         await loadGalleries();
+        
+        // If we're viewing an image and it was deleted, close viewer or adjust index
+        if (viewingImageIndex.value !== null) {
+          if (currentImages.value.length === 0) {
+            closeImageViewer();
+          } else if (viewingImageIndex.value >= currentImages.value.length) {
+            viewingImageIndex.value = currentImages.value.length - 1;
+          }
+        }
       } catch (err) {
         console.error("Error deleting gallery:", err);
-        alert(`Failed to delete image: ${err.message}`);
+        error.value = `Failed to delete image: ${err.message || err}`;
+        setTimeout(() => {
+          error.value = "";
+        }, 5000);
       }
+    };
+
+    const deleteGallery = async (id) => {
+      openDeleteModal(id);
     };
 
     const setFilter = async (value) => {
@@ -442,7 +638,9 @@ export default {
     const groupedGalleries = computed(() => {
       const map = {};
       galleries.value.forEach((g) => {
-        const cat = g.category || "general";
+        // Use the category as-is, but normalize to handle null/undefined
+        // Default to "about" if category is missing
+        const cat = (g.category || defaultCategory).trim();
         if (!map[cat]) map[cat] = [];
         map[cat].push(g);
       });
@@ -454,7 +652,57 @@ export default {
       return found || categories[0];
     });
 
-    const currentImages = computed(() => groupedGalleries.value[currentCategory.value] || []);
+    const currentImages = computed(() => {
+      const categoryKey = filterCategory.value || defaultCategory;
+      return groupedGalleries.value[categoryKey] || [];
+    });
+
+    const currentViewingImage = computed(() => {
+      if (viewingImageIndex.value === null) return null;
+      return currentImages.value[viewingImageIndex.value] || null;
+    });
+
+    const viewImage = (index) => {
+      viewingImageIndex.value = index;
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = "hidden";
+    };
+
+    const closeImageViewer = () => {
+      viewingImageIndex.value = null;
+      // Restore body scroll
+      document.body.style.overflow = "";
+    };
+
+    const nextImage = () => {
+      if (viewingImageIndex.value < currentImages.value.length - 1) {
+        viewingImageIndex.value++;
+      }
+    };
+
+    const previousImage = () => {
+      if (viewingImageIndex.value > 0) {
+        viewingImageIndex.value--;
+      }
+    };
+
+    const deleteCurrentImage = () => {
+      if (!currentViewingImage.value) return;
+      const imageId = currentViewingImage.value.id;
+      openDeleteModal(imageId);
+    };
+
+    const handleKeyDown = (event) => {
+      if (viewingImageIndex.value === null) return;
+      
+      if (event.key === "Escape") {
+        closeImageViewer();
+      } else if (event.key === "ArrowLeft") {
+        previousImage();
+      } else if (event.key === "ArrowRight") {
+        nextImage();
+      }
+    };
 
     onMounted(async () => {
       const valid = applyRouteCategory();
@@ -463,6 +711,16 @@ export default {
         return;
       }
       await loadGalleries();
+      
+      // Add keyboard event listener
+      window.addEventListener("keydown", handleKeyDown);
+    });
+
+    onUnmounted(() => {
+      // Remove keyboard event listener
+      window.removeEventListener("keydown", handleKeyDown);
+      // Ensure body scroll is restored
+      document.body.style.overflow = "";
     });
 
     watch(
@@ -505,6 +763,17 @@ export default {
       deleteGallery,
       setFilter,
       selectCategory,
+      viewingImageIndex,
+      currentViewingImage,
+      viewImage,
+      closeImageViewer,
+      nextImage,
+      previousImage,
+      deleteCurrentImage,
+      showDeleteModal,
+      openDeleteModal,
+      closeDeleteModal,
+      confirmDelete,
     };
   },
 };

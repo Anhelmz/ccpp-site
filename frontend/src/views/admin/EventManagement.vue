@@ -194,7 +194,7 @@
       @click="closeModal"
     >
       <div
-        class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-brand-blue"
         @click.stop
       >
         <div class="p-6 border-b border-gray-200">
@@ -383,18 +383,39 @@
         </form>
       </div>
     </div>
+
+    <!-- Confirmation Modal -->
+    <ConfirmationModal
+      :show="showConfirmModal"
+      title="Delete Event"
+      message="Are you sure you want to delete this event? This action cannot be undone."
+      confirm-text="Delete Event"
+      @confirm="confirmDelete"
+      @cancel="cancelDelete"
+    />
+
+    <!-- Error Modal -->
+    <ErrorModal
+      :show="showErrorModal"
+      :message="errorMessage"
+      @close="closeErrorModal"
+    />
   </AdminLayout>
 </template>
 
 <script>
 import { ref, computed, onMounted } from "vue";
 import AdminLayout from "@/components/admin/AdminLayout.vue";
+import ConfirmationModal from "@/components/admin/ConfirmationModal.vue";
+import ErrorModal from "@/components/admin/ErrorModal.vue";
 import { eventService } from "@/services/eventService";
 
 export default {
   name: "EventManagement",
   components: {
     AdminLayout,
+    ConfirmationModal,
+    ErrorModal,
   },
   setup() {
     const showModal = ref(false);
@@ -406,6 +427,10 @@ export default {
     const formError = ref("");
     const filterType = ref("all");
     const searchQuery = ref("");
+    const showConfirmModal = ref(false);
+    const showErrorModal = ref(false);
+    const errorMessage = ref("");
+    const eventToDelete = ref(null);
 
     const eventForm = ref({
       title: "",
@@ -602,18 +627,37 @@ export default {
       }
     };
 
-    const deleteEvent = async (id) => {
-      if (!confirm("Are you sure you want to delete this event?")) {
-        return;
-      }
+    const deleteEvent = (id) => {
+      eventToDelete.value = id;
+      showConfirmModal.value = true;
+    };
+
+    const confirmDelete = async () => {
+      if (!eventToDelete.value) return;
+
+      const id = eventToDelete.value;
+      showConfirmModal.value = false;
 
       try {
         await eventService.deleteEvent(id);
         await loadEvents();
+        eventToDelete.value = null;
       } catch (err) {
         console.error("Error deleting event:", err);
-        alert(`Failed to delete event: ${err.message}`);
+        errorMessage.value = `Failed to delete event: ${err.message}`;
+        showErrorModal.value = true;
+        eventToDelete.value = null;
       }
+    };
+
+    const cancelDelete = () => {
+      showConfirmModal.value = false;
+      eventToDelete.value = null;
+    };
+
+    const closeErrorModal = () => {
+      showErrorModal.value = false;
+      errorMessage.value = "";
     };
 
     onMounted(() => {
@@ -640,6 +684,12 @@ export default {
       closeModal,
       saveEvent,
       deleteEvent,
+      showConfirmModal,
+      showErrorModal,
+      errorMessage,
+      confirmDelete,
+      cancelDelete,
+      closeErrorModal,
     };
   },
 };

@@ -536,8 +536,12 @@ export default {
     };
 
     const handleImageError = (event) => {
-      event.target.src =
-        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23ddd" width="200" height="200"/%3E%3Ctext fill="%23999" font-family="sans-serif" font-size="14" dy="10.5" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3EImage not found%3C/text%3E%3C/svg%3E';
+      // Hide the image when it fails to load instead of showing placeholder
+      event.target.style.display = 'none';
+      // Also hide the parent container to remove the blank space
+      if (event.target.parentElement) {
+        event.target.parentElement.style.display = 'none';
+      }
     };
 
     const openLightbox = (index) => {

@@ -246,12 +246,23 @@
         </form>
       </div>
     </div>
+
+    <!-- Confirmation Modal -->
+    <ConfirmationModal
+      :show="showConfirmModal"
+      title="Delete Video"
+      message="Are you sure you want to delete this video? This action cannot be undone."
+      confirm-text="Delete Video"
+      @confirm="confirmDelete"
+      @cancel="cancelDelete"
+    />
   </AdminLayout>
 </template>
 
 <script>
 import { ref, computed, onMounted } from "vue";
 import AdminLayout from "@/components/admin/AdminLayout.vue";
+import ConfirmationModal from "@/components/admin/ConfirmationModal.vue";
 import { videoStore } from "@/services/videoStore";
 
 const extractYouTubeId = (input) => {
@@ -266,6 +277,7 @@ export default {
   name: "VideoManagement",
   components: {
     AdminLayout,
+    ConfirmationModal,
   },
   setup() {
     const showModal = ref(false);
@@ -273,6 +285,8 @@ export default {
     const videos = ref([]);
     const formError = ref("");
     const searchQuery = ref("");
+    const showConfirmModal = ref(false);
+    const videoToDelete = ref(null);
 
     const videoForm = ref({
       title: "",
@@ -353,11 +367,21 @@ export default {
     };
 
     const deleteVideo = (id) => {
-      if (!confirm("Are you sure you want to delete this video?")) {
-        return;
-      }
-      videoStore.remove(id);
+      videoToDelete.value = id;
+      showConfirmModal.value = true;
+    };
+
+    const confirmDelete = () => {
+      if (!videoToDelete.value) return;
+      videoStore.remove(videoToDelete.value);
       loadVideos();
+      showConfirmModal.value = false;
+      videoToDelete.value = null;
+    };
+
+    const cancelDelete = () => {
+      showConfirmModal.value = false;
+      videoToDelete.value = null;
     };
 
     onMounted(() => {
@@ -378,6 +402,9 @@ export default {
       closeModal,
       saveVideo,
       deleteVideo,
+      showConfirmModal,
+      confirmDelete,
+      cancelDelete,
     };
   },
 };

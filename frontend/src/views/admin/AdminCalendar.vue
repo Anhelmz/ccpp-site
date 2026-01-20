@@ -2,13 +2,13 @@
   <AdminLayout>
     <div class="mb-6 flex flex-wrap gap-3 items-center justify-between">
       <div>
-        <h1 class="text-2xl font-semibold text-gray-400">Calendar</h1>
-        <p class="text-sm text-gray-500">Create events that show on the public calendar page.</p>
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-400">Calendar</h1>
+        <p class="text-sm text-gray-600 dark:text-gray-500">Create events that show on the public calendar page.</p>
       </div>
       <div class="flex gap-3">
         <button
           @click="resetToToday"
-          class="px-4 py-2 rounded-md border border-gray-700 text-gray-400 hover:bg-gray-800"
+          class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-400 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-medium shadow-sm"
         >
           Today
         </button>
@@ -24,12 +24,12 @@
       </div>
     </div>
 
-    <div class="bg-black rounded-xl shadow border border-gray-700 p-4 md:p-6">
+    <div class="bg-white dark:bg-black rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6">
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
           <button
             @click="previousMonth"
-            class="p-2 rounded-md border border-gray-700 hover:bg-gray-800 text-gray-400"
+            class="p-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-400 transition-colors shadow-sm"
             aria-label="Previous month"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,18 +38,18 @@
           </button>
           <button
             @click="nextMonth"
-            class="p-2 rounded-md border border-gray-700 hover:bg-gray-800 text-gray-400"
+            class="p-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-400 transition-colors shadow-sm"
             aria-label="Next month"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </button>
-          <h2 class="text-xl font-semibold text-gray-400">{{ monthLabel }}</h2>
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-400">{{ monthLabel }}</h2>
         </div>
       </div>
 
-      <div class="grid grid-cols-7 gap-2 text-sm font-semibold text-gray-500 mb-2">
+      <div class="grid grid-cols-7 gap-2 text-sm font-semibold text-gray-500 dark:text-gray-500 mb-2">
         <div v-for="day in weekdayLabels" :key="day" class="text-center py-2">
           {{ day }}
         </div>
@@ -60,11 +60,15 @@
           v-for="day in calendarDays"
           :key="day.date"
           :class="[
-            'min-h-28 border rounded-lg p-3 flex flex-col gap-2 cursor-pointer transition-colors',
+            'min-h-28 border rounded-lg p-3 flex flex-col gap-2 cursor-pointer transition-all hover:shadow-md',
             day.isPast 
-              ? (day.isCurrentMonth ? 'bg-gray-800 hover:bg-gray-700 border-gray-600 text-gray-500' : 'bg-gray-900 text-gray-600 border-gray-700')
-              : (day.isCurrentMonth ? 'bg-black hover:bg-gray-900 border-gray-700 text-gray-400' : 'bg-black text-gray-600 border-gray-800'),
-            day.isToday ? 'border-main ring-1 ring-main/30' : ''
+              ? (day.isCurrentMonth 
+                  ? 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-500' 
+                  : 'bg-gray-50 dark:bg-gray-900 text-gray-400 dark:text-gray-600 border-gray-200 dark:border-gray-700')
+              : (day.isCurrentMonth 
+                  ? 'bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-400' 
+                  : 'bg-gray-50 dark:bg-black text-gray-400 dark:text-gray-600 border-gray-200 dark:border-gray-800'),
+            day.isToday ? 'border-brand-blue dark:border-main ring-2 ring-brand-blue/20 dark:ring-main/30 bg-blue-50 dark:bg-main/10' : ''
           ]"
           @click="openCreateModal(day.date)"
         >
@@ -72,8 +76,9 @@
             <span :class="[
               'text-sm font-semibold', 
               day.isPast 
-                ? (day.isCurrentMonth ? 'text-gray-500' : 'text-gray-600')
-                : (day.isCurrentMonth ? 'text-gray-400' : 'text-gray-600')
+                ? (day.isCurrentMonth ? 'text-gray-500 dark:text-gray-500' : 'text-gray-400 dark:text-gray-600')
+                : (day.isCurrentMonth ? 'text-gray-800 dark:text-gray-400' : 'text-gray-400 dark:text-gray-600'),
+              day.isToday ? 'text-brand-blue dark:text-main font-bold' : ''
             ]">
               {{ day.day }}
             </span>
@@ -82,8 +87,8 @@
               :class="[
                 'text-[11px] font-semibold px-2 py-1 rounded-full',
                 day.isPast 
-                  ? 'bg-gray-700 text-gray-400' 
-                  : 'bg-main/20 text-main'
+                  ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400' 
+                  : 'bg-brand-blue/10 dark:bg-main/20 text-brand-blue dark:text-main'
               ]"
             >
               {{ day.events.length }} evt
@@ -95,16 +100,16 @@
               :key="event.id"
               type="button"
               :class="[
-                'w-full text-left text-xs rounded-md px-2 py-1 truncate',
+                'w-full text-left text-xs rounded-md px-2 py-1 truncate transition-colors',
                 day.isPast 
-                  ? 'bg-gray-700 text-gray-400 hover:bg-gray-600' 
-                  : 'bg-main/20 text-main hover:bg-main/30'
+                  ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600' 
+                  : 'bg-brand-blue/10 dark:bg-main/20 text-brand-blue dark:text-main hover:bg-brand-blue/20 dark:hover:bg-main/30'
               ]"
               @click.stop="openEditModal(event)"
             >
               {{ event.title }}
             </button>
-            <div v-if="day.events.length > 3" :class="['text-xs', day.isPast ? 'text-gray-600' : 'text-gray-500']">+{{ day.events.length - 3 }} more</div>
+            <div v-if="day.events.length > 3" :class="['text-xs', day.isPast ? 'text-gray-500 dark:text-gray-600' : 'text-gray-500 dark:text-gray-500']">+{{ day.events.length - 3 }} more</div>
           </div>
         </div>
       </div>
@@ -116,7 +121,7 @@
       @click="closeModal"
     >
       <div
-        class="bg-white rounded-xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto"
+        class="bg-white rounded-xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto border-2 border-brand-blue"
         @click.stop
       >
         <div class="p-5 border-b border-gray-200 flex items-center justify-between">
