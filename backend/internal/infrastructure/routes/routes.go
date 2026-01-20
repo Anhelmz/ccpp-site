@@ -61,7 +61,7 @@ func registerAPIRoutes(
 
 	gallery := api.Group("/gallery")
 	{
-		// Auth removed to allow uploads without token
+		gallery.POST("", galleryHandler.CreateGallery)
 		gallery.POST("/upload", galleryHandler.UploadGallery)
 		gallery.GET("", galleryHandler.GetAllGalleries)
 		gallery.GET("/:id", galleryHandler.GetGalleryByID)

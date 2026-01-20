@@ -2,11 +2,12 @@
   <AdminLayout>
     <!-- Upload Section -->
     <div class="bg-white dark:bg-[#0c0f14] rounded-xl shadow-lg p-6 mb-8 border border-gray-100 dark:border-[#0c94ab40]">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Upload New Images</h2>
+      <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Upload Images</h2>
 
+      <!-- File Selection -->
       <div
         :class="[
-          'border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer',
+          'border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer mb-6',
           isDragging
             ? 'border-main bg-primary/30 dark:border-[#0C94AB] dark:bg-[#0C94AB33]'
             : 'border-gray-300 bg-gray-100 hover:border-main hover:bg-primary/20 dark:border-[#0c94ab40] dark:bg-[#0c0f14] dark:hover:border-[#0C94AB] dark:hover:bg-[#0C94AB26]',
@@ -42,55 +43,107 @@
           </svg>
         </div>
         <p class="text-gray-700 dark:text-gray-200 font-medium mb-2">
-          Drag and drop images here, or click to select
+          Drag and drop images here, or click to browse folders
         </p>
         <p class="text-sm text-gray-500 dark:text-gray-300 mb-6">
           Supports JPG, PNG, GIF (Max 10MB per image)
         </p>
         <button
+          type="button"
           class="px-6 py-3 bg-main text-white rounded-lg hover:opacity-90 transition-colors font-medium shadow-md"
           @click.stop="triggerFileInput"
         >
-          Select Images
+          Select Images from Folder
         </button>
       </div>
 
-    <!-- Category Display -->
-    <div class="mt-6">
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-        Category
-      </label>
-      <p class="text-base font-semibold text-gray-900 dark:text-white capitalize">
-        {{ currentCategory.label }}
-      </p>
-    </div>
+      <!-- Category Selection -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          Category <span class="text-red-500">*</span>
+        </label>
+        <select
+          v-model="formData.category"
+          required
+          class="w-full px-4 py-2 border border-gray-300 dark:border-[#0c94ab40] rounded-lg bg-white dark:bg-[#0c0f14] text-gray-900 dark:text-white focus:ring-2 focus:ring-main focus:border-transparent"
+        >
+          <option v-for="cat in categories" :key="cat.value" :value="cat.value">
+            {{ cat.label }}
+          </option>
+        </select>
+      </div>
 
-      <!-- Upload Progress -->
-      <div v-if="uploading" class="mt-6">
-        <div class="flex items-center space-x-2">
+      <!-- Selected Files Preview -->
+      <div v-if="selectedFiles.length > 0" class="mb-4">
+        <p class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+          Selected Files ({{ selectedFiles.length }})
+        </p>
+        <div class="max-h-40 overflow-y-auto space-y-1">
           <div
-            class="animate-spin rounded-full h-5 w-5 border-2 border-main border-t-transparent"
-          ></div>
-          <span class="text-gray-700"
-            >Uploading {{ uploadingCount }} image(s)...</span
+            v-for="(file, index) in selectedFiles"
+            :key="index"
+            class="flex items-center justify-between p-2 bg-gray-50 dark:bg-[#1a1f2e] rounded text-sm"
           >
+            <span class="text-gray-700 dark:text-gray-300 truncate flex-1">{{ file.name }}</span>
+            <button
+              type="button"
+              @click="removeFile(index)"
+              class="ml-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+            >
+              Remove
+            </button>
+          </div>
         </div>
       </div>
 
+      <!-- Upload Button -->
+      <button
+        type="button"
+        :disabled="submitting || selectedFiles.length === 0"
+        @click="uploadFiles"
+        class="w-full px-6 py-3 bg-main text-white rounded-lg hover:opacity-90 transition-colors font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <span v-if="submitting" class="flex items-center justify-center space-x-2">
+          <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+          <span>Uploading {{ uploadingCount }} image(s)...</span>
+        </span>
+        <span v-else>Upload {{ selectedFiles.length || 0 }} Image(s)</span>
+      </button>
+
       <!-- Error Message -->
       <div
-        v-if="uploadError"
-        class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg"
+        v-if="error"
+        class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
       >
-        <p class="text-red-600 text-sm">{{ uploadError }}</p>
+        <p class="text-red-600 dark:text-red-400 text-sm">{{ error }}</p>
       </div>
 
       <!-- Success Message -->
       <div
-        v-if="uploadSuccess"
-        class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg"
+        v-if="success"
+        class="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg"
       >
-        <p class="text-green-600 text-sm">{{ uploadSuccess }}</p>
+        <p class="text-green-600 dark:text-green-400 text-sm">{{ success }}</p>
+      </div>
+    </div>
+
+    <!-- Category Selector -->
+    <div class="bg-white dark:bg-[#0c0f14] rounded-xl shadow-lg p-6 mb-8 border border-gray-100 dark:border-[#0c94ab40]">
+      <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Select Category</h2>
+      <div class="flex flex-wrap gap-2">
+        <button
+          v-for="cat in categories"
+          :key="cat.value"
+          @click="selectCategory(cat.value)"
+          :class="[
+            'px-4 py-2 rounded-lg font-medium transition-colors',
+            filterCategory === cat.value
+              ? 'bg-main text-white shadow-md'
+              : 'bg-gray-100 dark:bg-[#1a1f2e] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#252a3a]'
+          ]"
+        >
+          {{ cat.label }}
+        </button>
       </div>
     </div>
 
@@ -204,19 +257,23 @@ export default {
     ];
     const defaultCategory = categories[0].value;
 
-    const fileInput = ref(null);
-    const isDragging = ref(false);
-    const selectedCategory = ref(defaultCategory);
     const filterCategory = ref(defaultCategory);
     const galleries = ref([]);
     const loading = ref(false);
     const error = ref("");
-    const uploading = ref(false);
-    const uploadingCount = ref(0);
-    const uploadError = ref("");
-    const uploadSuccess = ref("");
+    const success = ref("");
+    const submitting = ref(false);
     const route = useRoute();
     const router = useRouter();
+
+    const fileInput = ref(null);
+    const isDragging = ref(false);
+    const selectedFiles = ref([]);
+    const uploadingCount = ref(0);
+
+    const formData = ref({
+      category: defaultCategory,
+    });
 
     const applyRouteCategory = () => {
       const routeCategory = route.params.category;
@@ -224,10 +281,112 @@ export default {
       const isValid = routeCategory && validValues.includes(routeCategory);
       const nextCategory = isValid ? routeCategory : defaultCategory;
 
-      selectedCategory.value = nextCategory;
       filterCategory.value = nextCategory;
+      formData.value.category = nextCategory; // Sync form category with selected category
 
       return isValid || !routeCategory;
+    };
+
+    const selectCategory = async (categoryValue) => {
+      filterCategory.value = categoryValue;
+      formData.value.category = categoryValue; // Update form category when switching
+      
+      // Update URL to reflect selected category
+      if (categoryValue === defaultCategory) {
+        await router.push({ name: "GalleryManagement" });
+      } else {
+        await router.push({ name: "GalleryCategory", params: { category: categoryValue } });
+      }
+      
+      await loadGalleries();
+    };
+
+    const triggerFileInput = () => {
+      fileInput.value?.click();
+    };
+
+    const handleFileSelect = (event) => {
+      const files = Array.from(event.target.files);
+      addFiles(files);
+    };
+
+    const handleDrop = (event) => {
+      isDragging.value = false;
+      const files = Array.from(event.dataTransfer.files).filter((file) =>
+        file.type.startsWith("image/"),
+      );
+      if (files.length > 0) {
+        addFiles(files);
+      }
+    };
+
+    const addFiles = (files) => {
+      const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+      selectedFiles.value = [...selectedFiles.value, ...imageFiles];
+      
+      // Clear file input to allow selecting the same files again
+      if (fileInput.value) {
+        fileInput.value.value = "";
+      }
+    };
+
+    const removeFile = (index) => {
+      selectedFiles.value.splice(index, 1);
+    };
+
+    const uploadFiles = async () => {
+      if (selectedFiles.value.length === 0) {
+        error.value = "Please select at least one image";
+        return;
+      }
+
+      if (!formData.value.category) {
+        error.value = "Please select a category";
+        return;
+      }
+
+      submitting.value = true;
+      uploadingCount.value = selectedFiles.value.length;
+      error.value = "";
+      success.value = "";
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const file of selectedFiles.value) {
+        try {
+          const formDataToSend = new FormData();
+          formDataToSend.append("image", file);
+          formDataToSend.append("category", formData.value.category);
+
+          await galleryService.uploadImage(formDataToSend);
+          successCount++;
+        } catch (err) {
+          console.error("Upload error:", err);
+          failCount++;
+          error.value = `Failed to upload ${failCount} image(s): ${err.response?.data?.error || err.message}`;
+        }
+      }
+
+      submitting.value = false;
+      uploadingCount.value = 0;
+
+      if (successCount > 0) {
+        success.value = `Successfully uploaded ${successCount} image(s)`;
+        setTimeout(() => {
+          success.value = "";
+        }, 3000);
+        
+        // Clear selected files
+        selectedFiles.value = [];
+        
+        await loadGalleries();
+      }
+
+      // Clear file input
+      if (fileInput.value) {
+        fileInput.value.value = "";
+      }
     };
 
     const getImageUrl = (path) => {
@@ -244,78 +403,12 @@ export default {
         'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23ddd" width="200" height="200"/%3E%3Ctext fill="%23999" font-family="sans-serif" font-size="14" dy="10.5" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3EImage not found%3C/text%3E%3C/svg%3E';
     };
 
-    const triggerFileInput = () => {
-      fileInput.value?.click();
-    };
-
-    const handleFileSelect = (event) => {
-      const files = Array.from(event.target.files);
-      uploadFiles(files);
-    };
-
-    const handleDrop = (event) => {
-      isDragging.value = false;
-      const files = Array.from(event.dataTransfer.files).filter((file) =>
-        file.type.startsWith("image/"),
-      );
-      if (files.length > 0) {
-        uploadFiles(files);
-      }
-    };
-
-    const uploadFiles = async (files) => {
-      if (!selectedCategory.value) {
-        uploadError.value = "Please select a category";
-        return;
-      }
-
-      uploading.value = true;
-      uploadingCount.value = files.length;
-      uploadError.value = "";
-      uploadSuccess.value = "";
-
-      let successCount = 0;
-      let failCount = 0;
-
-      for (const file of files) {
-        try {
-          const formData = new FormData();
-          formData.append("image", file);
-          formData.append("category", selectedCategory.value);
-
-          await galleryService.uploadImage(formData);
-          successCount++;
-        } catch (err) {
-          console.error("Upload error:", err);
-          failCount++;
-          uploadError.value = `Failed to upload ${failCount} image(s): ${err.message}`;
-        }
-      }
-
-      uploading.value = false;
-      uploadingCount.value = 0;
-
-      if (successCount > 0) {
-        uploadSuccess.value = `Successfully uploaded ${successCount} image(s)`;
-        setTimeout(() => {
-          uploadSuccess.value = "";
-        }, 3000);
-        await loadGalleries();
-      }
-
-      // Clear file input
-      if (fileInput.value) {
-        fileInput.value.value = "";
-      }
-    };
-
     const loadGalleries = async () => {
       loading.value = true;
       error.value = "";
       try {
-        const response = await galleryService.getGalleries(
-          filterCategory.value || null,
-        );
+        // Load all galleries (no category filter) so we can filter on frontend
+        const response = await galleryService.getGalleries(null);
         galleries.value = response.galleries || [];
       } catch (err) {
         console.error("Error loading galleries:", err);
@@ -385,29 +478,33 @@ export default {
     );
 
     return {
-      fileInput,
-      isDragging,
-      selectedCategory,
+      formData,
       filterCategory,
       galleries,
       loading,
       error,
-      uploading,
-      uploadingCount,
-      uploadError,
-      uploadSuccess,
+      success,
+      submitting,
       categories,
       groupedGalleries,
       currentCategory,
       currentImages,
+      fileInput,
+      isDragging,
+      selectedFiles,
+      uploadingCount,
       getImageUrl,
       handleImageError,
       triggerFileInput,
       handleFileSelect,
       handleDrop,
+      addFiles,
+      removeFile,
+      uploadFiles,
       loadGalleries,
       deleteGallery,
       setFilter,
+      selectCategory,
     };
   },
 };

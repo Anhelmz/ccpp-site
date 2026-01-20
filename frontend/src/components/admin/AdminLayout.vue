@@ -93,20 +93,6 @@
               </span>
               Galleries
             </router-link>
-            <div class="ml-6 space-y-0.5">
-              <router-link
-                v-for="section in gallerySections"
-                :key="section.value"
-                :to="section.to"
-                @click="closeSidebarOnMobile"
-                :class="subLinkClass(section.value)"
-              >
-                <span class="mr-2 inline-flex items-center justify-center h-5 w-3">
-                  <span class="h-1 w-1 rounded-full" :class="isDarkMode ? 'bg-[#0C94AB]' : 'bg-cyan-500'"></span>
-                </span>
-                {{ section.label }}
-              </router-link>
-            </div>
 
             <router-link
               to="/admin/events"
@@ -170,7 +156,13 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-4 8H7" />
                 </svg>
               </span>
-              Contact Requests
+              <span class="flex-1">Contact Requests</span>
+              <span
+                v-if="contactRequestCount > 0"
+                class="ml-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white text-xs font-semibold"
+              >
+                {{ contactRequestCount > 99 ? '99+' : contactRequestCount }}
+              </span>
             </router-link>
 
             <router-link
@@ -225,7 +217,7 @@
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden">
-        <main :class="['flex-1 overflow-y-auto', isDarkMode ? 'bg-[#000000] text-white' : 'bg-white']">
+        <main :class="['flex-1 overflow-y-auto', isDarkMode ? 'bg-[#000000] text-white' : 'bg-white text-black']">
           <div class="py-4 sm:py-6">
             <div class="px-4 sm:px-6">
               <slot />
@@ -238,8 +230,9 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { contactRequestService } from '@/services/contactRequestService'
 
 export default {
   name: 'AdminLayout',
@@ -270,17 +263,12 @@ export default {
     }
 
     const isDarkMode = ref(loadStoredTheme() ?? props.isDark)
+    const contactRequestCount = ref(0)
+    let countRefreshInterval = null
 
     const currentUser = computed(() => props.user || localUser.value)
     const userEmail = computed(() => currentUser.value?.email || 'admin@ccpp.org')
     const userInitial = computed(() => (currentUser.value?.email || 'A').charAt(0).toUpperCase())
-    const gallerySections = [
-      { value: 'about', label: 'About', to: { name: 'GalleryCategory', params: { category: 'about' } } },
-      { value: 'outreaches', label: 'Outreaches', to: { name: 'GalleryCategory', params: { category: 'outreaches' } } },
-      { value: 'youth', label: 'Youth Ministry', to: { name: 'GalleryCategory', params: { category: 'youth' } } },
-      { value: 'grace-church', label: 'Grace Church', to: { name: 'GalleryCategory', params: { category: 'grace-church' } } },
-      { value: 'general', label: 'General', to: { name: 'GalleryCategory', params: { category: 'general' } } }
-    ]
 
     const linkClass = (name, extraNames = []) => {
       const active = route.name === name || extraNames.includes(route.name)
@@ -295,21 +283,6 @@ export default {
       return active
         ? `${base} bg-white text-zinc-700 border-cyan-500`
         : `${base} text-zinc-600 border-transparent hover:bg-white hover:text-zinc-700 hover:border-cyan-500`
-    }
-
-    const subLinkClass = (value) => {
-      const active = route.name === 'GalleryCategory' && route.params.category === value
-      const base = 'group flex items-center px-6 sm:px-8 py-2 text-sm font-medium transition-all duration-200 ease-in-out rounded-r-md'
-
-      if (isDarkMode.value) {
-        return active
-          ? `${base} bg-slate-800 text-slate-100`
-          : `${base} text-slate-300 hover:bg-slate-800 hover:text-white`
-      }
-
-      return active
-        ? `${base} bg-white text-zinc-700`
-        : `${base} text-zinc-600 hover:bg-white hover:text-zinc-700`
     }
 
     const toggleSidebar = () => {
@@ -344,6 +317,16 @@ export default {
       emit('toggle-theme', isDarkMode.value)
     }
 
+    const loadContactRequestCount = async () => {
+      try {
+        const response = await contactRequestService.getContactRequests()
+        contactRequestCount.value = response.requests?.length || 0
+      } catch (err) {
+        console.error('Error loading contact request count:', err)
+        contactRequestCount.value = 0
+      }
+    }
+
     onMounted(() => {
       const saved = localStorage.getItem('authUser')
       if (saved) {
@@ -353,6 +336,16 @@ export default {
           localUser.value = null
         }
       }
+      
+      // Load contact request count and refresh every 30 seconds
+      loadContactRequestCount()
+      countRefreshInterval = setInterval(loadContactRequestCount, 30000)
+    })
+
+    onUnmounted(() => {
+      if (countRefreshInterval) {
+        clearInterval(countRefreshInterval)
+      }
     })
 
     return {
@@ -360,9 +353,8 @@ export default {
       isDarkMode,
       userEmail,
       userInitial,
-      gallerySections,
+      contactRequestCount,
       linkClass,
-      subLinkClass,
       toggleSidebar,
       closeSidebar,
       closeSidebarOnMobile,
@@ -374,8 +366,11 @@ export default {
 </script>
 
 <style scoped>
-.admin-dark-mode :deep(.bg-white) {
-  background-color: #0c0f14 !important;
+/* Remove all white backgrounds in dark mode */
+.admin-dark-mode :deep(.bg-white),
+.admin-dark-mode :deep(.bg-gray-50),
+.admin-dark-mode :deep(.bg-gray-100) {
+  background-color: #000000 !important;
   border-color: #0c94ab40 !important;
 }
 
@@ -387,6 +382,7 @@ export default {
   color: #f5f7fb;
 }
 
+/* Ensure all text is visible in dark mode - use light colors */
 .admin-dark-mode :deep(.text-gray-500),
 .admin-dark-mode :deep(.text-gray-600),
 .admin-dark-mode :deep(.text-gray-700),
@@ -398,7 +394,8 @@ export default {
 
 .admin-dark-mode :deep(.text-gray-900),
 .admin-dark-mode :deep(.text-zinc-900),
-.admin-dark-mode :deep(.font-semibold) {
+.admin-dark-mode :deep(.text-black),
+.admin-dark-mode :deep([class*="text-black"]) {
   color: #f8fbff !important;
 }
 
@@ -413,6 +410,51 @@ export default {
 .admin-dark-mode :deep(.router-link-exact-active) {
   background-color: #0c94ab1a !important;
   border-color: #0c94ab !important;
+}
+
+/* Ensure table headers and bodies are dark */
+.admin-dark-mode :deep(thead) {
+  background-color: #0a0a0a !important;
+}
+
+.admin-dark-mode :deep(tbody) {
+  background-color: #000000 !important;
+}
+
+.admin-dark-mode :deep(tbody tr:hover) {
+  background-color: #0a0a0a !important;
+}
+
+/* Ensure hover states don't use white */
+.admin-dark-mode :deep(.hover\:bg-white:hover),
+.admin-dark-mode :deep(.hover\:bg-gray-50:hover) {
+  background-color: #0a0a0a !important;
+  color: #f5f7fb !important;
+}
+
+/* Form inputs and selects - dark backgrounds with light text */
+.admin-dark-mode :deep(input[type="text"]),
+.admin-dark-mode :deep(input[type="search"]),
+.admin-dark-mode :deep(input[type="email"]),
+.admin-dark-mode :deep(input[type="password"]),
+.admin-dark-mode :deep(input[type="number"]),
+.admin-dark-mode :deep(input[type="date"]),
+.admin-dark-mode :deep(input[type="datetime-local"]),
+.admin-dark-mode :deep(select),
+.admin-dark-mode :deep(textarea) {
+  background-color: #000000 !important;
+  color: #f5f7fb !important;
+  border-color: #0c94ab40 !important;
+}
+
+.admin-dark-mode :deep(input::placeholder),
+.admin-dark-mode :deep(textarea::placeholder) {
+  color: #94a3b8 !important;
+}
+
+.admin-dark-mode :deep(select option) {
+  background-color: #000000 !important;
+  color: #f5f7fb !important;
 }
 </style>
 

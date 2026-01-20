@@ -1,9 +1,18 @@
 import api from "./api";
 
 export const galleryService = {
-  // Upload gallery image
+  // Create gallery image (using URL/path)
+  async createGallery(data) {
+    return await api.post("/gallery", data);
+  },
+
+  // Upload gallery image (file upload)
   async uploadImage(formData) {
-    return await api.post("/gallery/upload", formData);
+    return await api.post("/gallery/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   },
 
   // Get all galleries

@@ -112,12 +112,12 @@
     color: var(--admin-ink);
   }
 
-  /* Surface + border overrides */
+  /* Surface + border overrides - remove all white backgrounds in dark mode */
   .admin-root.admin-dark .bg-white,
   .admin-root.admin-dark .bg-white\/95,
   .admin-root.admin-dark .bg-gray-50,
   .admin-root.admin-dark .bg-gray-100 {
-    background-color: var(--admin-surface) !important;
+    background-color: #000000 !important;
   }
 
   .admin-root.admin-dark .bg-gray-200 {
@@ -131,12 +131,13 @@
     border-color: var(--admin-border) !important;
   }
 
-  /* Text colors */
+  /* Text colors - ensure all dark text becomes light in dark mode */
   .admin-root.admin-dark .text-gray-900,
   .admin-root.admin-dark .text-gray-800,
   .admin-root.admin-dark .text-gray-700,
   .admin-root.admin-dark .text-zinc-800,
-  .admin-root.admin-dark .text-zinc-700 {
+  .admin-root.admin-dark .text-zinc-700,
+  .admin-root.admin-dark .text-black {
     color: var(--admin-ink) !important;
   }
 
@@ -151,23 +152,42 @@
     color: var(--admin-ink-muted) !important;
   }
 
-  /* Form fields */
+  /* Form fields - ensure dark backgrounds and light text */
   .admin-root.admin-dark input,
   .admin-root.admin-dark select,
   .admin-root.admin-dark textarea {
-    background-color: #0b162a;
-    color: var(--admin-ink);
-    border-color: var(--admin-border);
+    background-color: #000000 !important;
+    color: #f5f7fb !important;
+    border-color: #0c94ab40 !important;
   }
 
   .admin-root.admin-dark input::placeholder,
   .admin-root.admin-dark textarea::placeholder {
-    color: var(--admin-ink-muted);
+    color: #94a3b8 !important;
   }
 
   .admin-root.admin-dark select option {
-    background-color: #0b162a;
-    color: var(--admin-ink);
+    background-color: #000000 !important;
+    color: #f5f7fb !important;
+  }
+
+  /* Ensure all inputs and selects in dark mode are dark */
+  .admin-dark-mode :deep(input),
+  .admin-dark-mode :deep(select),
+  .admin-dark-mode :deep(textarea) {
+    background-color: #000000 !important;
+    color: #f5f7fb !important;
+    border-color: #0c94ab40 !important;
+  }
+
+  .admin-dark-mode :deep(input::placeholder),
+  .admin-dark-mode :deep(textarea::placeholder) {
+    color: #94a3b8 !important;
+  }
+
+  .admin-dark-mode :deep(select option) {
+    background-color: #000000 !important;
+    color: #f5f7fb !important;
   }
 
   /* Tables */
@@ -176,15 +196,15 @@
   }
 
   .admin-root.admin-dark thead {
-    background-color: var(--admin-surface-alt) !important;
+    background-color: #0a0a0a !important;
   }
 
   .admin-root.admin-dark tbody {
-    background-color: var(--admin-surface) !important;
+    background-color: #000000 !important;
   }
 
   .admin-root.admin-dark tbody tr:hover {
-    background-color: #111827 !important;
+    background-color: #0a0a0a !important;
   }
 
   /* Status backgrounds */
@@ -200,11 +220,11 @@
     background-color: rgba(59, 130, 246, 0.12) !important;
   }
 
-  /* Hover helpers */
+  /* Hover helpers - ensure no white backgrounds on hover */
   .admin-root.admin-dark .hover\:bg-gray-50:hover,
   .admin-root.admin-dark .hover\:bg-white:hover {
-    background-color: #111827 !important;
-    color: var(--admin-ink);
+    background-color: #0a0a0a !important;
+    color: var(--admin-ink) !important;
   }
 
   /* Accent text tweaks */
@@ -215,5 +235,14 @@
 
   .admin-root.admin-dark .text-green-600 {
     color: #86efac !important;
+  }
+
+  /* Light mode: Ensure white backgrounds have black text */
+  .admin-root:not(.admin-dark-mode) .bg-white {
+    color: #000000;
+  }
+
+  .admin-root:not(.admin-dark-mode) .hover\:bg-white:hover {
+    color: #000000;
   }
 }

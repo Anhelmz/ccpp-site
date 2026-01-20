@@ -2,13 +2,13 @@
   <AdminLayout>
     <div class="mb-6 flex flex-wrap gap-3 items-center justify-between">
       <div>
-        <h1 class="text-2xl font-semibold text-gray-900">Calendar</h1>
-        <p class="text-sm text-gray-600">Create events that show on the public calendar page.</p>
+        <h1 class="text-2xl font-semibold text-gray-400">Calendar</h1>
+        <p class="text-sm text-gray-500">Create events that show on the public calendar page.</p>
       </div>
       <div class="flex gap-3">
         <button
           @click="resetToToday"
-          class="px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
+          class="px-4 py-2 rounded-md border border-gray-700 text-gray-400 hover:bg-gray-800"
         >
           Today
         </button>
@@ -24,12 +24,12 @@
       </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow border border-gray-200 p-4 md:p-6">
+    <div class="bg-black rounded-xl shadow border border-gray-700 p-4 md:p-6">
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
           <button
             @click="previousMonth"
-            class="p-2 rounded-md border border-gray-200 hover:bg-gray-50"
+            class="p-2 rounded-md border border-gray-700 hover:bg-gray-800 text-gray-400"
             aria-label="Previous month"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,18 +38,18 @@
           </button>
           <button
             @click="nextMonth"
-            class="p-2 rounded-md border border-gray-200 hover:bg-gray-50"
+            class="p-2 rounded-md border border-gray-700 hover:bg-gray-800 text-gray-400"
             aria-label="Next month"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </button>
-          <h2 class="text-xl font-semibold text-gray-900">{{ monthLabel }}</h2>
+          <h2 class="text-xl font-semibold text-gray-400">{{ monthLabel }}</h2>
         </div>
       </div>
 
-      <div class="grid grid-cols-7 gap-2 text-sm font-semibold text-gray-600 mb-2">
+      <div class="grid grid-cols-7 gap-2 text-sm font-semibold text-gray-500 mb-2">
         <div v-for="day in weekdayLabels" :key="day" class="text-center py-2">
           {{ day }}
         </div>
@@ -61,16 +61,31 @@
           :key="day.date"
           :class="[
             'min-h-28 border rounded-lg p-3 flex flex-col gap-2 cursor-pointer transition-colors',
-            day.isCurrentMonth ? 'bg-white hover:bg-gray-50 border-gray-200' : 'bg-gray-50 text-gray-400 border-gray-100',
+            day.isPast 
+              ? (day.isCurrentMonth ? 'bg-gray-800 hover:bg-gray-700 border-gray-600 text-gray-500' : 'bg-gray-900 text-gray-600 border-gray-700')
+              : (day.isCurrentMonth ? 'bg-black hover:bg-gray-900 border-gray-700 text-gray-400' : 'bg-black text-gray-600 border-gray-800'),
             day.isToday ? 'border-main ring-1 ring-main/30' : ''
           ]"
           @click="openCreateModal(day.date)"
         >
           <div class="flex items-center justify-between">
-            <span :class="['text-sm font-semibold', day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400']">
+            <span :class="[
+              'text-sm font-semibold', 
+              day.isPast 
+                ? (day.isCurrentMonth ? 'text-gray-500' : 'text-gray-600')
+                : (day.isCurrentMonth ? 'text-gray-400' : 'text-gray-600')
+            ]">
               {{ day.day }}
             </span>
-            <span v-if="day.events.length" class="text-[11px] font-semibold bg-main/10 text-main px-2 py-1 rounded-full">
+            <span 
+              v-if="day.events.length" 
+              :class="[
+                'text-[11px] font-semibold px-2 py-1 rounded-full',
+                day.isPast 
+                  ? 'bg-gray-700 text-gray-400' 
+                  : 'bg-main/20 text-main'
+              ]"
+            >
               {{ day.events.length }} evt
             </span>
           </div>
@@ -79,12 +94,17 @@
               v-for="event in day.events.slice(0, 3)"
               :key="event.id"
               type="button"
-              class="w-full text-left text-xs bg-main/10 text-main rounded-md px-2 py-1 truncate hover:bg-main/20"
+              :class="[
+                'w-full text-left text-xs rounded-md px-2 py-1 truncate',
+                day.isPast 
+                  ? 'bg-gray-700 text-gray-400 hover:bg-gray-600' 
+                  : 'bg-main/20 text-main hover:bg-main/30'
+              ]"
               @click.stop="openEditModal(event)"
             >
               {{ event.title }}
             </button>
-            <div v-if="day.events.length > 3" class="text-xs text-gray-500">+{{ day.events.length - 3 }} more</div>
+            <div v-if="day.events.length > 3" :class="['text-xs', day.isPast ? 'text-gray-600' : 'text-gray-500']">+{{ day.events.length - 3 }} more</div>
           </div>
         </div>
       </div>
@@ -100,8 +120,8 @@
         @click.stop
       >
         <div class="p-5 border-b border-gray-200 flex items-center justify-between">
-          <h3 class="text-xl font-semibold text-gray-900">{{ editingEvent ? 'Edit Event' : 'New Event' }}</h3>
-          <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
+          <h3 class="text-xl font-semibold text-black">{{ editingEvent ? 'Edit Event' : 'New Event' }}</h3>
+          <button @click="closeModal" class="text-black hover:text-gray-800">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -110,63 +130,63 @@
 
         <form @submit.prevent="saveEvent" class="p-5 space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+            <label class="block text-sm font-medium text-black mb-1">Title *</label>
             <input
               v-model="form.title"
               type="text"
               required
-              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-main focus:border-main"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 text-black focus:ring-2 focus:ring-main focus:border-main"
               placeholder="Event title"
             />
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Start *</label>
+              <label class="block text-sm font-medium text-black mb-1">Start *</label>
               <input
                 v-model="form.start"
                 type="datetime-local"
                 required
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-main focus:border-main"
+                class="w-full border border-gray-300 rounded-md px-3 py-2 text-black focus:ring-2 focus:ring-main focus:border-main"
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">End *</label>
+              <label class="block text-sm font-medium text-black mb-1">End *</label>
               <input
                 v-model="form.end"
                 type="datetime-local"
                 required
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-main focus:border-main"
+                class="w-full border border-gray-300 rounded-md px-3 py-2 text-black focus:ring-2 focus:ring-main focus:border-main"
               />
             </div>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+            <label class="block text-sm font-medium text-black mb-1">Location</label>
             <input
               v-model="form.location"
               type="text"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-main focus:border-main"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 text-black focus:ring-2 focus:ring-main focus:border-main"
               placeholder="Main hall"
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Summary</label>
+            <label class="block text-sm font-medium text-black mb-1">Summary</label>
             <input
               v-model="form.summary"
               type="text"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-main focus:border-main"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 text-black focus:ring-2 focus:ring-main focus:border-main"
               placeholder="Short blurb"
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label class="block text-sm font-medium text-black mb-1">Description</label>
             <textarea
               v-model="form.description"
               rows="4"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-main focus:border-main"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 text-black focus:ring-2 focus:ring-main focus:border-main"
               placeholder="Full details"
             ></textarea>
           </div>
@@ -176,7 +196,7 @@
           </div>
 
           <div class="flex justify-end gap-3 pt-3">
-            <button type="button" @click="closeModal" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+            <button type="button" @click="closeModal" class="px-4 py-2 border border-gray-300 rounded-md text-black hover:bg-gray-50">
               Cancel
             </button>
             <button
@@ -271,11 +291,18 @@ export default {
             dateKey: (ev.startTime || ev.start || ev.date || '').split('T')[0]
           }))
           .filter((ev) => ev.dateKey === dateKey)
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        const dayDate = new Date(cursor)
+        dayDate.setHours(0, 0, 0, 0)
+        const isPast = dayDate < today
+        
         days.push({
           date: dateKey,
           day: cursor.getDate(),
           isCurrentMonth: cursor.getMonth() === currentMonth.value,
           isToday: cursor.toDateString() === new Date().toDateString(),
+          isPast: isPast,
           events: dayEvents
         })
         cursor.setDate(cursor.getDate() + 1)

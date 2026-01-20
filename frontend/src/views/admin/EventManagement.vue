@@ -23,7 +23,7 @@
     </div>
 
     <!-- Events List -->
-    <div class="bg-white rounded-lg shadow">
+    <div>
       <div class="p-6 border-b border-gray-200">
         <div
           class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
@@ -106,7 +106,7 @@
       <!-- Events Table -->
       <div v-else class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+          <thead>
             <tr>
               <th
                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -135,11 +135,11 @@
               </th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          <tbody class="divide-y divide-gray-200">
             <tr
               v-for="event in filteredEvents"
               :key="event.id"
-              class="hover:bg-gray-50 transition-colors"
+              class="transition-colors"
             >
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-medium text-gray-900">

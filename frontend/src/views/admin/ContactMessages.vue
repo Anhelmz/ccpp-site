@@ -1,7 +1,19 @@
 <template>
   <AdminLayout>
+    <!-- Contact Requests Count -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h1 class="text-2xl font-semibold text-gray-900">Contact Requests</h1>
+          <p class="text-sm text-gray-600 mt-1">
+            Total: <span class="font-semibold text-main">{{ requests.length }}</span> contact request{{ requests.length !== 1 ? 's' : '' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- Filters -->
-    <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <div class="p-6 mb-6">
       <div class="flex flex-wrap items-center gap-4">
         <select
           v-model="statusFilter"
@@ -29,7 +41,7 @@
     </div>
 
     <!-- Messages List -->
-    <div class="bg-white rounded-lg shadow">
+    <div>
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <div
@@ -77,7 +89,7 @@
       <!-- Messages Table -->
       <div v-else class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+          <thead>
             <tr>
               <th
                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -111,11 +123,11 @@
               </th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          <tbody class="divide-y divide-gray-200">
             <tr
               v-for="request in filteredRequests"
               :key="request.id"
-              class="hover:bg-gray-50 transition-colors"
+              class="transition-colors"
             >
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-medium text-gray-900">

@@ -20,6 +20,12 @@ type GalleryHandler struct {
 	uploadPath     string
 }
 
+type CreateGalleryRequest struct {
+	Path     string `json:"path"`
+	Filename string `json:"filename"`
+	Category string `json:"category" binding:"required"`
+}
+
 func NewGalleryHandler(galleryService services.GalleryService) *GalleryHandler {
 	uploadPath := os.Getenv("UPLOAD_PATH")
 	if uploadPath == "" {
@@ -37,7 +43,52 @@ func NewGalleryHandler(galleryService services.GalleryService) *GalleryHandler {
 	}
 }
 
-// UploadGallery handles POST /api/gallery/upload
+// CreateGallery handles POST /api/gallery (for URL/path)
+func (h *GalleryHandler) CreateGallery(c *gin.Context) {
+	var req CreateGalleryRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Validate path is not empty
+	if strings.TrimSpace(req.Path) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Path is required"})
+		return
+	}
+
+	// Validate filename is not empty
+	if strings.TrimSpace(req.Filename) == "" {
+		// If filename not provided, extract from path
+		req.Filename = filepath.Base(req.Path)
+	}
+
+	// Validate category
+	if strings.TrimSpace(req.Category) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Category is required"})
+		return
+	}
+
+	// Create gallery record
+	gallery := &models.Gallery{
+		Filename: req.Filename,
+		Path:     req.Path,
+		Category: req.Category,
+	}
+
+	if err := h.galleryService.CreateGallery(gallery); err != nil {
+		log.Printf("Error creating gallery record: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save gallery record"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Gallery image added successfully",
+		"gallery": gallery,
+	})
+}
+
+// UploadGallery handles POST /api/gallery/upload (for file uploads)
 func (h *GalleryHandler) UploadGallery(c *gin.Context) {
 	// Get category from form
 	category := c.PostForm("category")
@@ -81,16 +132,8 @@ func (h *GalleryHandler) UploadGallery(c *gin.Context) {
 	nameWithoutExt := strings.TrimSuffix(filename, ext)
 	uniqueFilename := fmt.Sprintf("%s_%d%s", nameWithoutExt, timestamp, ext)
 
-	// Create category subdirectory
-	categoryPath := filepath.Join(h.uploadPath, category)
-	if err := os.MkdirAll(categoryPath, 0755); err != nil {
-		log.Printf("Error creating category directory: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create upload directory"})
-		return
-	}
-
-	// Save file
-	filePath := filepath.Join(categoryPath, uniqueFilename)
+	// Save file directly to upload directory
+	filePath := filepath.Join(h.uploadPath, uniqueFilename)
 	if err := c.SaveUploadedFile(file, filePath); err != nil {
 		log.Printf("Error saving file: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
@@ -100,7 +143,7 @@ func (h *GalleryHandler) UploadGallery(c *gin.Context) {
 	// Create gallery record
 	gallery := &models.Gallery{
 		Filename: uniqueFilename,
-		Path:     filepath.Join("uploads/gallery", category, uniqueFilename),
+		Path:     filepath.Join("uploads/gallery", uniqueFilename),
 		Category: category,
 	}
 
@@ -174,11 +217,13 @@ func (h *GalleryHandler) DeleteGallery(c *gin.Context) {
 		return
 	}
 
-	// Delete file from filesystem
-	filePath := filepath.Join(h.uploadPath, gallery.Category, gallery.Filename)
-	if err := os.Remove(filePath); err != nil {
-		log.Printf("Warning: Failed to delete file %s: %v", filePath, err)
-		// Continue with database deletion even if file deletion fails
+	// Delete file from filesystem if it's in uploads directory
+	if strings.HasPrefix(gallery.Path, "uploads/gallery/") {
+		filePath := filepath.Join(h.uploadPath, gallery.Filename)
+		if err := os.Remove(filePath); err != nil {
+			log.Printf("Warning: Failed to delete file %s: %v", filePath, err)
+			// Continue with database deletion even if file deletion fails
+		}
 	}
 
 	// Delete from database
