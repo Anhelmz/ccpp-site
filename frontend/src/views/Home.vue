@@ -606,6 +606,46 @@
           </p>
         </div>
 
+        <!-- Search Bar -->
+        <div class="max-w-2xl mx-auto mb-12">
+          <div class="flex gap-3">
+            <input
+              v-model="videoSearchQuery"
+              type="text"
+              :placeholder="teachings.searchPlaceholder || 'Search videos...'"
+              class="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-full text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/40 backdrop-blur-sm"
+              @keyup.enter="performVideoSearch"
+            />
+            <button
+              type="button"
+              @click="performVideoSearch"
+              class="px-6 py-3 bg-brand-orange text-white font-semibold rounded-full hover:bg-brand-orange/90 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </button>
+            <button
+              v-if="videoSearchQuery"
+              type="button"
+              @click="clearVideoSearch"
+              class="px-6 py-3 bg-white/10 border border-white/20 text-white font-semibold rounded-full hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <div
             v-for="teaching in displayedTeachings"
@@ -671,7 +711,7 @@
         </div>
 
         <div
-          v-if="storedVideos.length > videosPerPage"
+          v-if="filteredVideos.length > videosPerPage"
           class="mt-8 flex items-center justify-center gap-3"
         >
           <button
@@ -866,6 +906,7 @@ export default {
             "Teachings captured each week to keep you connected to the verse-by-verse journey through Scripture.",
           badge: "Teaching Series",
           watchLabel: "Watch now",
+          searchPlaceholder: "Search videos...",
           list: [
             {
               id: "IrTzMEBtbaI",
@@ -1023,6 +1064,7 @@ export default {
             "ការបង្រៀនត្រូវបានថតរៀងរាល់សប្ដាហ៍ ដើម្បីអោយអ្នកនៅតែភ្ជាប់ជាមួយដំណើរតាមជួរព្រះគម្ពីរ។",
           badge: "ស៊េរីការបង្រៀន",
           watchLabel: "មើលឥឡូវនេះ",
+          searchPlaceholder: "ស្វែងរកវីដេអូ...",
           list: [
             {
               id: "IrTzMEBtbaI",
@@ -1070,29 +1112,53 @@ export default {
     const storedVideos = ref([]);
     const videosPerPage = 3;
     const currentVideoPage = ref(1);
+    const videoSearchQuery = ref("");
+
+    const allVideos = computed(() => {
+      if (storedVideos.value.length) {
+        return storedVideos.value.map((video) => ({
+          id: video.youtubeId,
+          title: video.title,
+          description: video.description,
+          url:
+            video.youtubeUrl ||
+            `https://www.youtube.com/watch?v=${video.youtubeId}`,
+        }));
+      }
+      return teachings.value.list;
+    });
+
+    const filteredVideos = computed(() => {
+      if (!videoSearchQuery.value.trim()) {
+        return allVideos.value;
+      }
+      const query = videoSearchQuery.value.toLowerCase().trim();
+      return allVideos.value.filter(
+        (video) =>
+          video.title.toLowerCase().includes(query) ||
+          video.description.toLowerCase().includes(query),
+      );
+    });
 
     const totalVideoPages = computed(() =>
-      storedVideos.value.length
-        ? Math.ceil(storedVideos.value.length / videosPerPage)
+      filteredVideos.value.length
+        ? Math.ceil(filteredVideos.value.length / videosPerPage)
         : 1,
     );
 
     const displayedTeachings = computed(() => {
-      if (storedVideos.value.length) {
-        const start = (currentVideoPage.value - 1) * videosPerPage;
-        return storedVideos.value
-          .slice(start, start + videosPerPage)
-          .map((video) => ({
-            id: video.youtubeId,
-            title: video.title,
-            description: video.description,
-            url:
-              video.youtubeUrl ||
-              `https://www.youtube.com/watch?v=${video.youtubeId}`,
-          }));
-      }
-      return teachings.value.list;
+      const start = (currentVideoPage.value - 1) * videosPerPage;
+      return filteredVideos.value.slice(start, start + videosPerPage);
     });
+
+    const performVideoSearch = () => {
+      currentVideoPage.value = 1;
+    };
+
+    const clearVideoSearch = () => {
+      videoSearchQuery.value = "";
+      currentVideoPage.value = 1;
+    };
 
     const nextSlide = () => {
       currentSlideIndex.value =
@@ -1128,6 +1194,12 @@ export default {
         }
       },
     );
+
+    watch(videoSearchQuery, () => {
+      if (currentVideoPage.value > totalVideoPages.value) {
+        currentVideoPage.value = 1;
+      }
+    });
 
     const nextVideoPage = () => {
       if (currentVideoPage.value < totalVideoPages.value) {
@@ -1166,6 +1238,10 @@ export default {
       nextVideoPage,
       prevVideoPage,
       goToVideoPage,
+      videoSearchQuery,
+      filteredVideos,
+      performVideoSearch,
+      clearVideoSearch,
     };
   },
 };

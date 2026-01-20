@@ -139,7 +139,8 @@
             <tr
               v-for="event in filteredEvents"
               :key="event.id"
-              class="transition-colors"
+              class="transition-colors hover:bg-gray-50 cursor-pointer"
+              @click="openEditModal(event)"
             >
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-medium text-gray-900">
@@ -167,13 +168,7 @@
                   {{ event.category || "—" }}
                 </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <button
-                  class="text-blue-600 hover:text-blue-800 mr-4"
-                  @click="openEditModal(event)"
-                >
-                  Edit
-                </button>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" @click.stop>
                 <button
                   class="text-red-600 hover:text-red-800"
                   @click="deleteEvent(event.id)"
@@ -190,24 +185,25 @@
     <!-- Create/Edit Event Modal -->
     <div
       v-if="showModal"
-      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-      @click="closeModal"
+      class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      @click.self="closeModal"
     >
       <div
-        class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-brand-blue"
+        class="bg-white rounded-xl shadow-2xl border-2 border-gray-200 max-w-2xl w-full max-h-[90vh] overflow-y-auto transform transition-all"
         @click.stop
       >
-        <div class="p-6 border-b border-gray-200">
-          <div class="flex justify-between items-center">
-            <h3 class="text-xl font-semibold text-gray-900">
+        <div class="p-8">
+          <!-- Modal Header -->
+          <div class="flex justify-between items-start mb-6 pb-4 border-b border-gray-200">
+            <h2 class="text-3xl font-bold text-gray-900">
               {{ editingEvent ? "Edit Event" : "Create New Event" }}
-            </h3>
+            </h2>
             <button
-              class="text-gray-400 hover:text-gray-600"
+              class="text-gray-500 hover:text-gray-700 transition-colors p-1 hover:bg-gray-100 rounded-full"
               @click="closeModal"
             >
               <svg
-                class="w-6 h-6"
+                class="h-6 w-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -221,166 +217,174 @@
               </svg>
             </button>
           </div>
-        </div>
 
-        <form class="p-6 space-y-6" @submit.prevent="saveEvent">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Event Title *
-            </label>
-            <input
-              v-model="eventForm.title"
-              type="text"
-              required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
-              placeholder="Sunday Worship Service"
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Summary (Short Description)
-            </label>
-            <input
-              v-model="eventForm.summary"
-              type="text"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
-              placeholder="Brief summary of the event"
-            />
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Start date & time *
+          <form class="space-y-6" @submit.prevent="saveEvent">
+            <!-- Event Title -->
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                Event Title *
               </label>
               <input
-                v-model="eventForm.start"
-                type="datetime-local"
-                required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                End date & time *
-              </label>
-              <input
-                v-model="eventForm.end"
-                type="datetime-local"
-                required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
-              />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Location
-              </label>
-              <input
-                v-model="eventForm.location"
+                v-model="eventForm.title"
                 type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
-                placeholder="Main hall"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-main focus:border-transparent bg-white"
+                placeholder="Sunday Worship Service"
               />
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Category
-              </label>
-              <input
-                v-model="eventForm.category"
-                type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
-                placeholder="Worship, Youth, Outreach..."
-              />
-            </div>
-          </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Color (badge)
+            <!-- Summary -->
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                Summary (Short Description)
               </label>
               <input
-                v-model="eventForm.color"
-                type="color"
-                class="w-full h-11 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
+                v-model="eventForm.summary"
+                type="text"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-main focus:border-transparent bg-white"
+                placeholder="Brief summary of the event"
               />
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Recurrence
+
+            <!-- Date & Time -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                  Start date & time *
+                </label>
+                <input
+                  v-model="eventForm.start"
+                  type="datetime-local"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-main focus:border-transparent bg-white"
+                />
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                  End date & time *
+                </label>
+                <input
+                  v-model="eventForm.end"
+                  type="datetime-local"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-main focus:border-transparent bg-white"
+                />
+              </div>
+            </div>
+
+            <!-- Location & Category -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                  Location
+                </label>
+                <input
+                  v-model="eventForm.location"
+                  type="text"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-main focus:border-transparent bg-white"
+                  placeholder="Main hall"
+                />
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                  Category
+                </label>
+                <input
+                  v-model="eventForm.category"
+                  type="text"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-main focus:border-transparent bg-white"
+                  placeholder="Worship, Youth, Outreach..."
+                />
+              </div>
+            </div>
+
+            <!-- Color & Recurrence -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                  Color (badge)
+                </label>
+                <input
+                  v-model="eventForm.color"
+                  type="color"
+                  class="w-full h-11 px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-main focus:border-transparent bg-white"
+                />
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                  Recurrence
+                </label>
+                <select
+                  v-model="eventForm.recurrence"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-main focus:border-transparent bg-white"
+                >
+                  <option value="none">Does not repeat</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Recurrence Ends -->
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                Recurrence ends (optional)
               </label>
-              <select
-                v-model="eventForm.recurrence"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
+              <input
+                v-model="eventForm.recurrenceEndsAt"
+                type="datetime-local"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-main focus:border-transparent bg-white"
+              />
+            </div>
+
+            <!-- Description -->
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                Description
+              </label>
+              <textarea
+                v-model="eventForm.description"
+                rows="4"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-main focus:border-transparent bg-white"
+                placeholder="Event description..."
+              ></textarea>
+            </div>
+
+            <!-- Error Message -->
+            <div
+              v-if="formError"
+              class="p-4 bg-red-50 border-2 border-red-200 rounded-lg"
+            >
+              <p class="text-red-600 text-sm font-medium">{{ formError }}</p>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end space-x-3">
+              <button
+                type="button"
+                class="px-6 py-2.5 border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-semibold shadow-sm"
+                @click="closeModal"
               >
-                <option value="none">Does not repeat</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
-              </select>
+                Cancel
+              </button>
+              <button
+                type="submit"
+                :disabled="saving"
+                class="px-6 py-2.5 bg-main text-white rounded-lg hover:opacity-90 transition-colors font-semibold shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {{
+                  saving
+                    ? "Saving..."
+                    : editingEvent
+                      ? "Update Event"
+                      : "Create Event"
+                }}
+              </button>
             </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Recurrence ends (optional)
-            </label>
-            <input
-              v-model="eventForm.recurrenceEndsAt"
-              type="datetime-local"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Description
-            </label>
-            <textarea
-              v-model="eventForm.description"
-              rows="4"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
-              placeholder="Event description..."
-            ></textarea>
-          </div>
-
-          <!-- Error Message -->
-          <div
-            v-if="formError"
-            class="p-4 bg-red-50 border border-red-200 rounded-lg"
-          >
-            <p class="text-red-600 text-sm">{{ formError }}</p>
-          </div>
-
-          <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              @click="closeModal"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              :disabled="saving"
-              class="px-6 py-2 bg-main text-white rounded-lg hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {{
-                saving
-                  ? "Saving..."
-                  : editingEvent
-                    ? "Update Event"
-                    : "Create Event"
-              }}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
 

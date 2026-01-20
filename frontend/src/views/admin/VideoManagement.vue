@@ -89,7 +89,7 @@
               <th
                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                Actions
+                Action
               </th>
             </tr>
           </thead>
@@ -97,7 +97,8 @@
             <tr
               v-for="video in filteredVideos"
               :key="video.id"
-              class="transition-colors"
+              class="transition-colors cursor-pointer hover:bg-gray-50"
+              @click="openEditModal(video)"
             >
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-medium text-gray-900">
@@ -120,20 +121,15 @@
                   target="_blank"
                   rel="noopener noreferrer"
                   class="text-xs text-main hover:underline"
+                  @click.stop
                 >
                   Open link
                 </a>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button
-                  class="text-blue-600 hover:text-blue-800 mr-4"
-                  @click="openEditModal(video)"
-                >
-                  Edit
-                </button>
-                <button
                   class="text-red-600 hover:text-red-800"
-                  @click="deleteVideo(video.id)"
+                  @click.stop="deleteVideo(video.id)"
                 >
                   Delete
                 </button>
@@ -150,16 +146,21 @@
       @click="closeModal"
     >
       <div
-        class="bg-white rounded-lg shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto"
+        class="bg-white rounded-[28px] border border-gray-100 shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto"
         @click.stop
       >
-        <div class="p-6 border-b border-gray-200">
+        <div class="p-8 border-b border-gray-100">
           <div class="flex justify-between items-center">
-            <h3 class="text-xl font-semibold text-gray-900">
-              {{ editingVideo ? "Edit Video" : "Add New Video" }}
-            </h3>
+            <div class="space-y-2">
+              <p class="text-xs uppercase tracking-[0.35em] text-brand-blue/70">
+                {{ editingVideo ? "Update" : "Add" }}
+              </p>
+              <h3 class="text-3xl font-semibold text-gray-900">
+                {{ editingVideo ? "Edit Video" : "Add New Video" }}
+              </h3>
+            </div>
             <button
-              class="text-gray-400 hover:text-gray-600"
+              class="text-gray-400 hover:text-gray-600 transition-colors"
               @click="closeModal"
             >
               <svg
@@ -179,7 +180,7 @@
           </div>
         </div>
 
-        <form class="p-6 space-y-6" @submit.prevent="saveVideo">
+        <form class="p-8 space-y-6" @submit.prevent="saveVideo">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
               Title *
@@ -188,7 +189,7 @@
               v-model="videoForm.title"
               type="text"
               required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
+              class="input-field"
               placeholder="Teaching title"
             />
           </div>
@@ -200,7 +201,7 @@
             <textarea
               v-model="videoForm.description"
               rows="3"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
+              class="input-field"
               placeholder="Brief description"
             ></textarea>
           </div>
@@ -213,7 +214,7 @@
               v-model="videoForm.youtubeInput"
               type="text"
               required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-main focus:border-main"
+              class="input-field"
               placeholder="https://www.youtube.com/watch?v=XXXXXXXXXXX"
             />
             <p class="text-xs text-gray-500 mt-1">
@@ -223,12 +224,12 @@
 
           <div
             v-if="formError"
-            class="p-4 bg-red-50 border border-red-200 rounded-lg"
+            class="p-4 bg-red-50 border border-red-200 rounded-2xl"
           >
             <p class="text-red-600 text-sm">{{ formError }}</p>
           </div>
 
-          <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200">
+          <div class="flex justify-end space-x-4 pt-4 border-t border-gray-100">
             <button
               type="button"
               class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -238,7 +239,7 @@
             </button>
             <button
               type="submit"
-              class="px-6 py-2 bg-main text-white rounded-lg hover:opacity-90 transition-colors"
+              class="btn-primary"
             >
               {{ editingVideo ? "Update Video" : "Add Video" }}
             </button>
