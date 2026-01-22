@@ -233,22 +233,22 @@
                   </div>
                 </div>
               </div>
-              <!-- Events Dropdown -->
+              <!-- Upcoming Events Dropdown -->
               <div
                 class="relative"
                 @mouseenter="eventsDropdownOpen = true"
                 @mouseleave="eventsDropdownOpen = false"
               >
                 <router-link
-                  to="/events"
+                  to="/events/upcoming-events"
                   :class="[
                     'transition-colors text-lg font-medium flex items-center',
-                    isPathActive(['/events'])
+                    isPathActive(['/events/upcoming-events', '/events/calendar'])
                       ? 'text-brand-orange'
                       : 'text-[#393232] hover:text-brand-orange',
                   ]"
                 >
-                  Events
+                  Upcoming Events
                   <svg
                     class="ml-1 h-4 w-4"
                     fill="none"
@@ -489,18 +489,18 @@
                   </router-link>
                 </div>
               </div>
-              <!-- Events Dropdown Mobile -->
+              <!-- Upcoming Events Dropdown Mobile -->
               <div>
                 <button
                   :class="[
                     'w-full text-left transition-colors py-2 flex items-center justify-between',
-                    isPathActive(['/events'])
+                    isPathActive(['/events/upcoming-events', '/events/calendar'])
                       ? 'text-brand-orange font-semibold'
                       : 'text-[#393232] hover:text-brand-orange',
                   ]"
                   @click="eventsDropdownMobileOpen = !eventsDropdownMobileOpen"
                 >
-                  Events
+                  Upcoming Events
                   <svg
                     class="h-4 w-4 transition-transform"
                     :class="{ 'rotate-180': eventsDropdownMobileOpen }"
@@ -636,10 +636,10 @@
               </li>
               <li>
                 <router-link
-                  to="/events"
+                  to="/events/upcoming-events"
                   class="text-white/80 hover:text-white transition-colors duration-200 text-sm"
                 >
-                  Events
+                  Upcoming Events
                 </router-link>
               </li>
               <li>

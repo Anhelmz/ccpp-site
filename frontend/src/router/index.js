@@ -9,7 +9,6 @@ import Ministries from '@/views/Ministries.vue'
 import YouthMinistry from '@/views/YouthMinistry.vue'
 import GraceChurch from '@/views/GraceChurch.vue'
 import Outreaches from '@/views/Outreaches.vue'
-import Events from '@/views/Events.vue'
 import Calendar from '@/views/Calendar.vue'
 import UpcomingEvents from '@/views/UpcomingEvents.vue'
 import Resources from '@/views/Resources.vue'
@@ -25,7 +24,6 @@ import ContentManagement from '@/views/admin/ContentManagement.vue'
 import ContactMessages from '@/views/admin/ContactMessages.vue'
 import Settings from '@/views/admin/Settings.vue'
 import VideoManagement from '@/views/admin/VideoManagement.vue'
-import AdminCalendar from '@/views/admin/AdminCalendar.vue'
 
 const routes = [
   {
@@ -77,11 +75,6 @@ const routes = [
     path: '/ministries/outreaches',
     name: 'Outreaches',
     component: Outreaches
-  },
-  {
-    path: '/events',
-    name: 'Events',
-    component: Events
   },
   {
     path: '/events/calendar',
@@ -154,9 +147,7 @@ const routes = [
   },
   {
     path: '/admin/calendar',
-    name: 'AdminCalendar',
-    component: AdminCalendar,
-    meta: { requiresAdmin: true }
+    redirect: '/admin/events'
   },
   {
     path: '/admin/videos',
