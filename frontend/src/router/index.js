@@ -22,7 +22,6 @@ import GalleryManagement from '@/views/admin/GalleryManagement.vue'
 import EventManagement from '@/views/admin/EventManagement.vue'
 import ContentManagement from '@/views/admin/ContentManagement.vue'
 import ContactMessages from '@/views/admin/ContactMessages.vue'
-import Settings from '@/views/admin/Settings.vue'
 import VideoManagement from '@/views/admin/VideoManagement.vue'
 
 const routes = [
@@ -165,12 +164,6 @@ const routes = [
     path: '/admin/contacts',
     name: 'ContactMessages',
     component: ContactMessages,
-    meta: { requiresAdmin: true }
-  },
-  {
-    path: '/admin/settings',
-    name: 'Settings',
-    component: Settings,
     meta: { requiresAdmin: true }
   }
 ]
