@@ -2,7 +2,7 @@
   <AdminLayout>
     <div class="mb-6 flex justify-end">
       <button
-        class="px-6 py-3 bg-main text-white rounded-lg hover:opacity-90 transition-colors shadow-lg font-medium flex items-center space-x-2"
+        class="new-video-button px-6 py-3 bg-white border border-gray-300 text-green-600 rounded-lg hover:bg-gray-50 transition-colors shadow-lg font-medium flex items-center space-x-2"
         @click="openCreateModal"
       >
         <svg
@@ -22,7 +22,7 @@
       </button>
     </div>
 
-    <div>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
       <div class="p-6 border-b border-gray-200">
         <div
           class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
@@ -72,71 +72,73 @@
         </button>
       </div>
 
-      <div v-else class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead>
-            <tr>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Title
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                YouTube ID
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr
-              v-for="video in filteredVideos"
-              :key="video.id"
-              class="transition-colors cursor-pointer hover:bg-gray-50"
-              @click="openEditModal(video)"
-            >
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-gray-900">
-                  {{ video.title }}
-                </div>
-                <div
-                  v-if="video.description"
-                  class="text-sm text-gray-500 truncate max-w-xs"
+      <div v-else class="overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
                 >
-                  {{ video.description }}
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900">{{ video.youtubeId }}</div>
-                <a
-                  :href="
-                    video.youtubeUrl ||
-                    `https://www.youtube.com/watch?v=${video.youtubeId}`
-                  "
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-xs text-main hover:underline"
-                  @click.stop
+                  Title
+                </th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
                 >
-                  Open link
-                </a>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <button
-                  class="text-red-600 hover:text-red-800"
-                  @click.stop="deleteVideo(video.id)"
+                  YouTube ID
+                </th>
+                <th
+                  class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
                 >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr
+                v-for="video in filteredVideos"
+                :key="video.id"
+                class="hover:bg-gray-50 transition-colors cursor-pointer"
+                @click="openEditModal(video)"
+              >
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-semibold text-gray-900">
+                    {{ video.title }}
+                  </div>
+                  <div
+                    v-if="video.description"
+                    class="text-sm text-gray-500 truncate max-w-xs"
+                  >
+                    {{ video.description }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ video.youtubeId }}</div>
+                  <a
+                    :href="
+                      video.youtubeUrl ||
+                      `https://www.youtube.com/watch?v=${video.youtubeId}`
+                    "
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                    @click.stop
+                  >
+                    Open link
+                  </a>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" @click.stop>
+                  <button
+                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-sm"
+                    @click="deleteVideo(video.id)"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -410,3 +412,24 @@ export default {
   },
 };
 </script>
+
+<style>
+/* Force white background and green text for New Video button, overriding admin dark mode */
+.admin-dark-mode .new-video-button,
+.new-video-button {
+  background-color: white !important;
+  border-color: #d1d5db !important;
+  color: #16a34a !important;
+}
+
+.admin-dark-mode .new-video-button:hover,
+.new-video-button:hover {
+  background-color: #f9fafb !important;
+  color: #16a34a !important;
+}
+
+.admin-dark-mode .new-video-button svg,
+.new-video-button svg {
+  color: #16a34a !important;
+}
+</style>

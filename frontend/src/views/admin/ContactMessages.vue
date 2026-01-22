@@ -32,7 +32,7 @@
           @input="filterContacts"
         />
         <button
-          class="px-4 py-2 bg-main text-white rounded-lg hover:opacity-90 transition-colors text-sm font-medium shadow-sm"
+          class="refresh-button px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium shadow-sm"
           @click="loadRequests"
         >
           Refresh
@@ -492,3 +492,19 @@ export default {
   },
 };
 </script>
+
+<style>
+/* Force black text for Refresh button, overriding admin dark mode */
+.admin-dark-mode .refresh-button,
+.refresh-button {
+  background-color: white !important;
+  border-color: #d1d5db !important;
+  color: #111827 !important;
+}
+
+.admin-dark-mode .refresh-button:hover,
+.refresh-button:hover {
+  background-color: #f9fafb !important;
+  color: #111827 !important;
+}
+</style>

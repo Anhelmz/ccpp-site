@@ -1,16 +1,16 @@
 <template>
   <AdminLayout>
     <!-- Upload Section -->
-    <div class="bg-white dark:bg-[#0c0f14] rounded-xl shadow-lg p-6 mb-8 border border-gray-100 dark:border-[#0c94ab40]">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Upload Images</h2>
+    <div class="gallery-upload-section bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-200" style="background-color: white !important;">
+      <h2 class="text-xl font-bold text-gray-900 mb-6">Upload Images</h2>
 
       <!-- File Selection -->
       <div
         :class="[
-          'border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer mb-6',
+          'gallery-upload-area border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer mb-6',
           isDragging
-            ? 'border-main bg-primary/30 dark:border-[#0C94AB] dark:bg-[#0C94AB33]'
-            : 'border-gray-300 bg-gray-100 hover:border-main hover:bg-primary/20 dark:border-[#0c94ab40] dark:bg-[#0c0f14] dark:hover:border-[#0C94AB] dark:hover:bg-[#0C94AB26]',
+            ? 'border-main bg-blue-50'
+            : 'border-gray-300 bg-white hover:border-main hover:bg-gray-50',
         ]"
         @drop.prevent="handleDrop"
         @dragover.prevent="isDragging = true"
@@ -42,15 +42,15 @@
             ></path>
           </svg>
         </div>
-        <p class="text-gray-700 dark:text-gray-200 font-medium mb-2">
+        <p class="text-gray-700 font-medium mb-2">
           Drag and drop images here, or click to browse folders
         </p>
-        <p class="text-sm text-gray-500 dark:text-gray-300 mb-6">
+        <p class="text-sm text-gray-500 mb-6">
           Supports JPG, PNG, GIF (Max 10MB per image)
         </p>
         <button
           type="button"
-          class="px-6 py-3 bg-main text-white rounded-lg hover:opacity-90 transition-colors font-medium shadow-md"
+          class="select-images-button px-6 py-3 bg-white border border-gray-300 text-green-600 rounded-lg hover:bg-gray-50 transition-colors font-medium shadow-md"
           @click.stop="triggerFileInput"
         >
           Select Images from Folder
@@ -59,7 +59,7 @@
 
       <!-- Category Selection for Upload -->
       <div class="mb-6">
-        <label class="block text-base font-semibold text-gray-900 dark:text-white mb-3">
+        <label class="block text-base font-semibold text-gray-900 mb-3">
           Upload Category <span class="text-red-500">*</span>
         </label>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -71,34 +71,34 @@
             :class="[
               'px-4 py-4 rounded-lg font-medium text-sm transition-all duration-200 border-2 shadow-sm',
               formData.category === cat.value
-                ? 'bg-brand-blue dark:bg-main text-white border-brand-blue dark:border-main shadow-md shadow-brand-blue/20 dark:shadow-main/20'
-                : 'bg-white dark:bg-[#1a1f2e] text-gray-700 dark:text-gray-300 border-gray-300 dark:border-[#0c94ab40] hover:border-brand-blue/50 dark:hover:border-main/50 hover:bg-gray-50 dark:hover:bg-[#252a3a] hover:shadow-md'
+                ? 'bg-brand-blue text-white border-brand-blue shadow-md shadow-brand-blue/20'
+                : 'bg-white text-gray-700 border-gray-300 hover:border-brand-blue/50 hover:bg-gray-50 hover:shadow-md'
             ]"
           >
             {{ cat.label }}
           </button>
         </div>
-        <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">
-          Currently selected: <span class="font-semibold text-gray-900 dark:text-white">{{ categories.find(c => c.value === formData.category)?.label }}</span>
+        <p class="text-xs text-gray-600 mt-2">
+          Currently selected: <span class="font-semibold text-gray-900">{{ categories.find(c => c.value === formData.category)?.label }}</span>
         </p>
       </div>
 
       <!-- Selected Files Preview -->
       <div v-if="selectedFiles.length > 0" class="mb-4">
-        <p class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+        <p class="text-sm font-medium text-gray-700 mb-2">
           Selected Files ({{ selectedFiles.length }})
         </p>
-        <div class="max-h-40 overflow-y-auto space-y-1 border border-gray-200 dark:border-gray-700 rounded-lg p-2 bg-gray-50 dark:bg-[#1a1f2e]">
+        <div class="max-h-40 overflow-y-auto space-y-1 border border-gray-200 rounded-lg p-2 bg-white">
           <div
             v-for="(file, index) in selectedFiles"
             :key="index"
-            class="flex items-center justify-between p-2 bg-white dark:bg-[#0c0f14] rounded text-sm border border-gray-200 dark:border-gray-700 hover:shadow-sm transition-shadow"
+            class="flex items-center justify-between p-2 bg-white rounded text-sm border border-gray-200 hover:shadow-sm transition-shadow"
           >
-            <span class="text-gray-700 dark:text-gray-300 truncate flex-1">{{ file.name }}</span>
+            <span class="text-gray-700 truncate flex-1">{{ file.name }}</span>
             <button
               type="button"
               @click="removeFile(index)"
-              class="ml-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium"
+              class="ml-2 text-red-600 hover:text-red-800 font-medium"
             >
               Remove
             </button>
@@ -138,10 +138,10 @@
     </div>
 
     <!-- Category Selector -->
-    <div class="bg-white dark:bg-[#0c0f14] rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-[#0c94ab40]">
+    <div class="gallery-category-section bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200" style="background-color: white !important;">
       <div class="mb-6">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Gallery Category</h2>
-        <p class="text-sm text-gray-600 dark:text-gray-400">Select a category to view and manage images</p>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Gallery Category</h2>
+        <p class="text-sm text-gray-600">Select a category to view and manage images</p>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <button
@@ -152,8 +152,8 @@
             'relative px-6 py-8 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:scale-105',
             'border-2 flex flex-col items-center justify-center min-h-[120px] shadow-sm',
             filterCategory === cat.value
-              ? 'bg-brand-blue dark:bg-main text-white border-brand-blue dark:border-main shadow-lg shadow-brand-blue/30 dark:shadow-main/30 scale-105'
-              : 'bg-white dark:bg-[#1a1f2e] text-gray-700 dark:text-gray-300 border-gray-300 dark:border-[#0c94ab40] hover:border-brand-blue/50 dark:hover:border-main/50 hover:bg-gray-50 dark:hover:bg-[#252a3a] hover:shadow-md'
+              ? 'bg-brand-blue text-white border-brand-blue shadow-lg shadow-brand-blue/30 scale-105'
+              : 'bg-white text-gray-700 border-gray-300 hover:border-brand-blue/50 hover:bg-gray-50 hover:shadow-md'
           ]"
         >
           <div v-if="filterCategory === cat.value" class="absolute top-2 right-2">
@@ -166,7 +166,7 @@
             v-if="groupedGalleries[cat.value] && groupedGalleries[cat.value].length > 0"
             :class="[
               'text-sm mt-2 font-normal',
-              filterCategory === cat.value ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'
+              filterCategory === cat.value ? 'text-white/80' : 'text-gray-500'
             ]"
           >
             {{ groupedGalleries[cat.value].length }} image(s)
@@ -176,11 +176,11 @@
     </div>
 
     <!-- Gallery Images Grid -->
-    <div class="bg-white dark:bg-[#0c0f14] rounded-xl shadow-lg p-6 border border-gray-200 dark:border-[#0c94ab40]">
+    <div class="gallery-images-section bg-white rounded-xl shadow-lg p-6 border border-gray-200" style="background-color: white !important;">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
-          <h2 class="text-xl font-bold text-gray-900 dark:text-white">Gallery Images</h2>
-          <p class="text-sm text-gray-600 dark:text-gray-300">Section: {{ currentCategory.label }}</p>
+          <h2 class="text-xl font-bold text-gray-900">Gallery Images</h2>
+          <p class="text-sm text-gray-600">Section: {{ currentCategory.label }}</p>
         </div>
       </div>
 
@@ -218,8 +218,8 @@
             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
           ></path>
         </svg>
-        <p class="text-gray-600 dark:text-gray-300 mb-2">No images in this category yet</p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
+        <p class="text-gray-600 mb-2">No images in this category yet</p>
+        <p class="text-sm text-gray-500">
           Upload images to the "{{ currentCategory.label }}" category to get started
         </p>
       </div>
@@ -228,16 +228,16 @@
       <div v-else>
         <div class="mb-8">
           <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white capitalize">
+            <h3 class="text-lg font-semibold text-gray-900 capitalize">
               {{ currentCategory.label }}
             </h3>
-            <span class="text-sm text-gray-500 dark:text-gray-300">{{ currentImages.length }} image(s)</span>
+            <span class="text-sm text-gray-500">{{ currentImages.length }} image(s)</span>
           </div>
           <div v-if="currentImages.length > 0" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             <div
               v-for="(gallery, index) in currentImages"
               :key="gallery.id"
-              class="relative group rounded-lg overflow-hidden border border-gray-300 dark:border-[#0c94ab40] bg-white dark:bg-[#0c0f14] shadow-sm hover:shadow-lg transition-all cursor-pointer hover:border-brand-blue dark:hover:border-[#0C94AB]"
+              class="gallery-image-item relative group rounded-lg overflow-hidden border border-gray-300 bg-white shadow-sm hover:shadow-lg transition-all cursor-pointer hover:border-brand-blue"
               @click="viewImage(index)"
             >
               <img
@@ -270,7 +270,7 @@
             </div>
           </div>
           <div v-else class="text-center py-8">
-            <p class="text-sm text-gray-500 dark:text-gray-400">No images in this category yet.</p>
+            <p class="text-sm text-gray-500">No images in this category yet.</p>
           </div>
         </div>
       </div>
@@ -778,3 +778,96 @@ export default {
   },
 };
 </script>
+
+<style>
+/* Force white backgrounds for gallery sections, overriding admin dark mode */
+.admin-dark-mode .gallery-upload-section,
+.gallery-upload-section {
+  background-color: white !important;
+  border-color: #e5e7eb !important;
+}
+
+.admin-dark-mode .gallery-upload-area,
+.gallery-upload-area {
+  background-color: white !important;
+  border-color: #d1d5db !important;
+}
+
+.admin-dark-mode .gallery-upload-area:hover,
+.gallery-upload-area:hover {
+  background-color: #f9fafb !important;
+}
+
+.admin-dark-mode .gallery-category-section,
+.gallery-category-section {
+  background-color: white !important;
+  border-color: #e5e7eb !important;
+}
+
+.admin-dark-mode .gallery-category-section button:not(.bg-brand-blue),
+.gallery-category-section button:not(.bg-brand-blue) {
+  background-color: white !important;
+  border-color: #d1d5db !important;
+  color: #374151 !important;
+}
+
+.admin-dark-mode .gallery-category-section button:not(.bg-brand-blue):hover,
+.gallery-category-section button:not(.bg-brand-blue):hover {
+  background-color: #f9fafb !important;
+}
+
+.admin-dark-mode .gallery-images-section,
+.gallery-images-section {
+  background-color: white !important;
+  border-color: #e5e7eb !important;
+}
+
+.admin-dark-mode .gallery-image-item,
+.gallery-image-item {
+  background-color: white !important;
+  border-color: #d1d5db !important;
+}
+
+.admin-dark-mode .gallery-upload-section h2,
+.admin-dark-mode .gallery-category-section h2,
+.admin-dark-mode .gallery-images-section h2,
+.gallery-upload-section h2,
+.gallery-category-section h2,
+.gallery-images-section h2 {
+  color: #111827 !important;
+}
+
+.admin-dark-mode .gallery-upload-section p,
+.admin-dark-mode .gallery-category-section p,
+.admin-dark-mode .gallery-images-section p,
+.gallery-upload-section p,
+.gallery-category-section p,
+.gallery-images-section p {
+  color: inherit !important;
+}
+
+.admin-dark-mode .gallery-upload-section .text-gray-500,
+.admin-dark-mode .gallery-upload-section .text-gray-600,
+.admin-dark-mode .gallery-upload-section .text-gray-700,
+.admin-dark-mode .gallery-upload-section .text-gray-900,
+.gallery-upload-section .text-gray-500,
+.gallery-upload-section .text-gray-600,
+.gallery-upload-section .text-gray-700,
+.gallery-upload-section .text-gray-900 {
+  color: inherit !important;
+}
+
+/* Force green text for Select Images button, overriding admin dark mode */
+.admin-dark-mode .select-images-button,
+.select-images-button {
+  background-color: white !important;
+  border-color: #d1d5db !important;
+  color: #16a34a !important;
+}
+
+.admin-dark-mode .select-images-button:hover,
+.select-images-button:hover {
+  background-color: #f9fafb !important;
+  color: #16a34a !important;
+}
+</style>
