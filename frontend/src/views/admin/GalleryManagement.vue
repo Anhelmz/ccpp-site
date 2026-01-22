@@ -1,7 +1,7 @@
 <template>
   <AdminLayout>
     <!-- Upload Section -->
-    <div class="gallery-upload-section bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-200" style="background-color: white !important;">
+    <div class="gallery-upload-section bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-200">
       <h2 class="text-xl font-bold text-gray-900 mb-6">Upload Images</h2>
 
       <!-- File Selection -->
@@ -138,7 +138,7 @@
     </div>
 
     <!-- Category Selector -->
-    <div class="gallery-category-section bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200" style="background-color: white !important;">
+    <div class="gallery-category-section bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
       <div class="mb-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-2">Gallery Category</h2>
         <p class="text-sm text-gray-600">Select a category to view and manage images</p>
@@ -176,7 +176,7 @@
     </div>
 
     <!-- Gallery Images Grid -->
-    <div class="gallery-images-section bg-white rounded-xl shadow-lg p-6 border border-gray-200" style="background-color: white !important;">
+    <div class="gallery-images-section bg-white rounded-xl shadow-lg p-6 border border-gray-200">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
           <h2 class="text-xl font-bold text-gray-900">Gallery Images</h2>
@@ -780,92 +780,59 @@ export default {
 </script>
 
 <style>
-/* Force white backgrounds for gallery sections, overriding admin dark mode */
-.admin-dark-mode .gallery-upload-section,
+/* Force white backgrounds for gallery sections in light mode only */
 .gallery-upload-section {
   background-color: white !important;
   border-color: #e5e7eb !important;
 }
 
-.admin-dark-mode .gallery-upload-area,
 .gallery-upload-area {
   background-color: white !important;
   border-color: #d1d5db !important;
 }
 
-.admin-dark-mode .gallery-upload-area:hover,
 .gallery-upload-area:hover {
   background-color: #f9fafb !important;
 }
 
-.admin-dark-mode .gallery-category-section,
 .gallery-category-section {
   background-color: white !important;
   border-color: #e5e7eb !important;
 }
 
-.admin-dark-mode .gallery-category-section button:not(.bg-brand-blue),
 .gallery-category-section button:not(.bg-brand-blue) {
   background-color: white !important;
   border-color: #d1d5db !important;
   color: #374151 !important;
 }
 
-.admin-dark-mode .gallery-category-section button:not(.bg-brand-blue):hover,
 .gallery-category-section button:not(.bg-brand-blue):hover {
   background-color: #f9fafb !important;
 }
 
-.admin-dark-mode .gallery-images-section,
 .gallery-images-section {
   background-color: white !important;
   border-color: #e5e7eb !important;
 }
 
-.admin-dark-mode .gallery-image-item,
 .gallery-image-item {
   background-color: white !important;
   border-color: #d1d5db !important;
 }
 
-.admin-dark-mode .gallery-upload-section h2,
-.admin-dark-mode .gallery-category-section h2,
-.admin-dark-mode .gallery-images-section h2,
 .gallery-upload-section h2,
 .gallery-category-section h2,
 .gallery-images-section h2 {
   color: #111827 !important;
 }
 
-.admin-dark-mode .gallery-upload-section p,
-.admin-dark-mode .gallery-category-section p,
-.admin-dark-mode .gallery-images-section p,
-.gallery-upload-section p,
-.gallery-category-section p,
-.gallery-images-section p {
-  color: inherit !important;
-}
-
-.admin-dark-mode .gallery-upload-section .text-gray-500,
-.admin-dark-mode .gallery-upload-section .text-gray-600,
-.admin-dark-mode .gallery-upload-section .text-gray-700,
-.admin-dark-mode .gallery-upload-section .text-gray-900,
-.gallery-upload-section .text-gray-500,
-.gallery-upload-section .text-gray-600,
-.gallery-upload-section .text-gray-700,
-.gallery-upload-section .text-gray-900 {
-  color: inherit !important;
-}
-
-/* Force green text for Select Images button, overriding admin dark mode */
-.admin-dark-mode .select-images-button,
+/* Force green text for Select Images button */
 .select-images-button {
   background-color: white !important;
   border-color: #d1d5db !important;
   color: #16a34a !important;
 }
 
-.admin-dark-mode .select-images-button:hover,
 .select-images-button:hover {
   background-color: #f9fafb !important;
   color: #16a34a !important;

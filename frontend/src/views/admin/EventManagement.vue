@@ -5,6 +5,18 @@
         <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-400">Events & Calendar</h1>
         <p class="text-sm text-gray-600 dark:text-gray-500">Manage events and view them as a calendar or list.</p>
       </div>
+      <div class="flex-1 flex justify-center">
+        <button
+          v-if="viewMode === 'list'"
+          @click="openCreateModal"
+          class="new-event-button px-6 py-3 bg-white border border-gray-300 text-green-600 rounded-lg hover:bg-gray-50 transition-colors shadow-lg font-medium flex items-center space-x-2"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          <span>New Event</span>
+        </button>
+      </div>
       <div class="flex gap-3 items-center">
         <!-- View Toggle -->
         <div class="view-toggle-container flex items-center gap-2 px-2 py-1 bg-white rounded-lg border border-gray-300">
@@ -41,15 +53,6 @@
             </span>
           </button>
         </div>
-        <button
-          @click="openCreateModal"
-          class="new-event-button px-6 py-3 bg-white border border-gray-300 text-green-600 rounded-lg hover:bg-gray-50 transition-colors shadow-lg font-medium flex items-center space-x-2"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          <span>New Event</span>
-        </button>
       </div>
     </div>
     
@@ -59,7 +62,7 @@
         <div class="flex items-center gap-3">
           <button
             @click="previousMonth"
-            class="p-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-400 transition-colors shadow-sm"
+            class="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 transition-colors shadow-sm"
             aria-label="Previous month"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,7 +71,7 @@
           </button>
           <button
             @click="nextMonth"
-            class="p-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-400 transition-colors shadow-sm"
+            class="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 transition-colors shadow-sm"
             aria-label="Next month"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,8 +120,8 @@
               :class="[
                 'text-[11px] font-semibold px-2 py-1 rounded-full',
                 day.isPast 
-                  ? 'bg-gray-200 text-gray-600' 
-                  : 'bg-brand-blue/10 text-brand-blue'
+                  ? 'bg-gray-200 dark:bg-transparent text-black dark:text-white' 
+                  : 'bg-brand-blue/10 dark:bg-transparent text-black dark:text-white'
               ]"
             >
               {{ day.events.length }} evt
@@ -132,21 +135,21 @@
               :class="[
                 'w-full text-left text-xs rounded-md px-2 py-1 truncate transition-colors',
                 day.isPast 
-                  ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' 
-                  : 'bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/20'
+                  ? 'bg-gray-200 dark:bg-transparent text-black dark:text-white hover:bg-gray-300 dark:hover:bg-transparent' 
+                  : 'bg-brand-blue/10 dark:bg-transparent text-black dark:text-white hover:bg-brand-blue/20 dark:hover:bg-transparent'
               ]"
               @click.stop="openEditModal(event)"
             >
               {{ event.title }}
             </button>
-            <div v-if="day.events.length > 3" class="text-xs text-gray-500">+{{ day.events.length - 3 }} more</div>
+            <div v-if="day.events.length > 3" class="text-xs text-black dark:text-white">+{{ day.events.length - 3 }} more</div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Events List -->
-    <div v-else class="events-list-container bg-white rounded-lg shadow" style="background-color: white !important;">
+    <div v-else class="events-list-container bg-white rounded-lg shadow">
       <div class="p-6 border-b border-gray-200">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h2 class="text-xl font-semibold text-gray-900">Events</h2>
@@ -264,14 +267,13 @@
       @click="closeModal"
     >
       <div
-        class="event-form-modal bg-white rounded-xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto border-2 border-gray-200"
-        style="background-color: white !important;"
+        class="event-form-modal bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto border-2 border-gray-200 dark:border-gray-700"
         @click.stop
       >
-        <div class="p-8 border-b border-gray-200">
+        <div class="p-8 border-b border-gray-200 dark:border-gray-700">
           <div class="flex justify-between items-start mb-6">
-            <h3 class="text-3xl font-bold text-gray-900">{{ editingEvent ? 'Edit Event' : 'New Event' }}</h3>
-            <button @click="closeModal" class="text-gray-500 hover:text-gray-700 transition-colors p-1 hover:bg-gray-100 rounded-full">
+            <h3 class="text-3xl font-bold text-gray-900 dark:text-white">{{ editingEvent ? 'Edit Event' : 'New Event' }}</h3>
+            <button @click="closeModal" class="text-gray-500 dark:text-white hover:text-gray-700 dark:hover:text-gray-200 transition-colors p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -281,93 +283,93 @@
 
         <form @submit.prevent="saveEvent" class="p-8 space-y-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Title *</label>
             <input
               v-model="eventForm.title"
               type="text"
               required
-              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-main focus:border-main"
+              class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:ring-2 focus:ring-main focus:border-main"
               placeholder="Event title"
             />
           </div>
 
           <div v-if="viewMode === 'calendar'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Start *</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Start *</label>
               <input
                 v-model="eventForm.start"
                 type="datetime-local"
                 required
-                class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-main focus:border-main"
+                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:ring-2 focus:ring-main focus:border-main"
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">End *</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">End *</label>
               <input
                 v-model="eventForm.end"
                 type="datetime-local"
                 required
-                class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-main focus:border-main"
+                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:ring-2 focus:ring-main focus:border-main"
               />
             </div>
           </div>
 
           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Date *</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Date *</label>
               <input
                 v-model="eventForm.date"
                 type="date"
                 required
-                class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-main focus:border-main"
+                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:ring-2 focus:ring-main focus:border-main"
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Time</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Time</label>
               <input
                 v-model="eventForm.time"
                 type="time"
-                class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-main focus:border-main"
+                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:ring-2 focus:ring-main focus:border-main"
               />
             </div>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Location</label>
             <input
               v-model="eventForm.location"
               type="text"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-main focus:border-main"
+              class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:ring-2 focus:ring-main focus:border-main"
               placeholder="Main hall"
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Summary</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Summary</label>
             <input
               v-model="eventForm.summary"
               type="text"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-main focus:border-main"
+              class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:ring-2 focus:ring-main focus:border-main"
               placeholder="Short blurb"
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Description</label>
             <textarea
               v-model="eventForm.description"
               rows="4"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-main focus:border-main"
+              class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:ring-2 focus:ring-main focus:border-main"
               placeholder="Full details"
             ></textarea>
           </div>
 
-          <div v-if="formError" class="p-3 border border-red-200 bg-red-50 text-red-700 text-sm rounded-md">
+          <div v-if="formError" class="p-3 border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm rounded-md">
             {{ formError }}
           </div>
 
           <div class="flex justify-end gap-3 pt-4">
-            <button type="button" @click="closeModal" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+            <button type="button" @click="closeModal" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
               Cancel
             </button>
             <button
@@ -742,25 +744,27 @@ export default {
 </script>
 
 <style>
-/* Force white background for event form modal, overriding admin dark mode */
-.admin-dark-mode .event-form-modal,
+/* Force white background for modal in light mode */
 .event-form-modal {
   background-color: white !important;
-  color: #111827 !important;
 }
 
-.admin-dark-mode .event-form-modal div,
-.admin-dark-mode .event-form-modal p,
-.admin-dark-mode .event-form-modal span {
-  color: #111827 !important;
+/* Allow dark mode background */
+.admin-dark-mode .event-form-modal {
+  background-color: #1f2937 !important;
 }
 
-.admin-dark-mode .event-form-modal input[type="text"],
-.admin-dark-mode .event-form-modal input[type="date"],
-.admin-dark-mode .event-form-modal input[type="time"],
-.admin-dark-mode .event-form-modal input[type="datetime-local"],
-.admin-dark-mode .event-form-modal textarea,
-.admin-dark-mode .event-form-modal select,
+/* Force black text for all modal text in light mode */
+.event-form-modal label,
+.event-form-modal h3,
+.event-form-modal p,
+.event-form-modal span,
+.event-form-modal div,
+.event-form-modal button:not(.bg-main) {
+  color: #000000 !important;
+}
+
+/* Ensure form inputs are white in light mode (when NOT in admin-dark-mode) */
 .event-form-modal input[type="text"],
 .event-form-modal input[type="date"],
 .event-form-modal input[type="time"],
@@ -772,256 +776,104 @@ export default {
   border-color: #d1d5db !important;
 }
 
-.admin-dark-mode .event-form-modal input::placeholder,
-.admin-dark-mode .event-form-modal textarea::placeholder,
-.event-form-modal input::placeholder,
-.event-form-modal textarea::placeholder {
-  color: #9ca3af !important;
+/* Override for dark mode only - make inputs dark */
+.admin-dark-mode .event-form-modal input[type="text"],
+.admin-dark-mode .event-form-modal input[type="date"],
+.admin-dark-mode .event-form-modal input[type="time"],
+.admin-dark-mode .event-form-modal input[type="datetime-local"],
+.admin-dark-mode .event-form-modal textarea,
+.admin-dark-mode .event-form-modal select {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #0c94ab40 !important;
 }
 
+/* Ensure all text is white in dark mode only */
 .admin-dark-mode .event-form-modal label,
-.event-form-modal label {
-  color: #374151 !important;
-}
-
 .admin-dark-mode .event-form-modal h3,
-.admin-dark-mode .event-form-modal h2,
-.admin-dark-mode .event-form-modal h1,
-.event-form-modal h3,
-.event-form-modal h2,
-.event-form-modal h1 {
-  color: #111827 !important;
+.admin-dark-mode .event-form-modal p,
+.admin-dark-mode .event-form-modal span,
+.admin-dark-mode .event-form-modal button:not(.bg-main) {
+  color: #ffffff !important;
 }
 
-.admin-dark-mode .event-form-modal button:not(.bg-main),
-.event-form-modal button:not(.bg-main) {
-  background-color: white !important;
-  color: #374151 !important;
-  border-color: #d1d5db !important;
+.admin-dark-mode .event-form-modal input::placeholder,
+.admin-dark-mode .event-form-modal textarea::placeholder {
+  color: #94a3b8 !important;
 }
 
-.admin-dark-mode .event-form-modal button:not(.bg-main):hover,
-.event-form-modal button:not(.bg-main):hover {
-  background-color: #f9fafb !important;
-  color: #111827 !important;
+/* Force black text for calendar event buttons and text in light mode - override AdminLayout's :deep() selectors */
+.calendar-container .calendar-day-cell button[type="button"] {
+  color: #000000 !important;
 }
 
-.admin-dark-mode .event-form-modal .text-gray-500,
-.admin-dark-mode .event-form-modal .text-gray-700,
-.admin-dark-mode .event-form-modal .text-gray-900,
-.admin-dark-mode .event-form-modal .text-black,
-.event-form-modal .text-gray-500,
-.event-form-modal .text-gray-700,
-.event-form-modal .text-gray-900,
-.event-form-modal .text-black {
-  color: #111827 !important;
+.calendar-container .calendar-day-cell .space-y-1 button {
+  color: #000000 !important;
 }
 
-.admin-dark-mode .event-form-modal .border-gray-200,
-.admin-dark-mode .event-form-modal .border-gray-300,
-.event-form-modal .border-gray-200,
-.event-form-modal .border-gray-300 {
-  border-color: #d1d5db !important;
+.calendar-container .calendar-day-cell .space-y-1 div {
+  color: #000000 !important;
 }
 
-/* Force white background for calendar container, overriding admin dark mode */
-.calendar-container {
-  background-color: white !important;
+.calendar-container .calendar-day-cell span[class*="rounded-full"] {
+  color: #000000 !important;
 }
 
-.calendar-container h2 {
-  color: #111827 !important;
+/* Override for dark mode - make event text white */
+.admin-dark-mode .calendar-container .calendar-day-cell button[type="button"] {
+  color: #ffffff !important;
 }
 
-.calendar-container button {
-  background-color: white !important;
-  color: #374151 !important;
-  border-color: #d1d5db !important;
+.admin-dark-mode .calendar-container .calendar-day-cell .space-y-1 button {
+  color: #ffffff !important;
 }
 
-.calendar-container button:hover {
-  background-color: #f9fafb !important;
+.admin-dark-mode .calendar-container .calendar-day-cell .space-y-1 div {
+  color: #ffffff !important;
 }
 
-.calendar-container .text-gray-400,
-.calendar-container .text-gray-500,
-.calendar-container .text-gray-900 {
-  color: inherit !important;
+.admin-dark-mode .calendar-container .calendar-day-cell span[class*="rounded-full"] {
+  color: #ffffff !important;
 }
 
-/* Force white background for events table, overriding admin dark mode */
-.admin-dark-mode .events-table-container,
-.events-table-container {
-  background-color: white !important;
-}
-
-.admin-dark-mode .events-table-container table,
-.events-table-container table {
-  background-color: white !important;
-}
-
-.admin-dark-mode .events-table-container thead,
-.events-table-container thead {
-  background-color: #f9fafb !important;
-}
-
-.admin-dark-mode .events-table-container tbody,
-.events-table-container tbody {
-  background-color: white !important;
-}
-
-.admin-dark-mode .events-table-container tbody tr,
-.events-table-container tbody tr {
-  background-color: white !important;
-}
-
-.admin-dark-mode .events-table-container tbody tr:hover,
-.events-table-container tbody tr:hover {
-  background-color: #f9fafb !important;
-}
-
-.admin-dark-mode .events-table-container th,
-.admin-dark-mode .events-table-container td,
-.events-table-container th,
-.events-table-container td {
-  color: #111827 !important;
-}
-
-.admin-dark-mode .events-table-container .text-gray-500,
-.admin-dark-mode .events-table-container .text-gray-900,
-.events-table-container .text-gray-500,
-.events-table-container .text-gray-900 {
-  color: #111827 !important;
-}
-
-.admin-dark-mode .events-table-container .text-gray-500 {
-  color: #6b7280 !important;
-}
-
-/* Force white background for events list container, overriding admin dark mode */
-.admin-dark-mode .events-list-container,
-.events-list-container {
-  background-color: white !important;
-}
-
-.admin-dark-mode .events-list-container h2,
-.events-list-container h2 {
-  color: #111827 !important;
-}
-
-.admin-dark-mode .events-list-container input,
-.admin-dark-mode .events-list-container select,
-.events-list-container input,
-.events-list-container select {
-  background-color: white !important;
-  color: #111827 !important;
-  border-color: #d1d5db !important;
-}
-
-/* Force white background for calendar day cells, overriding admin dark mode */
-.admin-dark-mode .calendar-container .calendar-day-cell,
-.calendar-container .calendar-day-cell {
-  background-color: white !important;
-  border-color: #e5e7eb !important;
-}
-
-.admin-dark-mode .calendar-container .calendar-day-cell:hover,
-.calendar-container .calendar-day-cell:hover {
-  background-color: #f9fafb !important;
-}
-
-.admin-dark-mode .calendar-container .calendar-day-cell span,
-.calendar-container .calendar-day-cell span {
-  color: #111827 !important;
-}
-
-.admin-dark-mode .calendar-container .calendar-day-cell .text-gray-400,
-.admin-dark-mode .calendar-container .calendar-day-cell .text-gray-500,
-.admin-dark-mode .calendar-container .calendar-day-cell .text-gray-800,
-.calendar-container .calendar-day-cell .text-gray-400,
-.calendar-container .calendar-day-cell .text-gray-500,
-.calendar-container .calendar-day-cell .text-gray-800 {
-  color: inherit !important;
-}
-
-.admin-dark-mode .calendar-container .calendar-day-cell button,
-.calendar-container .calendar-day-cell button {
-  background-color: #dbeafe !important;
-  color: #1e40af !important;
-}
-
-.admin-dark-mode .calendar-container .calendar-day-cell button:hover,
-.calendar-container .calendar-day-cell button:hover {
-  background-color: #bfdbfe !important;
-}
-
-/* Ensure today cell stays white */
-.admin-dark-mode .calendar-container .calendar-day-cell.border-brand-blue,
-.calendar-container .calendar-day-cell.border-brand-blue {
-  background-color: white !important;
-  border-color: #3b82f6 !important;
-}
-
-/* Force white background for view toggle container and buttons, overriding admin dark mode */
-.admin-dark-mode .view-toggle-container,
+/* Force white background for view toggle container in light mode only */
 .view-toggle-container {
   background-color: white !important;
   border-color: #d1d5db !important;
 }
 
-.admin-dark-mode .view-toggle-container button:not(.bg-main),
 .view-toggle-container button:not(.bg-main) {
   background-color: white !important;
   color: #374151 !important;
 }
 
-.admin-dark-mode .view-toggle-container button:not(.bg-main):hover,
 .view-toggle-container button:not(.bg-main):hover {
   background-color: #f9fafb !important;
   color: #111827 !important;
 }
 
 /* Ensure selected toggle button text is green */
-.admin-dark-mode .view-toggle-container button.bg-main,
 .view-toggle-container button.bg-main {
   color: #16a34a !important;
 }
 
-.admin-dark-mode .view-toggle-container button.bg-main svg,
 .view-toggle-container button.bg-main svg {
   color: #16a34a !important;
 }
 
-/* Force white background for New Event button, overriding admin dark mode */
-.admin-dark-mode .new-event-button,
+/* Force white background for New Event button in light mode only */
 .new-event-button {
   background-color: white !important;
   border-color: #d1d5db !important;
   color: #16a34a !important;
 }
 
-.admin-dark-mode .new-event-button:hover,
 .new-event-button:hover {
   background-color: #f9fafb !important;
   color: #16a34a !important;
 }
 
-.admin-dark-mode .new-event-button svg,
 .new-event-button svg {
   color: #16a34a !important;
-}
-
-/* Force white background for Today button, overriding admin dark mode */
-.admin-dark-mode .today-button,
-.today-button {
-  background-color: white !important;
-  border-color: #d1d5db !important;
-  color: #374151 !important;
-}
-
-.admin-dark-mode .today-button:hover,
-.today-button:hover {
-  background-color: #f9fafb !important;
-  color: #111827 !important;
 }
 </style>
