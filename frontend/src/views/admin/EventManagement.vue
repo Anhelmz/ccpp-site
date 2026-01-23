@@ -69,176 +69,200 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-7 gap-2 text-sm font-semibold text-gray-500 dark:text-gray-500 mb-2">
-        <div v-for="day in weekdayLabels" :key="day" class="text-center py-2">
-          {{ day }}
-        </div>
-      </div>
-
-      <div class="grid grid-cols-7 gap-2">
-        <div
-          v-for="day in calendarDays"
-          :key="day.date"
-          :class="[
-            'calendar-day-cell min-h-28 border rounded-lg p-3 flex flex-col gap-2 cursor-pointer transition-all hover:shadow-md',
-            day.isPast 
-              ? (day.isCurrentMonth 
-                  ? 'bg-white hover:bg-gray-50 border-gray-200 text-gray-500' 
-                  : 'bg-white text-gray-400 border-gray-200')
-              : (day.isCurrentMonth 
-                  ? 'bg-white hover:bg-gray-50 border-gray-300 text-gray-800' 
-                  : 'bg-white text-gray-400 border-gray-200'),
-            day.isToday ? 'border-brand-blue ring-2 ring-brand-blue/20 bg-white' : ''
-          ]"
-          @click="openCreateModal(day.date)"
-        >
-          <div class="flex items-center justify-between">
-            <span :class="[
-              'text-sm font-semibold', 
-              day.isPast 
-                ? (day.isCurrentMonth ? 'text-gray-500' : 'text-gray-400')
-                : (day.isCurrentMonth ? 'text-gray-800' : 'text-gray-400'),
-              day.isToday ? 'text-brand-blue font-bold' : ''
-            ]">
-              {{ day.day }}
-            </span>
+      <!-- Calendar with horizontal scroll on mobile -->
+      <div class="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+        <div class="min-w-[700px] md:min-w-0">
+          <div class="grid grid-cols-7 gap-2 text-sm font-semibold text-gray-500 dark:text-gray-500 mb-2">
+            <div v-for="day in weekdayLabels" :key="day" class="text-center py-2">
+              {{ day }}
+            </div>
           </div>
-          <div class="space-y-1">
-            <button
-              v-for="event in day.events.slice(0, 3)"
-              :key="event.id"
-              type="button"
+
+          <div class="grid grid-cols-7 gap-2">
+            <div
+              v-for="day in calendarDays"
+              :key="day.date"
               :class="[
-                'w-full text-left text-base font-semibold rounded-md px-2 py-1.5 truncate transition-colors text-[#23D3EE]',
+                'calendar-day-cell min-h-32 md:min-h-28 border rounded-lg p-3 flex flex-col gap-2 cursor-pointer transition-all hover:shadow-md',
                 day.isPast 
-                  ? 'bg-gray-200 dark:bg-transparent hover:bg-gray-300 dark:hover:bg-transparent opacity-70' 
-                  : 'bg-brand-blue/10 dark:bg-transparent hover:bg-brand-blue/20 dark:hover:bg-transparent'
+                  ? (day.isCurrentMonth 
+                      ? 'bg-white hover:bg-gray-50 border-gray-200 text-gray-500' 
+                      : 'bg-white text-gray-400 border-gray-200')
+                  : (day.isCurrentMonth 
+                      ? 'bg-white hover:bg-gray-50 border-gray-300 text-gray-800' 
+                      : 'bg-white text-gray-400 border-gray-200'),
+                day.isToday ? 'border-brand-blue ring-2 ring-brand-blue/20 bg-white' : ''
               ]"
-              @click.stop="openEditModal(event)"
+              @click="openCreateModal(day.date)"
             >
-              {{ event.title }}
-            </button>
-            <div v-if="day.events.length > 3" class="text-xs text-black dark:text-white">+{{ day.events.length - 3 }} more</div>
-            <button
-              v-if="day.events.length > 0"
-              type="button"
-              class="add-event-button w-full text-center text-xs font-medium rounded-md px-2 py-1.5 mt-1 transition-colors bg-[#23D3EE] text-white hover:bg-[#1FC5D9] hover:text-white"
-              @click.stop="openCreateModal(day.date)"
-            >
-              + Add Event
-            </button>
+              <div class="flex items-center justify-between">
+                <span :class="[
+                  'text-sm font-semibold', 
+                  day.isPast 
+                    ? (day.isCurrentMonth ? 'text-gray-500' : 'text-gray-400')
+                    : (day.isCurrentMonth ? 'text-gray-800' : 'text-gray-400'),
+                  day.isToday ? 'text-brand-blue font-bold' : ''
+                ]">
+                  {{ day.day }}
+                </span>
+              </div>
+              <div class="space-y-1">
+                <button
+                  v-for="event in day.events.slice(0, 3)"
+                  :key="event.id"
+                  type="button"
+                  :class="[
+                    'w-full text-left text-sm md:text-base font-semibold rounded-md px-2 py-1.5 truncate transition-colors text-[#23D3EE]',
+                    day.isPast 
+                      ? 'bg-gray-200 dark:bg-transparent hover:bg-gray-300 dark:hover:bg-transparent opacity-70' 
+                      : 'bg-brand-blue/10 dark:bg-transparent hover:bg-brand-blue/20 dark:hover:bg-transparent'
+                  ]"
+                  @click.stop="openEditModal(event)"
+                >
+                  {{ event.title }}
+                </button>
+                <div v-if="day.events.length > 3" class="text-xs text-black dark:text-white">+{{ day.events.length - 3 }} more</div>
+                <button
+                  v-if="day.events.length > 0"
+                  type="button"
+                  class="add-event-button w-full text-center text-xs font-medium rounded-md px-2 py-1.5 mt-1 transition-colors bg-[#23D3EE] text-white hover:bg-[#1FC5D9] hover:text-white"
+                  @click.stop="openCreateModal(day.date)"
+                >
+                  + Add Event
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Events List -->
-    <div v-else class="events-list-container bg-white rounded-lg shadow">
-      <div class="p-6 border-b border-gray-200">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h2 class="text-xl font-semibold text-gray-900">Events</h2>
-          <div class="flex items-center space-x-2 w-full sm:w-auto">
-            <input
-              v-model="searchQuery"
-              @input="filterEvents"
-              type="text"
-              placeholder="Search events..."
-              class="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-lg text-sm min-w-48"
-            />
-            <select 
-              v-model="filterType"
-              @change="loadEvents"
-              class="px-4 py-2 border border-gray-300 rounded-lg text-sm"
-            >
-              <option value="all">All Events</option>
-              <option value="upcoming">Upcoming</option>
-              <option value="past">Past</option>
-            </select>
+    <div v-else>
+      <!-- Loading State -->
+      <div v-if="loading" class="flex items-center justify-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#23D3EE]"></div>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <p class="text-sm text-red-800">{{ error }}</p>
+      </div>
+
+      <!-- Events Table -->
+      <div v-else-if="filteredEvents.length > 0">
+        <!-- Mobile Card View -->
+        <div class="md:hidden space-y-3">
+          <div
+            v-for="event in filteredEvents"
+            :key="event.id"
+            class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            @click="openEditModal(event)"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <h3 class="text-base font-semibold text-gray-900 pr-2">{{ event.title }}</h3>
+              <button
+                class="text-red-600 hover:text-red-800 transition-colors font-medium text-sm flex-shrink-0"
+                @click.stop="deleteEvent(event.id)"
+                aria-label="Delete event"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-center gap-2 text-gray-600">
+                <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span class="font-medium text-gray-700">Date:</span>
+                <span>{{ formatDate(event.date || event.startTime || event.start) }}</span>
+              </div>
+              <div class="flex items-center gap-2 text-gray-600">
+                <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="font-medium text-gray-700">Time:</span>
+                <span v-if="event.time">{{ event.time }}</span>
+                <span v-else-if="event.startTime || event.start">
+                  {{ formatTime(event.startTime || event.start) }}
+                  <span v-if="event.endTime || event.end"> - {{ formatTime(event.endTime || event.end) }}</span>
+                </span>
+                <span v-else class="text-gray-400">N/A</span>
+              </div>
+              <div class="flex items-center gap-2 text-gray-600">
+                <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span class="font-medium text-gray-700">Location:</span>
+                <span>{{ event.location || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop Table View -->
+        <div class="hidden md:block bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr 
+                  v-for="event in filteredEvents" 
+                  :key="event.id"
+                  @click="openEditModal(event)"
+                  class="hover:bg-gray-50 cursor-pointer transition-colors"
+                >
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {{ event.title }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {{ formatDate(event.date || event.startTime || event.start) }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <span v-if="event.time">{{ event.time }}</span>
+                    <span v-else-if="event.startTime || event.start">
+                      {{ formatTime(event.startTime || event.start) }}
+                      <span v-if="event.endTime || event.end"> - {{ formatTime(event.endTime || event.end) }}</span>
+                    </span>
+                    <span v-else class="text-gray-400">N/A</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {{ event.location || 'N/A' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" @click.stop>
+                    <button
+                      class="text-red-600 hover:text-red-800 transition-colors font-medium"
+                      @click="deleteEvent(event.id)"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <!-- Loading State -->
-      <div v-if="loading" class="text-center py-12">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-main border-t-transparent mb-4"></div>
-        <p class="text-gray-600">Loading events...</p>
-      </div>
-
-      <!-- Error State -->
-      <div v-else-if="error" class="text-center py-12">
-        <p class="text-red-600 mb-4">{{ error }}</p>
-        <button 
-          @click="loadEvents"
-          class="px-4 py-2 bg-main text-white rounded-lg hover:opacity-90 transition-colors"
-        >
-          Retry
-        </button>
-      </div>
-
       <!-- Empty State -->
-      <div v-else-if="filteredEvents.length === 0" class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-        </svg>
-        <p class="text-gray-600 mb-2">{{ searchQuery ? 'No events found' : 'No events created yet' }}</p>
-        <p class="text-sm text-gray-500 mb-4">{{ searchQuery ? 'Try a different search term' : 'Create your first event to get started' }}</p>
-        <button
-          v-if="!searchQuery"
-          @click="openCreateModal"
-          class="px-6 py-2 bg-main text-white rounded-lg hover:opacity-90 transition-colors"
-        >
-          Create Event
-        </button>
-      </div>
-
-      <!-- Events Table -->
-      <div v-else class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr 
-                v-for="event in filteredEvents" 
-                :key="event.id"
-                @click="openEditModal(event)"
-                class="hover:bg-gray-50 transition-colors cursor-pointer"
-              >
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {{ event.title }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {{ formatDate(event.date || event.startTime || event.start) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  <span v-if="event.time">{{ event.time }}</span>
-                  <span v-else-if="event.startTime || event.start">
-                    {{ formatTime(event.startTime || event.start) }}
-                    <span v-if="event.endTime || event.end"> - {{ formatTime(event.endTime || event.end) }}</span>
-                  </span>
-                  <span v-else class="text-gray-400">N/A</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {{ event.location || 'N/A' }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" @click.stop>
-                  <button 
-                    @click="deleteEvent(event.id)"
-                    class="text-red-600 hover:text-red-800 transition-colors font-medium"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <div v-else class="bg-white p-6 border border-gray-200 rounded-lg">
+        <div class="text-center py-12">
+          <svg class="mx-auto h-16 w-16 text-zinc-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <h3 class="text-lg font-medium text-zinc-900 mb-2">{{ searchQuery ? 'No events found' : 'No Events' }}</h3>
+          <p class="text-sm text-zinc-600">{{ searchQuery ? 'Try a different search term' : 'Create your first event to get started' }}</p>
         </div>
       </div>
     </div>

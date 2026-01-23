@@ -20,62 +20,132 @@
       </div>
 
       <!-- Contact Requests List -->
-      <div v-else-if="filteredRequests.length > 0" class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr 
-                v-for="request in filteredRequests" 
-                :key="request.id" 
-                @click="viewRequest(request)"
-                class="hover:bg-gray-50 cursor-pointer transition-colors"
+      <div v-else-if="filteredRequests.length > 0">
+        <!-- Mobile Card View -->
+        <div class="md:hidden space-y-3">
+          <div
+            v-for="request in filteredRequests"
+            :key="request.id"
+            class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            @click="viewRequest(request)"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <h3 class="text-base font-semibold text-gray-900 pr-2">{{ request.name }}</h3>
+              <button
+                class="text-red-600 hover:text-red-800 transition-colors font-medium text-sm flex-shrink-0"
+                @click.stop="deleteRequest(request.id)"
+                aria-label="Delete contact request"
               >
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {{ request.name }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  <a 
-                    :href="`mailto:${request.email}`" 
-                    @click.stop
-                    class="text-[#23D3EE] hover:text-[#1FC5D9]"
-                  >
-                    {{ request.email }}
-                  </a>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  <a 
-                    v-if="request.phone"
-                    :href="`tel:${request.phone}`" 
-                    @click.stop
-                    class="text-[#23D3EE] hover:text-[#1FC5D9]"
-                  >
-                    {{ request.phone }}
-                  </a>
-                  <span v-else class="text-gray-400">N/A</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ formatDate(request.created_at || request.createdAt) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" @click.stop>
-                  <button
-                    class="text-red-600 hover:text-red-800 transition-colors font-medium"
-                    @click="deleteRequest(request.id)"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-center gap-2 text-gray-600">
+                <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                <span class="font-medium text-gray-700">Email:</span>
+                <a 
+                  :href="`mailto:${request.email}`" 
+                  @click.stop
+                  class="text-[#23D3EE] hover:text-[#1FC5D9] truncate"
+                >
+                  {{ request.email }}
+                </a>
+              </div>
+              <div class="flex items-center gap-2 text-gray-600">
+                <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                </svg>
+                <span class="font-medium text-gray-700">Phone:</span>
+                <a 
+                  v-if="request.phone"
+                  :href="`tel:${request.phone}`" 
+                  @click.stop
+                  class="text-[#23D3EE] hover:text-[#1FC5D9]"
+                >
+                  {{ request.phone }}
+                </a>
+                <span v-else class="text-gray-400">N/A</span>
+              </div>
+              <div class="flex items-center gap-2 text-gray-600">
+                <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span class="font-medium text-gray-700">Submitted:</span>
+                <span>{{ formatDate(request.created_at || request.createdAt) }}</span>
+              </div>
+              <div v-if="request.reason" class="flex items-center gap-2 text-gray-600">
+                <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                <span class="font-medium text-gray-700">Reason:</span>
+                <span>{{ request.reason }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop Table View -->
+        <div class="hidden md:block bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr 
+                  v-for="request in filteredRequests" 
+                  :key="request.id" 
+                  @click="viewRequest(request)"
+                  class="hover:bg-gray-50 cursor-pointer transition-colors"
+                >
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {{ request.name }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <a 
+                      :href="`mailto:${request.email}`" 
+                      @click.stop
+                      class="text-[#23D3EE] hover:text-[#1FC5D9]"
+                    >
+                      {{ request.email }}
+                    </a>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <a 
+                      v-if="request.phone"
+                      :href="`tel:${request.phone}`" 
+                      @click.stop
+                      class="text-[#23D3EE] hover:text-[#1FC5D9]"
+                    >
+                      {{ request.phone }}
+                    </a>
+                    <span v-else class="text-gray-400">N/A</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ formatDate(request.created_at || request.createdAt) }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" @click.stop>
+                    <button
+                      class="text-red-600 hover:text-red-800 transition-colors font-medium"
+                      @click="deleteRequest(request.id)"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
