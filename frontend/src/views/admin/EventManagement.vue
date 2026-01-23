@@ -32,7 +32,8 @@
           </span>
         </button>
         <button
-          @click="openCreateModal"
+          @click="openCreateModal()"
+          type="button"
           class="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-[#23D3EE] text-white hover:bg-[#1FC5D9] flex items-center gap-2"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -267,10 +268,20 @@
       </div>
     </div>
 
+    <!-- Confirmation Modal -->
+    <ConfirmationModal
+      :show="showConfirmModal"
+      title="Delete Event"
+      message="Are you sure you want to delete this event? This action cannot be undone."
+      confirm-text="Delete Event"
+      @confirm="confirmDelete"
+      @cancel="cancelDelete"
+    />
+
     <!-- Create/Edit Event Modal -->
     <div
       v-if="showModal"
-      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 overflow-y-auto"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] overflow-y-auto"
       @click="closeModal"
     >
       <div
@@ -300,7 +311,7 @@
             />
           </div>
 
-          <div v-if="viewMode === 'calendar'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Start *</label>
               <input
@@ -316,26 +327,6 @@
                 v-model="eventForm.end"
                 type="datetime-local"
                 required
-                class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
-              />
-            </div>
-          </div>
-
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Date *</label>
-              <input
-                v-model="eventForm.date"
-                type="date"
-                required
-                class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Time</label>
-              <input
-                v-model="eventForm.time"
-                type="time"
                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
               />
             </div>
@@ -397,12 +388,14 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import AdminLayout from '@/components/admin/AdminLayout.vue'
+import ConfirmationModal from '@/components/admin/ConfirmationModal.vue'
 import { eventService } from '@/services/eventService'
 
 export default {
   name: 'EventManagement',
   components: {
-    AdminLayout
+    AdminLayout,
+    ConfirmationModal
   },
   setup() {
     const showModal = ref(false)
@@ -415,6 +408,8 @@ export default {
     const filterType = ref('all')
     const searchQuery = ref('')
     const viewMode = ref('list') // 'list' or 'calendar'
+    const showConfirmModal = ref(false)
+    const eventToDelete = ref(null)
 
     // Calendar state
     const currentMonth = ref(new Date().getMonth())
@@ -572,23 +567,21 @@ export default {
         end: ''
       }
       
-      if (viewMode.value === 'calendar') {
-        if (dateKey) {
-          const start = new Date(dateKey)
-          start.setHours(9, 0, 0, 0)
-          const end = new Date(dateKey)
-          end.setHours(10, 0, 0, 0)
-          eventForm.value.start = toDateTimeLocal(start.toISOString())
-          eventForm.value.end = toDateTimeLocal(end.toISOString())
-        } else {
-          // If no dateKey provided, use today's date
-          const today = new Date()
-          today.setHours(9, 0, 0, 0)
-          const end = new Date(today)
-          end.setHours(10, 0, 0, 0)
-          eventForm.value.start = toDateTimeLocal(today.toISOString())
-          eventForm.value.end = toDateTimeLocal(end.toISOString())
-        }
+      if (dateKey) {
+        const start = new Date(dateKey)
+        start.setHours(9, 0, 0, 0)
+        const end = new Date(dateKey)
+        end.setHours(10, 0, 0, 0)
+        eventForm.value.start = toDateTimeLocal(start.toISOString())
+        eventForm.value.end = toDateTimeLocal(end.toISOString())
+      } else {
+        // If no dateKey provided, use today's date
+        const today = new Date()
+        today.setHours(9, 0, 0, 0)
+        const end = new Date(today)
+        end.setHours(10, 0, 0, 0)
+        eventForm.value.start = toDateTimeLocal(today.toISOString())
+        eventForm.value.end = toDateTimeLocal(end.toISOString())
       }
       
       formError.value = ''
@@ -598,29 +591,15 @@ export default {
     const openEditModal = (event) => {
       editingEvent.value = event
       
-      if (viewMode.value === 'calendar') {
-        eventForm.value = {
-          title: event.title,
-          start: toDateTimeLocal(event.startTime || event.start || event.date),
-          end: toDateTimeLocal(event.endTime || event.end || event.startTime || event.date),
-          location: event.location || '',
-          summary: event.summary || '',
-          description: event.description || '',
-          date: '',
-          time: ''
-        }
-      } else {
-        const eventDate = new Date(event.date || event.startTime || event.start)
-        eventForm.value = {
-          title: event.title,
-          summary: event.summary || '',
-          description: event.description || '',
-          date: eventDate.toISOString().split('T')[0],
-          time: event.time || '',
-          location: event.location || '',
-          start: '',
-          end: ''
-        }
+      eventForm.value = {
+        title: event.title,
+        start: toDateTimeLocal(event.startTime || event.start || event.date),
+        end: toDateTimeLocal(event.endTime || event.end || event.startTime || event.date),
+        location: event.location || '',
+        summary: event.summary || '',
+        description: event.description || '',
+        date: '',
+        time: ''
       }
       
       formError.value = ''
@@ -638,36 +617,23 @@ export default {
       formError.value = ''
 
       try {
-        let eventData
+        const start = eventForm.value.start ? new Date(eventForm.value.start) : null
+        const end = eventForm.value.end ? new Date(eventForm.value.end) : null
 
-        if (viewMode.value === 'calendar') {
-          const start = eventForm.value.start ? new Date(eventForm.value.start) : null
-          const end = eventForm.value.end ? new Date(eventForm.value.end) : null
+        if (!start || !end || end < start) {
+          formError.value = 'Please provide valid start and end times.'
+          saving.value = false
+          return
+        }
 
-          if (!start || !end || end < start) {
-            formError.value = 'Please provide valid start and end times.'
-            saving.value = false
-            return
-          }
-
-          eventData = {
-            title: eventForm.value.title.trim(),
-            summary: eventForm.value.summary.trim(),
-            description: eventForm.value.description.trim(),
-            startTime: start.toISOString(),
-            endTime: end.toISOString(),
-            location: eventForm.value.location.trim(),
-            recurrence: 'none'
-          }
-        } else {
-          eventData = {
-            title: eventForm.value.title.trim(),
-            summary: eventForm.value.summary.trim(),
-            description: eventForm.value.description.trim(),
-            date: new Date(eventForm.value.date).toISOString(),
-            time: eventForm.value.time.trim(),
-            location: eventForm.value.location.trim()
-          }
+        const eventData = {
+          title: eventForm.value.title.trim(),
+          summary: eventForm.value.summary.trim(),
+          description: eventForm.value.description.trim(),
+          startTime: start.toISOString(),
+          endTime: end.toISOString(),
+          location: eventForm.value.location.trim(),
+          recurrence: 'none'
         }
 
         if (editingEvent.value) {
@@ -686,18 +652,31 @@ export default {
       }
     }
 
-    const deleteEvent = async (id) => {
-      if (!confirm('Are you sure you want to delete this event?')) {
-        return
-      }
+    const deleteEvent = (id) => {
+      eventToDelete.value = id
+      showConfirmModal.value = true
+    }
+
+    const confirmDelete = async () => {
+      if (!eventToDelete.value) return
+
+      const id = eventToDelete.value
+      showConfirmModal.value = false
 
       try {
         await eventService.deleteEvent(id)
         await loadEvents()
+        eventToDelete.value = null
       } catch (err) {
         console.error('Error deleting event:', err)
         alert(`Failed to delete event: ${err.message}`)
+        eventToDelete.value = null
       }
+    }
+
+    const cancelDelete = () => {
+      showConfirmModal.value = false
+      eventToDelete.value = null
     }
 
     const previousMonth = () => {
@@ -749,6 +728,10 @@ export default {
       closeModal,
       saveEvent,
       deleteEvent,
+      showConfirmModal,
+      eventToDelete,
+      confirmDelete,
+      cancelDelete,
       viewMode,
       weekdayLabels,
       monthLabel,
