@@ -9,8 +9,8 @@
         :class="[
           'gallery-upload-area border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer mb-6',
           isDragging
-            ? 'border-main bg-blue-50'
-            : 'border-gray-300 bg-white hover:border-main hover:bg-gray-50',
+            ? 'border-[#23D3EE] bg-blue-50'
+            : 'border-gray-300 bg-white hover:border-[#23D3EE] hover:bg-gray-50',
         ]"
         @drop.prevent="handleDrop"
         @dragover.prevent="isDragging = true"
@@ -29,7 +29,7 @@
           class="mx-auto w-16 h-16 bg-secondary rounded-full flex items-center justify-center mb-4"
         >
           <svg
-            class="h-8 w-8 text-main"
+            class="h-8 w-8 text-[#23D3EE]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -50,7 +50,7 @@
         </p>
         <button
           type="button"
-          class="select-images-button px-6 py-3 bg-white border border-gray-300 text-green-600 rounded-lg hover:bg-gray-50 transition-colors font-medium shadow-md"
+          class="select-images-button px-4 py-2 text-sm bg-white border border-gray-300 text-[#23D3EE] rounded-lg hover:bg-gray-50 transition-colors font-medium shadow-md"
           @click.stop="triggerFileInput"
         >
           Select Images from Folder
@@ -69,10 +69,10 @@
             type="button"
             @click="formData.category = cat.value"
             :class="[
-              'px-4 py-4 rounded-lg font-medium text-sm transition-all duration-200 border-2 shadow-sm',
+              'px-3 py-2 rounded-lg font-medium text-xs transition-all duration-200 border-2 shadow-sm',
               formData.category === cat.value
-                ? 'bg-brand-blue text-white border-brand-blue shadow-md shadow-brand-blue/20'
-                : 'bg-white text-gray-700 border-gray-300 hover:border-brand-blue/50 hover:bg-gray-50 hover:shadow-md'
+                ? 'bg-[#23D3EE] text-white border-[#23D3EE] shadow-md shadow-[#23D3EE]/20'
+                : 'bg-white text-gray-700 border-gray-300 hover:border-[#23D3EE]/50 hover:bg-gray-50 hover:shadow-md'
             ]"
           >
             {{ cat.label }}
@@ -111,7 +111,7 @@
         type="button"
         :disabled="submitting || selectedFiles.length === 0"
         @click="uploadFiles"
-        class="w-full px-6 py-3 bg-brand-blue dark:bg-main text-white rounded-lg hover:bg-brand-blue/90 dark:hover:opacity-90 transition-colors font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full px-4 py-2 text-sm bg-[#23D3EE] text-white rounded-lg hover:bg-[#1FC5D9] transition-colors font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span v-if="submitting" class="flex items-center justify-center space-x-2">
           <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
@@ -149,15 +149,15 @@
           :key="cat.value"
           @click="selectCategory(cat.value)"
           :class="[
-            'relative px-6 py-8 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:scale-105',
-            'border-2 flex flex-col items-center justify-center min-h-[120px] shadow-sm',
+            'relative px-3 py-3 rounded-lg font-semibold text-sm transition-all duration-200 transform hover:scale-105',
+            'border-2 flex flex-col items-center justify-center min-h-[70px] shadow-sm',
             filterCategory === cat.value
-              ? 'bg-brand-blue text-white border-brand-blue shadow-lg shadow-brand-blue/30 scale-105'
-              : 'bg-white text-gray-700 border-gray-300 hover:border-brand-blue/50 hover:bg-gray-50 hover:shadow-md'
+              ? 'bg-[#23D3EE] text-white border-[#23D3EE] shadow-lg shadow-[#23D3EE]/30 scale-105'
+              : 'bg-white text-gray-700 border-gray-300 hover:border-[#23D3EE]/50 hover:bg-gray-50 hover:shadow-md'
           ]"
         >
-          <div v-if="filterCategory === cat.value" class="absolute top-2 right-2">
-            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <div v-if="filterCategory === cat.value" class="absolute top-1.5 right-1.5">
+            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
           </div>
@@ -165,7 +165,7 @@
           <span 
             v-if="groupedGalleries[cat.value] && groupedGalleries[cat.value].length > 0"
             :class="[
-              'text-sm mt-2 font-normal',
+              'text-xs mt-1 font-normal',
               filterCategory === cat.value ? 'text-white/80' : 'text-gray-500'
             ]"
           >
@@ -187,7 +187,7 @@
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <div
-          class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-brand-blue dark:border-main border-t-transparent mb-4"
+          class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#23D3EE] border-t-transparent mb-4"
         ></div>
         <p class="text-gray-600">Loading gallery...</p>
       </div>
@@ -196,7 +196,7 @@
       <div v-else-if="error" class="text-center py-12">
         <p class="text-red-600 mb-4">{{ error }}</p>
         <button
-          class="px-4 py-2 bg-main text-white rounded-lg hover:opacity-90 transition-colors"
+          class="px-3 py-1.5 text-sm bg-[#23D3EE] text-white rounded-lg hover:bg-[#1FC5D9] transition-colors"
           @click="loadGalleries"
         >
           Retry
@@ -237,7 +237,7 @@
             <div
               v-for="(gallery, index) in currentImages"
               :key="gallery.id"
-              class="gallery-image-item relative group rounded-lg overflow-hidden border border-gray-300 bg-white shadow-sm hover:shadow-lg transition-all cursor-pointer hover:border-brand-blue"
+              class="gallery-image-item relative group rounded-lg overflow-hidden border border-gray-300 bg-white shadow-sm hover:shadow-lg transition-all cursor-pointer hover:border-[#23D3EE]"
               @click="viewImage(index)"
             >
               <img
@@ -250,13 +250,13 @@
                 class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-opacity flex items-center justify-center gap-2"
               >
                 <button
-                  class="text-white opacity-0 group-hover:opacity-100 px-4 py-2 bg-brand-blue dark:bg-blue-600 rounded-lg hover:bg-brand-blue/90 dark:hover:bg-blue-700 transition-all text-sm font-semibold shadow-lg transform hover:scale-105"
+                  class="text-white opacity-0 group-hover:opacity-100 px-3 py-1.5 bg-[#23D3EE] rounded-lg hover:bg-[#1FC5D9] transition-all text-xs font-medium shadow-lg transform hover:scale-105"
                   @click.stop="viewImage(index)"
                 >
                   View
                 </button>
                 <button
-                  class="text-white opacity-0 group-hover:opacity-100 px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-all text-sm font-semibold shadow-lg transform hover:scale-105"
+                  class="opacity-0 group-hover:opacity-100 px-3 py-1.5 text-red-600 hover:text-red-800 transition-all text-xs font-medium"
                   @click.stop="openDeleteModal(gallery.id)"
                 >
                   Delete
@@ -286,10 +286,10 @@
         <!-- Close Button -->
         <button
           @click="closeImageViewer"
-          class="absolute top-4 right-4 z-10 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-2 hover:bg-black/70"
+          class="absolute top-4 right-4 z-10 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-1.5 hover:bg-black/70"
           aria-label="Close"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -297,7 +297,7 @@
         <!-- Delete Button -->
         <button
           @click="deleteCurrentImage"
-          class="absolute top-4 right-20 z-10 text-white hover:text-red-300 transition-colors bg-red-600/80 hover:bg-red-600 rounded-full px-4 py-2 text-sm font-semibold"
+          class="absolute top-4 right-20 z-10 text-red-600 hover:text-red-800 transition-colors px-3 py-1.5 text-xs font-medium"
           aria-label="Delete"
         >
           Delete Image
@@ -307,11 +307,11 @@
         <button
           v-if="currentImages.length > 1"
           @click.stop="previousImage"
-          class="absolute left-4 z-10 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-3 hover:bg-black/70 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="absolute left-4 z-10 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-2 hover:bg-black/70 disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="viewingImageIndex === 0"
           aria-label="Previous"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -320,11 +320,11 @@
         <button
           v-if="currentImages.length > 1"
           @click.stop="nextImage"
-          class="absolute right-4 z-10 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-3 hover:bg-black/70 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="absolute right-4 z-10 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-2 hover:bg-black/70 disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="viewingImageIndex === currentImages.length - 1"
           aria-label="Next"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </button>
@@ -377,13 +377,13 @@
         <div class="flex gap-3 justify-end">
           <button
             @click="closeDeleteModal"
-            class="px-4 py-2 bg-gray-200 dark:bg-[#1a1f2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-[#252a3a] transition-colors font-medium"
+            class="px-3 py-1.5 text-sm bg-gray-200 dark:bg-[#1a1f2e] text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-[#252a3a] transition-colors font-medium"
           >
             Cancel
           </button>
           <button
             @click="confirmDelete"
-            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+            class="px-3 py-1.5 text-sm text-red-600 hover:text-red-800 transition-colors font-medium"
           >
             Delete Image
           </button>
@@ -800,15 +800,6 @@ export default {
   border-color: #e5e7eb !important;
 }
 
-.gallery-category-section button:not(.bg-brand-blue) {
-  background-color: white !important;
-  border-color: #d1d5db !important;
-  color: #374151 !important;
-}
-
-.gallery-category-section button:not(.bg-brand-blue):hover {
-  background-color: #f9fafb !important;
-}
 
 .gallery-images-section {
   background-color: white !important;
@@ -826,15 +817,15 @@ export default {
   color: #111827 !important;
 }
 
-/* Force green text for Select Images button */
+/* Force blue text for Select Images button */
 .select-images-button {
   background-color: white !important;
   border-color: #d1d5db !important;
-  color: #16a34a !important;
+  color: #23D3EE !important;
 }
 
 .select-images-button:hover {
   background-color: #f9fafb !important;
-  color: #16a34a !important;
+  color: #23D3EE !important;
 }
 </style>

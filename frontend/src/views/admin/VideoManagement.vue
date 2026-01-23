@@ -1,47 +1,27 @@
 <template>
   <AdminLayout>
-    <div class="mb-6 flex justify-end">
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-semibold text-zinc-900">Videos</h1>
+      <p class="mt-1 text-sm text-zinc-600">Manage YouTube videos</p>
+    </div>
+
+    <div class="mb-4 flex flex-wrap gap-3 items-center justify-end">
       <button
-        class="new-video-button px-6 py-3 bg-white border border-gray-300 text-green-600 rounded-lg hover:bg-gray-50 transition-colors shadow-lg font-medium flex items-center space-x-2"
         @click="openCreateModal"
+        class="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-[#23D3EE] text-white hover:bg-[#1FC5D9] flex items-center gap-2"
       >
-        <svg
-          class="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 4v16m8-8H4"
-          ></path>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
-        <span>New Video</span>
+        New Video
       </button>
     </div>
 
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div class="p-6 border-b border-gray-200">
-        <div
-          class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-        >
-          <h2 class="text-xl font-semibold text-gray-900">Videos</h2>
-          <div class="flex items-center space-x-2 w-full sm:w-auto">
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Search videos..."
-              class="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-lg text-sm min-w-48"
-            />
-          </div>
-        </div>
-      </div>
-
+    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
       <div v-if="filteredVideos.length === 0" class="text-center py-12">
         <svg
-          class="mx-auto h-12 w-12 text-gray-400 mb-4"
+          class="mx-auto h-16 w-16 text-zinc-300 mb-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -53,10 +33,10 @@
             d="M15 10l4.553-2.276a1 1 0 010 1.788L15 12.222M9 10L4.447 7.724a1 1 0 000 1.788L9 12.222m6 0l4.553 2.276a1 1 0 010 1.788L15 18m-6-5.778l-4.553 2.276a1 1 0 000 1.788L9 18m0-8l6 3m-6 0l6 3"
           />
         </svg>
-        <p class="text-gray-600 mb-2">
+        <h3 class="text-lg font-medium text-zinc-900 mb-2">
           {{ searchQuery ? "No videos found" : "No videos added yet" }}
-        </p>
-        <p class="text-sm text-gray-500 mb-4">
+        </h3>
+        <p class="text-sm text-zinc-600 mb-4">
           {{
             searchQuery
               ? "Try a different search term"
@@ -65,33 +45,21 @@
         </p>
         <button
           v-if="!searchQuery"
-          class="px-6 py-2 bg-main text-white rounded-lg hover:opacity-90 transition-colors"
+          class="px-6 py-2 bg-[#23D3EE] text-white rounded-lg hover:bg-[#1FC5D9] transition-colors font-medium shadow-sm"
           @click="openCreateModal"
         >
           Add Video
         </button>
       </div>
 
-      <div v-else class="overflow-hidden">
+      <div v-else>
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                >
-                  Title
-                </th>
-                <th
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                >
-                  YouTube ID
-                </th>
-                <th
-                  class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                >
-                  Actions
-                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Links</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -101,19 +69,10 @@
                 class="hover:bg-gray-50 transition-colors cursor-pointer"
                 @click="openEditModal(video)"
               >
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-semibold text-gray-900">
-                    {{ video.title }}
-                  </div>
-                  <div
-                    v-if="video.description"
-                    class="text-sm text-gray-500 truncate max-w-xs"
-                  >
-                    {{ video.description }}
-                  </div>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {{ video.title }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ video.youtubeId }}</div>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                   <a
                     :href="
                       video.youtubeUrl ||
@@ -121,7 +80,7 @@
                     "
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                    class="text-xs text-[#23D3EE] hover:text-[#1FC5D9]"
                     @click.stop
                   >
                     Open link
@@ -129,7 +88,7 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" @click.stop>
                   <button
-                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-sm"
+                    class="text-red-600 hover:text-red-800 transition-colors font-medium"
                     @click="deleteVideo(video.id)"
                   >
                     Delete
@@ -144,23 +103,18 @@
 
     <div
       v-if="showModal"
-      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       @click="closeModal"
     >
       <div
-        class="bg-white rounded-[28px] border border-gray-100 shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto"
+        class="bg-white rounded-xl border border-gray-200 shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto"
         @click.stop
       >
-        <div class="p-8 border-b border-gray-100">
-          <div class="flex justify-between items-center">
-            <div class="space-y-2">
-              <p class="text-xs uppercase tracking-[0.35em] text-brand-blue/70">
-                {{ editingVideo ? "Update" : "Add" }}
-              </p>
-              <h3 class="text-3xl font-semibold text-gray-900">
-                {{ editingVideo ? "Edit Video" : "Add New Video" }}
-              </h3>
-            </div>
+        <div class="p-8 border-b border-gray-200">
+          <div class="flex justify-between items-start mb-6">
+            <h3 class="text-3xl font-bold text-gray-900">
+              {{ editingVideo ? "Edit Video" : "New Video" }}
+            </h3>
             <button
               class="text-gray-400 hover:text-gray-600 transition-colors"
               @click="closeModal"
@@ -191,7 +145,7 @@
               v-model="videoForm.title"
               type="text"
               required
-              class="input-field"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
               placeholder="Teaching title"
             />
           </div>
@@ -203,7 +157,7 @@
             <textarea
               v-model="videoForm.description"
               rows="3"
-              class="input-field"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
               placeholder="Brief description"
             ></textarea>
           </div>
@@ -216,7 +170,7 @@
               v-model="videoForm.youtubeInput"
               type="text"
               required
-              class="input-field"
+              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
               placeholder="https://www.youtube.com/watch?v=XXXXXXXXXXX"
             />
             <p class="text-xs text-gray-500 mt-1">
@@ -231,19 +185,20 @@
             <p class="text-red-600 text-sm">{{ formError }}</p>
           </div>
 
-          <div class="flex justify-end space-x-4 pt-4 border-t border-gray-100">
+          <div class="flex justify-end gap-3 pt-4">
             <button
               type="button"
-              class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
               @click="closeModal"
             >
               Cancel
             </button>
             <button
               type="submit"
-              class="btn-primary"
+              class="px-5 py-2 bg-[#23D3EE] text-white rounded-md hover:bg-[#1FC5D9] transition-colors disabled:opacity-50"
+              :disabled="saving"
             >
-              {{ editingVideo ? "Update Video" : "Add Video" }}
+              {{ saving ? 'Saving...' : editingVideo ? 'Update Video' : 'Create Video' }}
             </button>
           </div>
         </form>
@@ -413,23 +368,3 @@ export default {
 };
 </script>
 
-<style>
-/* Force white background and green text for New Video button, overriding admin dark mode */
-.admin-dark-mode .new-video-button,
-.new-video-button {
-  background-color: white !important;
-  border-color: #d1d5db !important;
-  color: #16a34a !important;
-}
-
-.admin-dark-mode .new-video-button:hover,
-.new-video-button:hover {
-  background-color: #f9fafb !important;
-  color: #16a34a !important;
-}
-
-.admin-dark-mode .new-video-button svg,
-.new-video-button svg {
-  color: #16a34a !important;
-}
-</style>

@@ -104,7 +104,7 @@
                 </p>
               </div>
               <button
-                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                class="px-4 py-2 text-red-600 hover:text-red-800 transition-colors"
               >
                 Clear Gallery
               </button>
@@ -120,7 +120,7 @@
                 </p>
               </div>
               <button
-                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                class="px-4 py-2 text-red-600 hover:text-red-800 transition-colors"
               >
                 Reset Settings
               </button>

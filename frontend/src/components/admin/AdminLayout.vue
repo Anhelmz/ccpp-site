@@ -1,17 +1,13 @@
 <template>
-  <div :class="['admin-root flex flex-col h-screen', isDarkMode ? 'bg-[#050505] text-white admin-dark-mode' : 'bg-gray-50']">
+  <div class="admin-root flex flex-col h-screen bg-gray-50">
     <!-- Top Bar -->
-    <nav
-      class="border-b shadow-sm"
-      :class="isDarkMode ? 'bg-[#000000] border-[#0C94AB] text-white' : 'bg-gray-50 border-gray-200'"
-    >
+    <nav class="border-b shadow-sm bg-gray-50 border-gray-200">
       <div class="px-4 sm:px-6 flex items-center justify-between h-12">
         <div class="flex items-center">
           <button
             @click="toggleSidebar"
-            class="lg:hidden mr-3 p-2 rounded-md transition-colors"
+            class="lg:hidden mr-3 p-2 rounded-md transition-colors text-zinc-600 hover:text-zinc-900 hover:bg-gray-100"
             aria-label="Toggle menu"
-            :class="isDarkMode ? 'text-white hover:bg-[#0C94AB1A]' : 'text-zinc-600 hover:text-zinc-900 hover:bg-gray-100'"
           >
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -20,34 +16,26 @@
           <div class="flex items-center">
             <div class="w-8 sm:w-10 flex flex-col items-center justify-center mr-1 mb-0.5">
               <div class="flex gap-1 sm:gap-1.5 mb-0.5">
-                <div class="w-1 sm:w-1.5 h-1 sm:h-1.5 bg-cyan-400 rounded-full"></div>
-                <div class="w-1 sm:w-1.5 h-1 sm:h-1.5 bg-cyan-400 rounded-full"></div>
+                <div class="w-1 sm:w-1.5 h-1 sm:h-1.5 bg-[#23D3EE] rounded-full"></div>
+                <div class="w-1 sm:w-1.5 h-1 sm:h-1.5 bg-[#23D3EE] rounded-full"></div>
               </div>
-              <div class="w-1 sm:w-1.5 h-1 sm:h-1.5 bg-cyan-400 rounded-full"></div>
+              <div class="w-1 sm:w-1.5 h-1 sm:h-1.5 bg-[#23D3EE] rounded-full"></div>
             </div>
-            <h1 class="text-xl sm:text-2xl font-light tracking-wider leading-tight" :class="isDarkMode ? 'text-white' : 'text-zinc-700'">
+            <h1 class="text-xl sm:text-2xl font-light tracking-wider leading-tight text-zinc-700">
               ANHELM
             </h1>
           </div>
         </div>
-
-        <div class="flex items-center">
-          <button
-            type="button"
-            @click="toggleTheme"
-            :aria-pressed="isDarkMode"
-            class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md border transition-colors"
-            :class="isDarkMode ? 'bg-[#0a0a0a] border-[#0C94AB] text-white hover:bg-[#0C94AB26]' : 'border-gray-200 text-zinc-600 hover:text-zinc-800 hover:bg-white'"
-          >
-            <svg v-if="isDarkMode" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <svg v-else class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-            </svg>
-            <span>{{ isDarkMode ? 'Light mode' : 'Dark mode' }}</span>
-          </button>
-        </div>
+        <a
+          href="/"
+          target="_blank"
+          class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors bg-[#23D3EE] text-white hover:bg-[#1FC5D9] flex items-center gap-1.5"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+          </svg>
+          View Site
+        </a>
       </div>
     </nav>
 
@@ -61,9 +49,8 @@
       <!-- Sidebar -->
       <nav
         :class="[
-          'fixed lg:static inset-y-0 left-0 z-50 w-64 shadow-sm border-r flex flex-col transform transition-transform duration-300 ease-in-out',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
-          isDarkMode ? 'bg-[#000000] border-[#0C94AB] shadow-lg' : 'bg-gray-50 border-gray-200'
+          'fixed lg:static inset-y-0 left-0 z-50 w-64 shadow-sm border-r flex flex-col transform transition-transform duration-300 ease-in-out bg-gray-50 border-gray-200',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         ]"
       >
         <div class="flex-1 py-4 overflow-y-auto">
@@ -74,7 +61,7 @@
               :class="linkClass('AdminDashboard')"
             >
               <span class="mr-3 inline-flex items-center justify-center">
-                <svg class="h-5 w-5" :class="isDarkMode ? 'text-[#0C94AB]' : 'text-cyan-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5 text-[#23D3EE]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2 7-7 7 7 2 2v7a1 1 0 01-1 1h-4v-4a2 2 0 00-2-2h-4a2 2 0 00-2 2v4H4a1 1 0 01-1-1v-7z" />
                 </svg>
               </span>
@@ -87,7 +74,7 @@
               :class="linkClass('GalleryManagement', ['GalleryCategory'])"
             >
               <span class="mr-3 inline-flex items-center justify-center">
-                <svg class="h-5 w-5" :class="isDarkMode ? 'text-[#0C94AB]' : 'text-cyan-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5 text-[#23D3EE]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16l4-4m-8 4h.01" />
                 </svg>
               </span>
@@ -100,7 +87,7 @@
               :class="linkClass('EventManagement')"
             >
               <span class="mr-3 inline-flex items-center justify-center">
-                <svg class="h-5 w-5" :class="isDarkMode ? 'text-[#0C94AB]' : 'text-green-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </span>
@@ -113,7 +100,7 @@
               :class="linkClass('VideoManagement')"
             >
               <span class="mr-3 inline-flex items-center justify-center">
-                <svg class="h-5 w-5" :class="isDarkMode ? 'text-[#0C94AB]' : 'text-purple-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276a1 1 0 010 1.788L15 12.222M9 10L4.447 7.724a1 1 0 000 1.788L9 12.222m6 0l4.553 2.276a1 1 0 010 1.788L15 18m-6-5.778l-4.553 2.276a1 1 0 000 1.788L9 18m0-8l6 3m-6 0l6 3" />
                 </svg>
               </span>
@@ -126,7 +113,7 @@
               :class="linkClass('ContactMessages', ['contact-requests', 'contact-request-detail'])"
             >
               <span class="mr-3 inline-flex items-center justify-center">
-                <svg class="h-5 w-5" :class="isDarkMode ? 'text-[#0C94AB]' : 'text-cyan-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5 text-[#23D3EE]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-4 8H7" />
                 </svg>
               </span>
@@ -142,42 +129,41 @@
         </div>
 
         <!-- User Section -->
-        <div class="border-t" :class="isDarkMode ? 'border-[#0C94AB]' : 'border-gray-200'">
+        <div class="border-t border-gray-200">
           <div class="p-4">
             <div class="flex items-center">
               <div class="flex-shrink-0">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center" :class="isDarkMode ? 'bg-[#0C94AB] text-black' : 'bg-cyan-100'">
-                  <span class="text-sm font-medium" :class="isDarkMode ? 'text-black' : 'text-cyan-600'">{{ userInitial }}</span>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center bg-[#23D3EE]/20">
+                  <span class="text-sm font-medium text-[#23D3EE]">{{ userInitial }}</span>
                 </div>
               </div>
               <div class="ml-3 flex-1 min-w-0">
-                <p class="text-sm font-medium truncate" :class="isDarkMode ? 'text-white' : 'text-zinc-700'">{{ userEmail }}</p>
+                <p class="text-sm font-medium truncate text-zinc-700">{{ userEmail }}</p>
                 <button
                   @click="handleLogout"
-                  class="text-xs"
-                  :class="isDarkMode ? 'text-slate-300 hover:text-white' : 'text-zinc-500 hover:text-zinc-700'"
+                  class="text-xs text-zinc-500 hover:text-zinc-700"
                 >
                   Sign out
                 </button>
               </div>
             </div>
           </div>
-          <div class="flex items-center justify-center pt-3 pb-4 border-t px-4" :class="isDarkMode ? 'border-[#0C94AB]' : 'border-gray-200'">
+          <div class="flex items-center justify-center pt-3 pb-4 border-t px-4 border-gray-200">
             <div class="w-5 flex flex-col items-center justify-center mr-1 mb-0.5">
               <div class="flex gap-1 mb-0.5">
-                <div class="w-1 h-1 bg-cyan-400 rounded-full"></div>
-                <div class="w-1 h-1 bg-cyan-400 rounded-full"></div>
+                <div class="w-1 h-1 bg-[#23D3EE] rounded-full"></div>
+                <div class="w-1 h-1 bg-[#23D3EE] rounded-full"></div>
               </div>
-              <div class="w-1 h-1 bg-cyan-400 rounded-full"></div>
+              <div class="w-1 h-1 bg-[#23D3EE] rounded-full"></div>
             </div>
-            <span class="text-xs font-light text-zinc-500 tracking-wider leading-tight" :class="isDarkMode ? 'text-slate-300' : ''">ANHELM</span>
+            <span class="text-xs font-light text-zinc-500 tracking-wider leading-tight">ANHELM</span>
           </div>
         </div>
       </nav>
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden">
-        <main :class="['flex-1 overflow-y-auto', isDarkMode ? 'bg-[#000000] text-white' : 'bg-white text-black']">
+        <main class="flex-1 overflow-y-auto bg-white text-black">
           <div class="py-4 sm:py-6">
             <div class="px-4 sm:px-6">
               <slot />
@@ -200,10 +186,6 @@ export default {
     user: {
       type: Object,
       default: null
-    },
-    isDark: {
-      type: Boolean,
-      default: false
     }
   },
   setup(props, { emit }) {
@@ -211,18 +193,6 @@ export default {
     const route = useRoute()
     const sidebarOpen = ref(false)
     const localUser = ref(null)
-    const loadStoredTheme = () => {
-      try {
-        const stored = typeof window !== 'undefined' ? localStorage.getItem('adminDarkMode') : null
-        if (stored === 'true') return true
-        if (stored === 'false') return false
-      } catch {
-        /* ignore storage errors */
-      }
-      return null
-    }
-
-    const isDarkMode = ref(loadStoredTheme() ?? props.isDark)
     const contactRequestCount = ref(0)
     let countRefreshInterval = null
 
@@ -234,15 +204,9 @@ export default {
       const active = route.name === name || extraNames.includes(route.name)
       const base = 'group flex items-center px-4 sm:px-6 py-3 text-sm font-medium border-l-4 transition-all duration-200 ease-in-out'
 
-      if (isDarkMode.value) {
-        return active
-          ? `${base} bg-slate-800 text-slate-100 border-cyan-400`
-          : `${base} text-slate-300 border-transparent hover:bg-slate-800 hover:text-white hover:border-cyan-400`
-      }
-
       return active
-        ? `${base} bg-white text-zinc-700 border-cyan-500`
-        : `${base} text-zinc-600 border-transparent hover:bg-white hover:text-zinc-700 hover:border-cyan-500`
+        ? `${base} bg-white text-zinc-700 border-[#23D3EE]`
+        : `${base} text-zinc-600 border-transparent hover:bg-white hover:text-zinc-700 hover:border-[#23D3EE]`
     }
 
     const toggleSidebar = () => {
@@ -265,16 +229,6 @@ export default {
       localStorage.removeItem('authUser')
       emit('logout')
       router.push('/admin/login')
-    }
-
-    const toggleTheme = () => {
-      isDarkMode.value = !isDarkMode.value
-      try {
-        localStorage.setItem('adminDarkMode', isDarkMode.value ? 'true' : 'false')
-      } catch {
-        /* ignore storage errors */
-      }
-      emit('toggle-theme', isDarkMode.value)
     }
 
     const loadContactRequestCount = async () => {
@@ -310,7 +264,6 @@ export default {
 
     return {
       sidebarOpen,
-      isDarkMode,
       userEmail,
       userInitial,
       contactRequestCount,
@@ -318,103 +271,12 @@ export default {
       toggleSidebar,
       closeSidebar,
       closeSidebarOnMobile,
-      handleLogout,
-      toggleTheme
+      handleLogout
     }
   }
 }
 </script>
 
 <style scoped>
-/* Remove all white backgrounds in dark mode */
-.admin-dark-mode :deep(.bg-white),
-.admin-dark-mode :deep(.bg-gray-50),
-.admin-dark-mode :deep(.bg-gray-100) {
-  background-color: #000000 !important;
-  border-color: #0c94ab40 !important;
-}
-
-.admin-dark-mode :deep(.border-gray-200) {
-  border-color: #0c94ab40 !important;
-}
-
-.admin-dark-mode {
-  color: #f5f7fb;
-}
-
-/* Ensure all text is visible in dark mode - use light colors */
-.admin-dark-mode :deep(.text-gray-500),
-.admin-dark-mode :deep(.text-gray-600),
-.admin-dark-mode :deep(.text-gray-700),
-.admin-dark-mode :deep(.text-zinc-500),
-.admin-dark-mode :deep(.text-zinc-600),
-.admin-dark-mode :deep(.text-zinc-700) {
-  color: #cfd7e3 !important;
-}
-
-.admin-dark-mode :deep(.text-gray-900),
-.admin-dark-mode :deep(.text-zinc-900),
-.admin-dark-mode :deep(.text-black),
-.admin-dark-mode :deep([class*="text-black"]) {
-  color: #f8fbff !important;
-}
-
-.admin-dark-mode :deep(a),
-.admin-dark-mode :deep(button),
-.admin-dark-mode :deep(.router-link-active),
-.admin-dark-mode :deep(.router-link-exact-active) {
-  color: #f5f7fb;
-}
-
-.admin-dark-mode :deep(.router-link-active),
-.admin-dark-mode :deep(.router-link-exact-active) {
-  background-color: #0c94ab1a !important;
-  border-color: #0c94ab !important;
-}
-
-/* Ensure table headers and bodies are dark */
-.admin-dark-mode :deep(thead) {
-  background-color: #0a0a0a !important;
-}
-
-.admin-dark-mode :deep(tbody) {
-  background-color: #000000 !important;
-}
-
-.admin-dark-mode :deep(tbody tr:hover) {
-  background-color: #0a0a0a !important;
-}
-
-/* Ensure hover states don't use white */
-.admin-dark-mode :deep(.hover\:bg-white:hover),
-.admin-dark-mode :deep(.hover\:bg-gray-50:hover) {
-  background-color: #0a0a0a !important;
-  color: #f5f7fb !important;
-}
-
-/* Form inputs and selects - dark backgrounds with light text */
-.admin-dark-mode :deep(input[type="text"]),
-.admin-dark-mode :deep(input[type="search"]),
-.admin-dark-mode :deep(input[type="email"]),
-.admin-dark-mode :deep(input[type="password"]),
-.admin-dark-mode :deep(input[type="number"]),
-.admin-dark-mode :deep(input[type="date"]),
-.admin-dark-mode :deep(input[type="datetime-local"]),
-.admin-dark-mode :deep(select),
-.admin-dark-mode :deep(textarea) {
-  background-color: #000000 !important;
-  color: #f5f7fb !important;
-  border-color: #0c94ab40 !important;
-}
-
-.admin-dark-mode :deep(input::placeholder),
-.admin-dark-mode :deep(textarea::placeholder) {
-  color: #94a3b8 !important;
-}
-
-.admin-dark-mode :deep(select option) {
-  background-color: #000000 !important;
-  color: #f5f7fb !important;
-}
 </style>
 
