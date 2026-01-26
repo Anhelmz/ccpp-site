@@ -73,7 +73,7 @@
             </label>
             <input
               type="text"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#23D3EE] focus:border-transparent"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0089AE] focus:border-transparent"
               :placeholder="selectedPage.name"
             />
           </div>
@@ -84,7 +84,7 @@
             </label>
             <textarea
               rows="10"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#23D3EE] focus:border-transparent"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0089AE] focus:border-transparent"
               placeholder="Page content..."
             ></textarea>
           </div>
@@ -97,7 +97,7 @@
               Cancel
             </button>
             <button
-              class="px-6 py-2 bg-[#23D3EE] text-white rounded-lg hover:bg-[#1FC5D9] transition-colors"
+              class="px-6 py-2 bg-[#0089AE] text-white rounded-lg hover:bg-[#007A9D] transition-colors"
             >
               Save Changes
             </button>

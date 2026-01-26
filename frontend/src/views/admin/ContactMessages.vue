@@ -6,12 +6,38 @@
       <p class="mt-1 text-sm text-zinc-600">View and manage contact form submissions</p>
     </div>
 
+    <!-- Search Bar -->
+    <div v-if="!selectedRequest" class="mb-6">
+      <div class="max-w-md">
+        <div class="relative">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search contact requests..."
+            class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE] focus:border-transparent"
+          />
+          <svg
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
 
     <!-- Messages List -->
     <div v-if="!selectedRequest">
       <!-- Loading State -->
       <div v-if="loading" class="flex items-center justify-center py-12">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#23D3EE]"></div>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0089AE]"></div>
       </div>
 
       <!-- Error State -->
@@ -50,8 +76,11 @@
                 <a 
                   :href="`mailto:${request.email}`" 
                   @click.stop
-                  class="text-[#23D3EE] hover:text-[#1FC5D9] truncate"
+                  class="text-[#0089AE] hover:text-[#007A9D] truncate flex items-center gap-1"
                 >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
                   {{ request.email }}
                 </a>
               </div>
@@ -64,8 +93,11 @@
                   v-if="request.phone"
                   :href="`tel:${request.phone}`" 
                   @click.stop
-                  class="text-[#23D3EE] hover:text-[#1FC5D9]"
+                  class="text-[#0089AE] hover:text-[#007A9D] flex items-center gap-1"
                 >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                  </svg>
                   {{ request.phone }}
                 </a>
                 <span v-else class="text-gray-400">N/A</span>
@@ -115,8 +147,11 @@
                     <a 
                       :href="`mailto:${request.email}`" 
                       @click.stop
-                      class="text-[#23D3EE] hover:text-[#1FC5D9]"
+                      class="text-[#0089AE] hover:text-[#007A9D] flex items-center gap-1.5"
                     >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                      </svg>
                       {{ request.email }}
                     </a>
                   </td>
@@ -125,8 +160,11 @@
                       v-if="request.phone"
                       :href="`tel:${request.phone}`" 
                       @click.stop
-                      class="text-[#23D3EE] hover:text-[#1FC5D9]"
+                      class="text-[#0089AE] hover:text-[#007A9D] flex items-center gap-1.5"
                     >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                      </svg>
                       {{ request.phone }}
                     </a>
                     <span v-else class="text-gray-400">N/A</span>
@@ -172,127 +210,122 @@
     </div>
 
     <!-- View Contact Details Page -->
-    <div v-if="selectedRequest" class="max-w-2xl mx-auto">
-      <!-- Page Header -->
-      <div class="flex justify-between items-start mb-4 pb-3 border-b border-gray-200">
-        <h2 class="text-xl font-semibold text-zinc-900">
-          Contact Message Details
-        </h2>
-        <button
-          class="text-gray-500 hover:text-gray-700 transition-colors p-1 hover:bg-gray-100 rounded-full"
-          @click="selectedRequest = null"
-        >
-          <svg
-            class="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            ></path>
-          </svg>
-        </button>
-      </div>
+    <div v-if="selectedRequest">
+      <!-- Breadcrumbs -->
+      <nav class="mb-6" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-sm">
+          <li>
+            <a href="#" @click.prevent="selectedRequest = null" class="text-gray-500 hover:text-gray-700">
+              Contact Requests
+            </a>
+          </li>
+          <li>
+            <span class="text-gray-400">/</span>
+          </li>
+          <li class="text-gray-900 font-medium">
+            {{ selectedRequest.name || 'Contact Request' }}
+          </li>
+        </ol>
+      </nav>
 
-      <!-- Contact Information -->
-      <div class="space-y-3">
-        <div class="grid grid-cols-2 gap-3">
-          <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1"
-              >Name</label
-            >
-            <p class="text-sm font-medium text-gray-900">{{ selectedRequest.name }}</p>
+      <!-- Contact Request Details -->
+      <div class="bg-white border border-gray-200 rounded-lg">
+        <div class="flex flex-col lg:flex-row">
+          <!-- Main Content Area -->
+          <div class="flex-1 p-6 lg:pr-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">{{ selectedRequest.name }}</h1>
+            
+            <!-- Message Content -->
+            <div class="prose max-w-none">
+              <div class="bg-gray-50 rounded-lg border border-gray-200 p-6">
+                <p class="text-gray-900 whitespace-pre-wrap text-base leading-relaxed">
+                  {{ selectedRequest.message }}
+                </p>
+              </div>
+            </div>
           </div>
-          <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1"
-              >Email</label
-            >
-            <p class="text-sm text-gray-900">
+
+          <!-- Sidebar -->
+          <div class="lg:w-80 lg:border-l border-gray-200 p-6 space-y-6 bg-gray-50">
+            <!-- Contact Information -->
+            <div>
+              <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Name</label>
+              <p class="mt-1 text-sm text-gray-900">{{ selectedRequest.name }}</p>
+            </div>
+
+            <div>
+              <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Email</label>
+              <div class="mt-1">
+                <a
+                  :href="`mailto:${selectedRequest.email}`"
+                  class="text-[#0089AE] hover:text-[#007A9D] text-sm flex items-center gap-1.5 break-all"
+                >
+                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                  {{ selectedRequest.email }}
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</label>
+              <div class="mt-1">
+                <a
+                  v-if="selectedRequest.phone"
+                  :href="`tel:${selectedRequest.phone}`"
+                  class="text-[#0089AE] hover:text-[#007A9D] text-sm flex items-center gap-1.5"
+                >
+                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                  </svg>
+                  {{ selectedRequest.phone }}
+                </a>
+                <span v-else class="text-sm text-gray-500">N/A</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</label>
+              <p class="mt-1 text-sm text-gray-900">{{ selectedRequest.reason }}</p>
+            </div>
+
+            <!-- Metadata -->
+            <div class="pt-4 border-t border-gray-200 space-y-3">
+              <div>
+                <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</label>
+                <p class="mt-1 text-sm text-gray-600">
+                  {{ formatDate(selectedRequest.created_at || selectedRequest.createdAt) }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-4 border-t border-gray-200 space-y-3">
               <a
-                :href="`mailto:${selectedRequest.email}`"
-                class="text-[#23D3EE] hover:text-[#1FC5D9] font-medium hover:underline"
+                :href="`mailto:${selectedRequest.email}?subject=Re: Contact Request`"
+                class="w-full px-4 py-2 bg-[#0089AE] text-white text-sm font-medium rounded-md hover:bg-[#007A9D] transition-colors flex items-center justify-center gap-2"
               >
-                {{ selectedRequest.email }}
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                Reply via Email
               </a>
-            </p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1"
-              >Phone</label
-            >
-            <p class="text-sm text-gray-900">
-              <a
-                v-if="selectedRequest.phone"
-                :href="`tel:${selectedRequest.phone}`"
-                class="text-[#23D3EE] hover:text-[#1FC5D9] font-medium hover:underline"
+              <button
+                @click="selectedRequest = null"
+                class="w-full px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
               >
-                {{ selectedRequest.phone }}
-              </a>
-              <span v-else class="text-gray-500">N/A</span>
-            </p>
-          </div>
-          <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1"
-              >Reason</label
-            >
-            <p class="text-sm font-medium text-gray-900">{{ selectedRequest.reason }}</p>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1"
-            >Message</label
-          >
-          <div
-            class="mt-1 p-3 bg-gray-50 rounded-lg border border-gray-200"
-          >
-            <p class="text-gray-900 whitespace-pre-wrap text-sm leading-relaxed">
-              {{ selectedRequest.message }}
-            </p>
+                Back to List
+              </button>
+              <button
+                @click="deleteRequest(selectedRequest.id)"
+                class="w-full px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
+              >
+                Delete Request
+              </button>
+            </div>
           </div>
         </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1"
-            >Submitted</label
-          >
-          <p class="text-xs font-medium text-gray-700">
-            {{
-              formatDate(
-                selectedRequest.created_at || selectedRequest.createdAt,
-              )
-            }}
-          </p>
-        </div>
-      </div>
-
-      <!-- Footer Actions -->
-      <div class="mt-4 pt-3 border-t border-gray-200 flex justify-end space-x-2">
-        <button
-          class="px-3 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 transition-colors font-medium"
-          @click="selectedRequest = null"
-        >
-          Close
-        </button>
-        <a
-          :href="`mailto:${selectedRequest.email}?subject=Re: Contact Request`"
-          class="px-3 py-1.5 bg-[#23D3EE] text-white rounded-md hover:bg-[#1FC5D9] transition-colors font-medium text-sm"
-        >
-          Reply via Email
-        </a>
-        <button
-          class="px-3 py-1.5 text-sm text-red-600 hover:text-red-800 transition-colors font-medium"
-          @click="deleteRequest(selectedRequest.id)"
-        >
-          Delete
-        </button>
       </div>
     </div>
 

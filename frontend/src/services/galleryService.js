@@ -30,4 +30,19 @@ export const galleryService = {
   async deleteGallery(id) {
     return await api.delete(`/gallery/${id}`);
   },
+
+  // Delete all galleries by category
+  async deleteGalleriesByCategory(category) {
+    return await api.delete(`/gallery/category/${category}`);
+  },
+
+  // Get old photos (soft-deleted or without ImageData)
+  async getOldPhotos() {
+    return await api.get("/gallery/old");
+  },
+
+  // Delete old photos permanently
+  async deleteOldPhotos() {
+    return await api.delete("/gallery/old");
+  },
 };

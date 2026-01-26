@@ -1,50 +1,76 @@
 <template>
   <AdminLayout>
-    <!-- Page Header -->
-    <div class="mb-8">
-      <h1 class="text-2xl font-semibold text-zinc-900">Events & Calendar</h1>
-      <p class="mt-1 text-sm text-zinc-600">Manage events and view them as a calendar or list</p>
-    </div>
-
-    <div class="mb-6 flex flex-wrap gap-3 items-center justify-end">
-      <div class="flex gap-3 items-center">
-        <!-- View Toggle -->
-        <button
-          @click="viewMode = 'list'"
-          class="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-[#23D3EE] text-white hover:bg-[#1FC5D9]"
-        >
-          <span class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-            </svg>
-            List
-          </span>
-        </button>
-        <button
-          @click="viewMode = 'calendar'"
-          class="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-[#23D3EE] text-white hover:bg-[#1FC5D9]"
-        >
-          <span class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-            Calendar
-          </span>
-        </button>
-        <button
-          @click="openCreateModal()"
-          type="button"
-          class="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-[#23D3EE] text-white hover:bg-[#1FC5D9] flex items-center gap-2"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          New Event
-        </button>
+    <!-- Events List/Calendar View -->
+    <div v-if="!selectedEvent && !showCreateForm">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-2xl font-semibold text-zinc-900">Events & Calendar</h1>
+        <p class="mt-1 text-sm text-zinc-600">Manage events and view them as a calendar or list</p>
       </div>
-    </div>
-    
-    <!-- Calendar View -->
+
+      <div class="mb-6 flex flex-wrap gap-3 items-center justify-between">
+        <!-- Search Bar -->
+        <div class="flex-1 max-w-md">
+          <div class="relative">
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search events..."
+              class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE] focus:border-transparent"
+            />
+            <svg
+              class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+        </div>
+        <div class="flex gap-3 items-center">
+          <!-- View Toggle -->
+          <button
+            @click="viewMode = 'list'"
+            class="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-[#0089AE] text-white hover:bg-[#007A9D]"
+          >
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+              </svg>
+              List
+            </span>
+          </button>
+          <button
+            @click="viewMode = 'calendar'"
+            class="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-[#0089AE] text-white hover:bg-[#007A9D]"
+          >
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              Calendar
+            </span>
+          </button>
+          <button
+            @click="openCreateForm()"
+            type="button"
+            class="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-[#0089AE] text-white hover:bg-[#007A9D] flex items-center gap-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            New Event
+          </button>
+        </div>
+      </div>
+      
+      <!-- Calendar View -->
     <div v-if="viewMode === 'calendar'" class="calendar-container bg-white rounded-xl shadow-lg border border-gray-200 p-4 md:p-6">
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
@@ -94,7 +120,7 @@
                       : 'bg-white text-gray-400 border-gray-200'),
                 day.isToday ? 'border-brand-blue ring-2 ring-brand-blue/20 bg-white' : ''
               ]"
-              @click="openCreateModal(day.date)"
+              @click="openCreateForm(day.date)"
             >
               <div class="flex items-center justify-between">
                 <span :class="[
@@ -113,12 +139,12 @@
                   :key="event.id"
                   type="button"
                   :class="[
-                    'w-full text-left text-sm md:text-base font-semibold rounded-md px-2 py-1.5 truncate transition-colors text-[#23D3EE]',
+                    'w-full text-left text-sm md:text-base font-semibold rounded-md px-2 py-1.5 truncate transition-colors text-[#0089AE]',
                     day.isPast 
                       ? 'bg-gray-200 dark:bg-transparent hover:bg-gray-300 dark:hover:bg-transparent opacity-70' 
                       : 'bg-brand-blue/10 dark:bg-transparent hover:bg-brand-blue/20 dark:hover:bg-transparent'
                   ]"
-                  @click.stop="openEditModal(event)"
+                  @click.stop="viewEvent(event)"
                 >
                   {{ event.title }}
                 </button>
@@ -126,8 +152,8 @@
                 <button
                   v-if="day.events.length > 0"
                   type="button"
-                  class="add-event-button w-full text-center text-xs font-medium rounded-md px-2 py-1.5 mt-1 transition-colors bg-[#23D3EE] text-white hover:bg-[#1FC5D9] hover:text-white"
-                  @click.stop="openCreateModal(day.date)"
+                  class="add-event-button w-full text-center text-xs font-medium rounded-md px-2 py-1.5 mt-1 transition-colors bg-[#0089AE] text-white hover:bg-[#007A9D] hover:text-white"
+                  @click.stop="openCreateForm(day.date)"
                 >
                   + Add Event
                 </button>
@@ -142,7 +168,7 @@
     <div v-else>
       <!-- Loading State -->
       <div v-if="loading" class="flex items-center justify-center py-12">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#23D3EE]"></div>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0089AE]"></div>
       </div>
 
       <!-- Error State -->
@@ -158,7 +184,7 @@
             v-for="event in filteredEvents"
             :key="event.id"
             class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-            @click="openEditModal(event)"
+            @click="viewEvent(event)"
           >
             <div class="flex items-start justify-between mb-3">
               <h3 class="text-base font-semibold text-gray-900 pr-2">{{ event.title }}</h3>
@@ -221,7 +247,7 @@
                 <tr 
                   v-for="event in filteredEvents" 
                   :key="event.id"
-                  @click="openEditModal(event)"
+                  @click="viewEvent(event)"
                   class="hover:bg-gray-50 cursor-pointer transition-colors"
                 >
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -267,6 +293,7 @@
         </div>
       </div>
     </div>
+    </div>
 
     <!-- Confirmation Modal -->
     <ConfirmationModal
@@ -278,108 +305,211 @@
       @cancel="cancelDelete"
     />
 
-    <!-- Create/Edit Event Modal -->
-    <div
-      v-if="showModal"
-      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] overflow-y-auto"
-      @click="closeModal"
-    >
-      <div
-        class="event-form-modal bg-white rounded-xl shadow-2xl w-full max-w-xl mx-auto my-8 border border-gray-200"
-        @click.stop
-      >
-        <div class="p-4 border-b border-gray-200">
-          <div class="flex justify-between items-center">
-            <h3 class="text-xl font-semibold text-gray-900">{{ editingEvent ? 'Edit Event' : 'New Event' }}</h3>
-            <button @click="closeModal" class="text-gray-500 hover:text-gray-700 transition-colors p-1 hover:bg-gray-100 rounded-full">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+    <!-- View Event Detail Page -->
+    <div v-if="selectedEvent && !showCreateForm">
+      <!-- Breadcrumbs -->
+      <nav class="mb-6" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-sm">
+          <li>
+            <a href="#" @click.prevent="selectedEvent = null" class="text-gray-500 hover:text-gray-700">
+              Events & Calendar
+            </a>
+          </li>
+          <li>
+            <span class="text-gray-400">/</span>
+          </li>
+          <li class="text-gray-900 font-medium">
+            {{ selectedEvent.title || 'Event' }}
+          </li>
+        </ol>
+      </nav>
+
+      <!-- Event Details -->
+      <div class="bg-white border border-gray-200 rounded-lg">
+        <div class="flex flex-col lg:flex-row">
+          <!-- Main Content Area -->
+          <div class="flex-1 p-6 lg:pr-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">{{ selectedEvent.title }}</h1>
+            
+            <!-- Event Summary -->
+            <div v-if="selectedEvent.summary" class="mb-6">
+              <div class="bg-gray-50 rounded-lg border border-gray-200 p-6">
+                <p class="text-gray-900 text-base leading-relaxed">
+                  {{ selectedEvent.summary }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div v-if="selectedEvent.description" class="prose max-w-none">
+              <div class="bg-gray-50 rounded-lg border border-gray-200 p-6">
+                <p class="text-gray-900 whitespace-pre-wrap text-base leading-relaxed">
+                  {{ selectedEvent.description }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="lg:w-80 lg:border-l border-gray-200 p-6 space-y-6 bg-gray-50">
+            <!-- Event Information -->
+            <div>
+              <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Title</label>
+              <p class="mt-1 text-sm text-gray-900">{{ selectedEvent.title }}</p>
+            </div>
+
+            <div>
+              <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date & Time</label>
+              <p class="mt-1 text-sm text-gray-600">
+                {{ formatDate(selectedEvent.startTime || selectedEvent.start || selectedEvent.date) }}
+                <span v-if="selectedEvent.startTime || selectedEvent.start">
+                  at {{ formatTime(selectedEvent.startTime || selectedEvent.start) }}
+                </span>
+              </p>
+            </div>
+
+            <div>
+              <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">End Date & Time</label>
+              <p class="mt-1 text-sm text-gray-600">
+                <span v-if="selectedEvent.endTime || selectedEvent.end">
+                  {{ formatDate(selectedEvent.endTime || selectedEvent.end) }}
+                  at {{ formatTime(selectedEvent.endTime || selectedEvent.end) }}
+                </span>
+                <span v-else class="text-gray-500">N/A</span>
+              </p>
+            </div>
+
+            <div v-if="selectedEvent.location">
+              <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Location</label>
+              <p class="mt-1 text-sm text-gray-900">{{ selectedEvent.location }}</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-4 border-t border-gray-200 space-y-3">
+              <button
+                @click="editEvent"
+                class="w-full px-4 py-2 bg-[#0089AE] text-white text-sm font-medium rounded-md hover:bg-[#007A9D] transition-colors"
+              >
+                Edit Event
+              </button>
+              <button
+                @click="selectedEvent = null"
+                class="w-full px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
+              >
+                Back to List
+              </button>
+              <button
+                @click="deleteEvent(selectedEvent.id)"
+                class="w-full px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
+              >
+                Delete Event
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create/Edit Event Form -->
+    <div v-if="showCreateForm || editingEvent">
+      <!-- Breadcrumbs -->
+      <nav class="mb-6" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-sm">
+          <li>
+            <a href="#" @click.prevent="closeForm" class="text-gray-500 hover:text-gray-700">
+              Events & Calendar
+            </a>
+          </li>
+          <li>
+            <span class="text-gray-400">/</span>
+          </li>
+          <li class="text-gray-900 font-medium">
+            {{ editingEvent ? 'Edit Event' : 'New Event' }}
+          </li>
+        </ol>
+      </nav>
+
+      <!-- Event Form -->
+      <div class="bg-white border border-gray-200 rounded-lg p-6 space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Title <span class="text-red-500">*</span></label>
+          <input
+            v-model="eventForm.title"
+            type="text"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE]"
+            placeholder="Event title"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Start <span class="text-red-500">*</span></label>
+            <input
+              v-model="eventForm.start"
+              type="datetime-local"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE]"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">End <span class="text-red-500">*</span></label>
+            <input
+              v-model="eventForm.end"
+              type="datetime-local"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE]"
+            />
           </div>
         </div>
 
-        <form @submit.prevent="saveEvent" class="p-6 space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-            <input
-              v-model="eventForm.title"
-              type="text"
-              required
-              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
-              placeholder="Event title"
-            />
-          </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+          <input
+            v-model="eventForm.location"
+            type="text"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE]"
+            placeholder="Main hall"
+          />
+        </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Start *</label>
-              <input
-                v-model="eventForm.start"
-                type="datetime-local"
-                required
-                class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">End *</label>
-              <input
-                v-model="eventForm.end"
-                type="datetime-local"
-                required
-                class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
-              />
-            </div>
-          </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Summary</label>
+          <input
+            v-model="eventForm.summary"
+            type="text"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE]"
+            placeholder="Short blurb"
+          />
+        </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-            <input
-              v-model="eventForm.location"
-              type="text"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
-              placeholder="Main hall"
-            />
-          </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+          <textarea
+            v-model="eventForm.description"
+            rows="3"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE]"
+            placeholder="Full details"
+          ></textarea>
+        </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Summary</label>
-            <input
-              v-model="eventForm.summary"
-              type="text"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
-              placeholder="Short blurb"
-            />
-          </div>
+        <div v-if="formError" class="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p class="text-sm text-red-800">{{ formError }}</p>
+        </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea
-              v-model="eventForm.description"
-              rows="3"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
-              placeholder="Full details"
-            ></textarea>
-          </div>
-
-          <div v-if="formError" class="p-3 border border-red-200 bg-red-50 text-red-700 text-sm rounded-md">
-            {{ formError }}
-          </div>
-
-          <div class="flex justify-end gap-3 pt-2">
-            <button type="button" @click="closeModal" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
-              Cancel
-            </button>
-            <button
-              type="submit"
-              class="px-5 py-2 text-white rounded-md transition-colors disabled:opacity-50"
-              :class="editingEvent ? 'bg-[#23D3EE] hover:bg-[#1FC5D9]' : 'bg-[#23D3EE] hover:bg-[#1FC5D9]'"
-              :disabled="saving"
-            >
-              {{ saving ? 'Saving...' : editingEvent ? 'Update Event' : 'Create Event' }}
-            </button>
-          </div>
-        </form>
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+          <button type="button" @click="closeForm" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+            Cancel
+          </button>
+          <button
+            type="button"
+            @click="saveEvent"
+            class="px-4 py-2 bg-[#0089AE] text-white rounded-md hover:bg-[#007A9D] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="saving"
+          >
+            {{ saving ? 'Saving...' : editingEvent ? 'Update Event' : 'Create Event' }}
+          </button>
+        </div>
       </div>
     </div>
   </AdminLayout>
@@ -398,7 +528,8 @@ export default {
     ConfirmationModal
   },
   setup() {
-    const showModal = ref(false)
+    const selectedEvent = ref(null)
+    const showCreateForm = ref(false)
     const editingEvent = ref(null)
     const events = ref([])
     const loading = ref(false)
@@ -554,8 +685,16 @@ export default {
       })
     })
 
-    const openCreateModal = (dateKey) => {
+    const viewEvent = (event) => {
+      selectedEvent.value = event
+      showCreateForm.value = false
       editingEvent.value = null
+    }
+
+    const openCreateForm = (dateKey) => {
+      selectedEvent.value = null
+      editingEvent.value = null
+      showCreateForm.value = true
       eventForm.value = {
         title: '',
         summary: '',
@@ -585,30 +724,32 @@ export default {
       }
       
       formError.value = ''
-      showModal.value = true
     }
 
-    const openEditModal = (event) => {
-      editingEvent.value = event
+    const editEvent = () => {
+      if (!selectedEvent.value) return
+      editingEvent.value = selectedEvent.value
+      showCreateForm.value = true
+      selectedEvent.value = null
       
       eventForm.value = {
-        title: event.title,
-        start: toDateTimeLocal(event.startTime || event.start || event.date),
-        end: toDateTimeLocal(event.endTime || event.end || event.startTime || event.date),
-        location: event.location || '',
-        summary: event.summary || '',
-        description: event.description || '',
+        title: editingEvent.value.title,
+        start: toDateTimeLocal(editingEvent.value.startTime || editingEvent.value.start || editingEvent.value.date),
+        end: toDateTimeLocal(editingEvent.value.endTime || editingEvent.value.end || editingEvent.value.startTime || editingEvent.value.date),
+        location: editingEvent.value.location || '',
+        summary: editingEvent.value.summary || '',
+        description: editingEvent.value.description || '',
         date: '',
         time: ''
       }
       
       formError.value = ''
-      showModal.value = true
     }
 
-    const closeModal = () => {
-      showModal.value = false
+    const closeForm = () => {
+      showCreateForm.value = false
       editingEvent.value = null
+      selectedEvent.value = null
       formError.value = ''
     }
 
@@ -643,7 +784,20 @@ export default {
         }
 
         await loadEvents()
-        closeModal()
+        
+        // After saving, view the event if editing, or go back to list if creating
+        if (editingEvent.value) {
+          const updatedEvent = events.value.find(e => e.id === editingEvent.value.id)
+          if (updatedEvent) {
+            selectedEvent.value = updatedEvent
+            showCreateForm.value = false
+            editingEvent.value = null
+          } else {
+            closeForm()
+          }
+        } else {
+          closeForm()
+        }
       } catch (err) {
         console.error('Error saving event:', err)
         formError.value = err.message || 'Failed to save event'
@@ -708,7 +862,8 @@ export default {
     })
 
     return {
-      showModal,
+      selectedEvent,
+      showCreateForm,
       editingEvent,
       events,
       loading,
@@ -723,9 +878,10 @@ export default {
       formatTime,
       loadEvents,
       filterEvents,
-      openCreateModal,
-      openEditModal,
-      closeModal,
+      viewEvent,
+      openCreateForm,
+      editEvent,
+      closeForm,
       saveEvent,
       deleteEvent,
       showConfirmModal,

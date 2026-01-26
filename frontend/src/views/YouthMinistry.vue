@@ -421,8 +421,16 @@ export default {
     const galleryContent = computed(() => content.value.gallery);
 
     const getImageUrl = (path) => {
-      if (path.startsWith("http")) return path;
-      return path.startsWith("/") ? path : `/${path}`;
+      // Handle data URIs (data:image/...)
+      if (path && path.startsWith("data:")) {
+        return path;
+      }
+      // Handle HTTP/HTTPS URLs
+      if (path && path.startsWith("http")) {
+        return path;
+      }
+      // Handle relative paths
+      return path && path.startsWith("/") ? path : `/${path || ''}`;
     };
 
     const fetchGalleryImages = async () => {

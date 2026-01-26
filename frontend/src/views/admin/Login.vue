@@ -6,10 +6,10 @@
     <div class="absolute bottom-6 left-6 flex items-center">
       <div class="w-4 h-4 flex flex-col items-center justify-center mr-2">
         <div class="flex gap-1 mb-0.5">
-          <div class="w-1 h-1 bg-[#23D3EE] rounded-full"></div>
-          <div class="w-1 h-1 bg-[#23D3EE] rounded-full"></div>
+          <div class="w-1 h-1 bg-[#0089AE] rounded-full"></div>
+          <div class="w-1 h-1 bg-[#0089AE] rounded-full"></div>
         </div>
-        <div class="w-1 h-1 bg-[#23D3EE] rounded-full"></div>
+        <div class="w-1 h-1 bg-[#0089AE] rounded-full"></div>
       </div>
       <span class="text-xs font-light text-zinc-500 tracking-wider"
         >ANHELM</span
@@ -22,10 +22,10 @@
           <div class="flex items-center">
             <div class="w-8 h-8 flex flex-col items-center justify-center mr-3">
               <div class="flex gap-1.5 mb-1">
-                <div class="w-1.5 h-1.5 bg-[#23D3EE] rounded-full"></div>
-                <div class="w-1.5 h-1.5 bg-[#23D3EE] rounded-full"></div>
+                <div class="w-1.5 h-1.5 bg-[#0089AE] rounded-full"></div>
+                <div class="w-1.5 h-1.5 bg-[#0089AE] rounded-full"></div>
               </div>
-              <div class="w-1.5 h-1.5 bg-[#23D3EE] rounded-full"></div>
+              <div class="w-1.5 h-1.5 bg-[#0089AE] rounded-full"></div>
             </div>
             <h1 class="text-2xl font-light text-zinc-700 tracking-wider">
               ANHELM
@@ -103,7 +103,7 @@
               type="email"
               autocomplete="email"
               required
-              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#23D3EE] focus:border-[#23D3EE] transition duration-150 ease-in-out text-sm"
+              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#0089AE] focus:border-[#0089AE] transition duration-150 ease-in-out text-sm"
               placeholder="admin@example.com"
             />
           </div>
@@ -146,7 +146,7 @@
               type="password"
               autocomplete="current-password"
               required
-              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#23D3EE] focus:border-[#23D3EE] transition duration-150 ease-in-out text-sm"
+              class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#0089AE] focus:border-[#0089AE] transition duration-150 ease-in-out text-sm"
               placeholder="Enter your password"
             />
           </div>
@@ -155,14 +155,14 @@
         <button
           type="submit"
           :disabled="loading"
-          class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#23D3EE] hover:bg-[#1FC5D9] focus:outline-none focus:ring-1 focus:ring-[#23D3EE] disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out"
+          class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#0089AE] hover:bg-[#007A9D] focus:outline-none focus:ring-1 focus:ring-[#0089AE] disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out"
         >
           <span
             v-if="loading"
             class="absolute left-0 inset-y-0 flex items-center pl-3"
           >
             <svg
-              class="animate-spin h-5 w-5 text-[#23D3EE]"
+              class="animate-spin h-5 w-5 text-[#0089AE]"
               fill="none"
               viewBox="0 0 24 24"
             >
@@ -183,7 +183,7 @@
           </span>
           <span v-else class="absolute left-0 inset-y-0 flex items-center pl-3">
             <svg
-              class="h-5 w-5 text-[#23D3EE] group-hover:text-[#23D3EE]/80"
+              class="h-5 w-5 text-[#0089AE] group-hover:text-[#0089AE]/80"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -207,8 +207,11 @@
       </form>
 
       <div class="mt-6 text-center">
-        <router-link to="/" class="text-sm text-[#23D3EE] hover:text-[#1FC5D9]">
-          ← Back to Website
+        <router-link to="/" class="text-sm text-[#0089AE] hover:text-[#007A9D] flex items-center justify-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+          Back to Website
         </router-link>
       </div>
     </div>

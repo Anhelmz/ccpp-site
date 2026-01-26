@@ -510,10 +510,16 @@ export default {
     const highlightSections = computed(() => content.value.highlights);
 
     const getImageUrl = (path) => {
-      if (path.startsWith("http")) {
+      // Handle data URIs (data:image/...)
+      if (path && path.startsWith("data:")) {
         return path;
       }
-      return path.startsWith("/") ? path : `/${path}`;
+      // Handle HTTP/HTTPS URLs
+      if (path && path.startsWith("http")) {
+        return path;
+      }
+      // Handle relative paths
+      return path && path.startsWith("/") ? path : `/${path || ''}`;
     };
 
     const fetchGalleryImages = async () => {

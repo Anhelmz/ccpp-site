@@ -64,7 +64,11 @@ func registerAPIRoutes(
 		gallery.POST("", galleryHandler.CreateGallery)
 		gallery.POST("/upload", galleryHandler.UploadGallery)
 		gallery.GET("", galleryHandler.GetAllGalleries)
+		gallery.GET("/old", galleryHandler.GetOldPhotos) // Must be before /:id route
+		gallery.DELETE("/old", galleryHandler.DeleteOldPhotos) // Must be before /:id route
 		gallery.GET("/:id", galleryHandler.GetGalleryByID)
+		gallery.GET("/:id/image", galleryHandler.GetGalleryImage)
+		gallery.DELETE("/category/:category", galleryHandler.DeleteGalleriesByCategory)
 		gallery.DELETE("/:id", galleryHandler.DeleteGallery)
 	}
 

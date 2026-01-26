@@ -34,3 +34,14 @@ func (s *galleryServiceImpl) DeleteGallery(id uint) error {
 	return s.galleryRepo.Delete(id)
 }
 
+func (s *galleryServiceImpl) DeleteGalleriesByCategory(category string) error {
+	return s.galleryRepo.DeleteByCategory(category)
+}
+
+func (s *galleryServiceImpl) GetOldPhotos() ([]models.Gallery, error) {
+	return s.galleryRepo.FindOldPhotos()
+}
+
+func (s *galleryServiceImpl) DeleteOldPhotos() (int64, error) {
+	return s.galleryRepo.DeleteOldPhotos()
+}

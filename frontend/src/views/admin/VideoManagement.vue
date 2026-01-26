@@ -1,24 +1,50 @@
 <template>
   <AdminLayout>
-    <!-- Page Header -->
-    <div class="mb-8">
-      <h1 class="text-2xl font-semibold text-zinc-900">Videos</h1>
-      <p class="mt-1 text-sm text-zinc-600">Manage YouTube videos</p>
-    </div>
+    <!-- Videos List View -->
+    <div v-if="!selectedVideo && !showCreateForm">
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-2xl font-semibold text-zinc-900">Videos</h1>
+        <p class="mt-1 text-sm text-zinc-600">Manage YouTube videos</p>
+      </div>
 
-    <div class="mb-4 flex flex-wrap gap-3 items-center justify-end">
-      <button
-        @click="openCreateModal"
-        class="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-[#23D3EE] text-white hover:bg-[#1FC5D9] flex items-center gap-2"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-        </svg>
-        New Video
-      </button>
-    </div>
+      <div class="mb-4 flex flex-wrap gap-3 items-center justify-between">
+        <!-- Search Bar -->
+        <div class="flex-1 max-w-md">
+          <div class="relative">
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search videos..."
+              class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE] focus:border-transparent"
+            />
+            <svg
+              class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+        </div>
+        <button
+          @click="openCreateForm"
+          class="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-[#0089AE] text-white hover:bg-[#007A9D] flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          New Video
+        </button>
+      </div>
 
-    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
       <div v-if="filteredVideos.length === 0" class="text-center py-12">
         <svg
           class="mx-auto h-16 w-16 text-zinc-300 mb-4"
@@ -45,8 +71,8 @@
         </p>
         <button
           v-if="!searchQuery"
-          class="px-6 py-2 bg-[#23D3EE] text-white rounded-lg hover:bg-[#1FC5D9] transition-colors font-medium shadow-sm"
-          @click="openCreateModal"
+          class="px-6 py-2 bg-[#0089AE] text-white rounded-lg hover:bg-[#007A9D] transition-colors font-medium shadow-sm"
+          @click="openCreateForm"
         >
           Add Video
         </button>
@@ -67,7 +93,7 @@
                 v-for="video in filteredVideos"
                 :key="video.id"
                 class="hover:bg-gray-50 transition-colors cursor-pointer"
-                @click="openEditModal(video)"
+                @click="viewVideo(video)"
               >
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {{ video.title }}
@@ -80,9 +106,12 @@
                     "
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="text-xs text-[#23D3EE] hover:text-[#1FC5D9]"
+                    class="text-xs text-[#0089AE] hover:text-[#007A9D] flex items-center gap-1.5"
                     @click.stop
                   >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                    </svg>
                     Open link
                   </a>
                 </td>
@@ -99,109 +128,200 @@
           </table>
         </div>
       </div>
+      </div>
     </div>
 
-    <div
-      v-if="showModal"
-      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-      @click="closeModal"
-    >
-      <div
-        class="bg-white rounded-xl border border-gray-200 shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto"
-        @click.stop
-      >
-        <div class="p-8 border-b border-gray-200">
-          <div class="flex justify-between items-start mb-6">
-            <h3 class="text-3xl font-bold text-gray-900">
-              {{ editingVideo ? "Edit Video" : "New Video" }}
-            </h3>
-            <button
-              class="text-gray-400 hover:text-gray-600 transition-colors"
-              @click="closeModal"
-            >
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+    <!-- View Video Detail Page -->
+    <div v-if="selectedVideo && !showCreateForm">
+      <!-- Breadcrumbs -->
+      <nav class="mb-6" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-sm">
+          <li>
+            <a href="#" @click.prevent="selectedVideo = null" class="text-gray-500 hover:text-gray-700">
+              Videos
+            </a>
+          </li>
+          <li>
+            <span class="text-gray-400">/</span>
+          </li>
+          <li class="text-gray-900 font-medium">
+            {{ selectedVideo.title || 'Video' }}
+          </li>
+        </ol>
+      </nav>
+
+      <!-- Video Details -->
+      <div class="bg-white border border-gray-200 rounded-lg">
+        <div class="flex flex-col lg:flex-row">
+          <!-- Main Content Area -->
+          <div class="flex-1 p-6 lg:pr-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">{{ selectedVideo.title }}</h1>
+            
+            <!-- Video Embed -->
+            <div class="mb-6">
+              <div class="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                <iframe
+                  :src="`https://www.youtube.com/embed/${selectedVideo.youtubeId}`"
+                  class="w-full h-full"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                ></iframe>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div v-if="selectedVideo.description" class="prose max-w-none">
+              <div class="bg-gray-50 rounded-lg border border-gray-200 p-6">
+                <p class="text-gray-900 whitespace-pre-wrap text-base leading-relaxed">
+                  {{ selectedVideo.description }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="lg:w-80 lg:border-l border-gray-200 p-6 space-y-6 bg-gray-50">
+            <!-- Video Information -->
+            <div>
+              <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Title</label>
+              <p class="mt-1 text-sm text-gray-900">{{ selectedVideo.title }}</p>
+            </div>
+
+            <div>
+              <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">YouTube ID</label>
+              <p class="mt-1 text-sm text-gray-600 break-all">{{ selectedVideo.youtubeId }}</p>
+            </div>
+
+            <div>
+              <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">YouTube Link</label>
+              <div class="mt-1">
+                <a
+                  :href="selectedVideo.youtubeUrl || `https://www.youtube.com/watch?v=${selectedVideo.youtubeId}`"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-[#0089AE] hover:text-[#007A9D] text-sm flex items-center gap-1.5 break-all"
+                >
+                  <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                  </svg>
+                  Open on YouTube
+                </a>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-4 border-t border-gray-200 space-y-3">
+              <button
+                @click="editVideo"
+                class="w-full px-4 py-2 bg-[#0089AE] text-white text-sm font-medium rounded-md hover:bg-[#007A9D] transition-colors"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
-              </svg>
-            </button>
+                Edit Video
+              </button>
+              <button
+                @click="selectedVideo = null"
+                class="w-full px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
+              >
+                Back to List
+              </button>
+              <button
+                @click="deleteVideo(selectedVideo.id)"
+                class="w-full px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
+              >
+                Delete Video
+              </button>
+            </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <form class="p-8 space-y-6" @submit.prevent="saveVideo">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Title *
-            </label>
-            <input
-              v-model="videoForm.title"
-              type="text"
-              required
-              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
-              placeholder="Teaching title"
-            />
-          </div>
+    <!-- Create/Edit Video Form -->
+    <div v-if="showCreateForm || editingVideo">
+      <!-- Breadcrumbs -->
+      <nav class="mb-6" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-sm">
+          <li>
+            <a href="#" @click.prevent="closeForm" class="text-gray-500 hover:text-gray-700">
+              Videos
+            </a>
+          </li>
+          <li>
+            <span class="text-gray-400">/</span>
+          </li>
+          <li class="text-gray-900 font-medium">
+            {{ editingVideo ? 'Edit Video' : 'New Video' }}
+          </li>
+        </ol>
+      </nav>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Description
-            </label>
-            <textarea
-              v-model="videoForm.description"
-              rows="3"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
-              placeholder="Brief description"
-            ></textarea>
-          </div>
+      <!-- Video Form -->
+      <div class="bg-white border border-gray-200 rounded-lg p-6 space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Title <span class="text-red-500">*</span>
+          </label>
+          <input
+            v-model="videoForm.title"
+            type="text"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE]"
+            placeholder="Teaching title"
+          />
+        </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              YouTube Link or ID *
-            </label>
-            <input
-              v-model="videoForm.youtubeInput"
-              type="text"
-              required
-              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-[#23D3EE] focus:border-[#23D3EE]"
-              placeholder="https://www.youtube.com/watch?v=XXXXXXXXXXX"
-            />
-            <p class="text-xs text-gray-500 mt-1">
-              Paste a full YouTube URL or the 11-character video ID.
-            </p>
-          </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Description
+          </label>
+          <textarea
+            v-model="videoForm.description"
+            rows="3"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE]"
+            placeholder="Brief description"
+          ></textarea>
+        </div>
 
-          <div
-            v-if="formError"
-            class="p-4 bg-red-50 border border-red-200 rounded-2xl"
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            YouTube Link or ID <span class="text-red-500">*</span>
+          </label>
+          <input
+            v-model="videoForm.youtubeInput"
+            type="text"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE]"
+            placeholder="https://www.youtube.com/watch?v=XXXXXXXXXXX"
+          />
+          <p class="text-xs text-gray-500 mt-1">
+            Paste a full YouTube URL or the 11-character video ID.
+          </p>
+        </div>
+
+        <div
+          v-if="formError"
+          class="p-4 bg-red-50 border border-red-200 rounded-lg"
+        >
+          <p class="text-sm text-red-800">{{ formError }}</p>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+          <button
+            type="button"
+            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+            @click="closeForm"
           >
-            <p class="text-red-600 text-sm">{{ formError }}</p>
-          </div>
-
-          <div class="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
-              @click="closeModal"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              class="px-5 py-2 bg-[#23D3EE] text-white rounded-md hover:bg-[#1FC5D9] transition-colors disabled:opacity-50"
-              :disabled="saving"
-            >
-              {{ saving ? 'Saving...' : editingVideo ? 'Update Video' : 'Create Video' }}
-            </button>
-          </div>
-        </form>
+            Cancel
+          </button>
+          <button
+            type="button"
+            @click="saveVideo"
+            class="px-4 py-2 bg-[#0089AE] text-white rounded-md hover:bg-[#007A9D] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="saving"
+          >
+            {{ saving ? 'Saving...' : editingVideo ? 'Update Video' : 'Create Video' }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -238,13 +358,15 @@ export default {
     ConfirmationModal,
   },
   setup() {
-    const showModal = ref(false);
+    const selectedVideo = ref(null);
+    const showCreateForm = ref(false);
     const editingVideo = ref(null);
     const videos = ref([]);
     const formError = ref("");
     const searchQuery = ref("");
     const showConfirmModal = ref(false);
     const videoToDelete = ref(null);
+    const saving = ref(false);
 
     const videoForm = ref({
       title: "",
@@ -271,39 +393,51 @@ export default {
       return list;
     });
 
-    const openCreateModal = () => {
+    const viewVideo = (video) => {
+      selectedVideo.value = video;
+      showCreateForm.value = false;
       editingVideo.value = null;
+    };
+
+    const openCreateForm = () => {
+      selectedVideo.value = null;
+      editingVideo.value = null;
+      showCreateForm.value = true;
       videoForm.value = {
         title: "",
         description: "",
         youtubeInput: "",
       };
       formError.value = "";
-      showModal.value = true;
     };
 
-    const openEditModal = (video) => {
-      editingVideo.value = video;
+    const editVideo = () => {
+      if (!selectedVideo.value) return;
+      editingVideo.value = selectedVideo.value;
+      showCreateForm.value = true;
+      selectedVideo.value = null;
       videoForm.value = {
-        title: video.title,
-        description: video.description || "",
-        youtubeInput: video.youtubeUrl || video.youtubeId || "",
+        title: editingVideo.value.title,
+        description: editingVideo.value.description || "",
+        youtubeInput: editingVideo.value.youtubeUrl || editingVideo.value.youtubeId || "",
       };
       formError.value = "";
-      showModal.value = true;
     };
 
-    const closeModal = () => {
-      showModal.value = false;
+    const closeForm = () => {
+      showCreateForm.value = false;
       editingVideo.value = null;
+      selectedVideo.value = null;
       formError.value = "";
     };
 
     const saveVideo = () => {
       formError.value = "";
+      saving.value = true;
       const id = extractYouTubeId(videoForm.value.youtubeInput);
       if (!videoForm.value.title.trim() || !id) {
         formError.value = "Title and a valid YouTube link/ID are required.";
+        saving.value = false;
         return;
       }
 
@@ -321,7 +455,21 @@ export default {
       }
 
       loadVideos();
-      closeModal();
+      saving.value = false;
+      
+      // After saving, view the video if editing, or go back to list if creating
+      if (editingVideo.value) {
+        const updatedVideo = videoStore.getAll().find(v => v.id === editingVideo.value.id);
+        if (updatedVideo) {
+          selectedVideo.value = updatedVideo;
+          showCreateForm.value = false;
+          editingVideo.value = null;
+        } else {
+          closeForm();
+        }
+      } else {
+        closeForm();
+      }
     };
 
     const deleteVideo = (id) => {
@@ -347,17 +495,20 @@ export default {
     });
 
     return {
-      showModal,
+      selectedVideo,
+      showCreateForm,
       editingVideo,
       videos,
       formError,
       searchQuery,
       videoForm,
       filteredVideos,
+      saving,
       loadVideos,
-      openCreateModal,
-      openEditModal,
-      closeModal,
+      viewVideo,
+      openCreateForm,
+      editVideo,
+      closeForm,
       saveVideo,
       deleteVideo,
       showConfirmModal,
