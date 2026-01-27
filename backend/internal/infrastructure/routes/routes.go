@@ -18,7 +18,7 @@ func registerAPIRoutes(
 	contactHandler *handlers.ContactHandler,
 	contactRequestHandler *handlers.ContactRequestHandler,
 	galleryHandler *handlers.GalleryHandler,
-	eventHandler *handlers.EventHandler,
+	eventCalendarHandler *handlers.EventCalendarHandler,
 ) {
 	// Auth routes
 	auth := api.Group("/auth")
@@ -74,12 +74,11 @@ func registerAPIRoutes(
 
 	events := api.Group("/events")
 	{
-		// Auth removed to allow admin calendar without token
-		events.POST("", eventHandler.CreateEvent)
-		events.GET("", eventHandler.GetAllEvents)
-		events.GET("/:id", eventHandler.GetEventByID)
-		events.PUT("/:id", eventHandler.UpdateEvent)
-		events.DELETE("/:id", eventHandler.DeleteEvent)
+		events.POST("", eventCalendarHandler.CreateEvent)
+		events.GET("", eventCalendarHandler.GetAllEvents)
+		events.GET("/:id", eventCalendarHandler.GetEventByID)
+		events.PUT("/:id", eventCalendarHandler.UpdateEvent)
+		events.DELETE("/:id", eventCalendarHandler.DeleteEvent)
 	}
 }
 
@@ -89,22 +88,22 @@ func SetupRoutes(
 	contactService services.ContactService,
 	contactRequestService services.ContactRequestService,
 	galleryService services.GalleryService,
-	eventService services.EventService,
+	eventCalendarService services.EventCalendarService,
 ) {
 	userHandler := handlers.NewUserHandler(userService)
 	contactHandler := handlers.NewContactHandler(contactService)
 	contactRequestHandler := handlers.NewContactRequestHandler(contactRequestService)
 	galleryHandler := handlers.NewGalleryHandler(galleryService)
-	eventHandler := handlers.NewEventHandler(eventService)
+	eventCalendarHandler := handlers.NewEventCalendarHandler(eventCalendarService)
 	authHandler := handlers.NewAuthHandler()
 
 	// Versioned API (existing)
 	apiV1 := router.Group("/api/v1")
-	registerAPIRoutes(apiV1, authHandler, userHandler, contactHandler, contactRequestHandler, galleryHandler, eventHandler)
+	registerAPIRoutes(apiV1, authHandler, userHandler, contactHandler, contactRequestHandler, galleryHandler, eventCalendarHandler)
 
 	// Unversioned API (go-vue-base compatibility)
 	api := router.Group("/api")
-	registerAPIRoutes(api, authHandler, userHandler, contactHandler, contactRequestHandler, galleryHandler, eventHandler)
+	registerAPIRoutes(api, authHandler, userHandler, contactHandler, contactRequestHandler, galleryHandler, eventCalendarHandler)
 
 	// Health check endpoint
 	router.GET("/health", func(c *gin.Context) {

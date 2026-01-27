@@ -326,7 +326,6 @@ func (h *GalleryHandler) DeleteGalleriesByCategory(c *gin.Context) {
 	})
 }
 
-
 // GetOldPhotos handles GET /api/gallery/old - returns old photos (soft-deleted or without ImageData)
 func (h *GalleryHandler) GetOldPhotos(c *gin.Context) {
 	oldPhotos, err := h.galleryService.GetOldPhotos()

@@ -524,8 +524,9 @@ export default {
     const error = ref("");
     const events = ref([]);
     const selectedEvent = ref(null);
-    const currentMonth = ref(new Date().getMonth());
-    const currentYear = ref(new Date().getFullYear());
+    // Use UTC for month/year to ensure consistency
+    const currentMonth = ref(new Date().getUTCMonth());
+    const currentYear = ref(new Date().getUTCFullYear());
     const selectedDay = ref(null);
 
     const translations = {
@@ -779,14 +780,20 @@ export default {
       const dateObj = date instanceof Date ? date : new Date(date);
       if (isNaN(dateObj.getTime())) return "";
       const months = content.value.months;
-      return `${months[dateObj.getMonth()]} ${dateObj.getDate()}, ${dateObj.getFullYear()}`;
+      // Use UTC methods for consistent date display
+      return `${months[dateObj.getUTCMonth()]} ${dateObj.getUTCDate()}, ${dateObj.getUTCFullYear()}`;
     };
 
     const formatTimeRange = (start, end) => {
       if (!start) return "";
-      const opts = { hour: "2-digit", minute: "2-digit" };
-      const startStr = start.toLocaleTimeString([], opts);
-      const endStr = end ? end.toLocaleTimeString([], opts) : "";
+      // Format time using UTC to ensure consistency
+      const formatUTCTime = (date) => {
+        const hours = String(date.getUTCHours()).padStart(2, '0');
+        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+      };
+      const startStr = formatUTCTime(start);
+      const endStr = end ? formatUTCTime(end) : "";
       return endStr && endStr !== startStr
         ? `${startStr} - ${endStr}`
         : startStr;
@@ -794,13 +801,26 @@ export default {
 
     const normalizeEvents = (apiEvents) =>
       apiEvents.map((event) => {
-        const start = new Date(event.startTime || event.date);
-        const end = event.endTime ? new Date(event.endTime) : start;
+        // CRITICAL: Extract date keys from raw API strings BEFORE any Date parsing
+        // Get the raw string values from API response (these are ISO 8601 UTC strings)
+        const startDateStr = typeof event.startDate === 'string' 
+          ? event.startDate 
+          : (event.startDate ? event.startDate.toISOString() : (event.startTime || event.date || ''))
+        const endDateStr = typeof event.endDate === 'string'
+          ? event.endDate
+          : (event.endDate ? event.endDate.toISOString() : (event.endTime || startDateStr))
+        
+        // Parse as Date objects ONLY for time operations (display, comparison)
+        const start = new Date(startDateStr);
+        const end = endDateStr ? new Date(endDateStr) : start;
 
         return {
           ...event,
           startTime: start,
           endTime: end,
+          // CRITICAL: Keep original raw strings for date key extraction
+          _startTimeStr: startDateStr,
+          _endTimeStr: endDateStr,
           recurrence: (event.recurrence || "none").toLowerCase(),
           recurrenceEndsAt: event.recurrenceEndsAt
             ? new Date(event.recurrenceEndsAt)
@@ -808,24 +828,25 @@ export default {
           timeRange: formatTimeRange(start, end),
           category: event.category || "",
           color: event.color || "",
-          content: event.description || event.summary || event.content || "",
+          content: event.details || event.description || event.summary || event.content || "",
         };
       });
 
     const addInterval = (date, recurrence) => {
       const next = new Date(date);
+      // Use UTC methods to maintain UTC consistency
       switch (recurrence) {
         case "daily":
-          next.setDate(next.getDate() + 1);
+          next.setUTCDate(next.getUTCDate() + 1);
           break;
         case "weekly":
-          next.setDate(next.getDate() + 7);
+          next.setUTCDate(next.getUTCDate() + 7);
           break;
         case "monthly":
-          next.setMonth(next.getMonth() + 1);
+          next.setUTCMonth(next.getUTCMonth() + 1);
           break;
         case "yearly":
-          next.setFullYear(next.getFullYear() + 1);
+          next.setUTCFullYear(next.getUTCFullYear() + 1);
           break;
         default:
           break;
@@ -841,21 +862,29 @@ export default {
         : null;
       const maxIterations = 500;
 
+      // event.startTime and event.endTime are already Date objects from normalizeEvents
       let currentStart = new Date(event.startTime);
       let currentEnd = new Date(event.endTime);
       let iterations = 0;
 
       const pushIfInRange = (start, end) => {
+        // Compare dates directly (Date objects compare by timestamp)
         if (end < rangeStart || start > rangeEnd) {
           return;
         }
 
+        // Extract date key from UTC ISO string for consistent matching
+        const occurrenceDateKey = start.toISOString().split('T')[0];
+        
         occurrences.push({
           ...event,
           occurrenceId: `${event.id}-${start.toISOString()}`,
           startTime: start,
           endTime: end,
           timeRange: formatTimeRange(start, end),
+          // Store the date key for this occurrence
+          _startTimeStr: start.toISOString(),
+          _endTimeStr: end.toISOString(),
         });
       };
 
@@ -882,7 +911,9 @@ export default {
       try {
         const response = await eventService.getEvents(false);
         const apiEvents = response.events || [];
+        console.log('Fetched events from API:', apiEvents);
         events.value = normalizeEvents(apiEvents);
+        console.log('Normalized events:', events.value);
         loading.value = false;
       } catch (err) {
         console.error("Error loading events:", err);
@@ -900,20 +931,66 @@ export default {
       const year = currentYear.value;
       const month = currentMonth.value;
 
-      const firstDayOfMonth = new Date(year, month, 1);
-      const lastDayOfMonth = new Date(year, month + 1, 0);
-
-      const startDate = new Date(firstDayOfMonth);
-      startDate.setDate(startDate.getDate() - firstDayOfMonth.getDay());
-
-      const endDate = new Date(lastDayOfMonth);
-      endDate.setDate(endDate.getDate() + (6 - lastDayOfMonth.getDay()));
-
-      return { startDate, endDate };
+      // Build calendar range using pure UTC date math - no Date object manipulation
+      // Calculate first and last day of month
+      const firstDayOfMonth = { year, month, day: 1 };
+      const lastDayOfMonthDate = new Date(Date.UTC(year, month + 1, 0));
+      const lastDayOfMonth = { year, month, day: lastDayOfMonthDate.getUTCDate() };
+      
+      // Calculate what day of week the first day falls on (0=Sunday, 6=Saturday)
+      const firstDayDate = new Date(Date.UTC(year, month, 1));
+      const firstDayOfWeek = firstDayDate.getUTCDay();
+      
+      // Start date is first day of month minus days to get to Sunday
+      let startYear = year;
+      let startMonth = month;
+      let startDay = 1 - firstDayOfWeek;
+      
+      // Handle case where startDay goes negative (previous month)
+      if (startDay <= 0) {
+        startMonth--;
+        if (startMonth < 0) {
+          startMonth = 11;
+          startYear--;
+        }
+        const daysInPrevMonth = new Date(Date.UTC(startYear, startMonth + 1, 0)).getUTCDate();
+        startDay = daysInPrevMonth + startDay;
+      }
+      
+      // Calculate what day of week the last day falls on
+      const lastDayDate = new Date(Date.UTC(year, month, lastDayOfMonth.day));
+      const lastDayOfWeek = lastDayDate.getUTCDay();
+      
+      // End date is last day of month plus days to get to Saturday
+      let endYear = year;
+      let endMonth = month;
+      let endDay = lastDayOfMonth.day + (6 - lastDayOfWeek);
+      
+      // Handle case where endDay exceeds days in month (next month)
+      const daysInEndMonth = new Date(Date.UTC(endYear, endMonth + 1, 0)).getUTCDate();
+      if (endDay > daysInEndMonth) {
+        endDay = endDay - daysInEndMonth;
+        endMonth++;
+        if (endMonth > 11) {
+          endMonth = 0;
+          endYear++;
+        }
+      }
+      
+      return { 
+        start: { year: startYear, month: startMonth, day: startDay },
+        end: { year: endYear, month: endMonth, day: endDay }
+      };
     });
 
     const expandedEvents = computed(() => {
-      const { startDate, endDate } = calendarRange.value;
+      const { start, end } = calendarRange.value;
+      // Convert calendar range to Date objects for comparison
+      const startDate = new Date(Date.UTC(start.year, start.month, start.day));
+      const endDate = new Date(Date.UTC(end.year, end.month, end.day));
+      // Set endDate to end of day
+      endDate.setUTCHours(23, 59, 59, 999);
+      
       const list = [];
 
       events.value.forEach((event) => {
@@ -927,7 +1004,28 @@ export default {
       const map = {};
 
       expandedEvents.value.forEach((event) => {
-        const dateKey = event.startTime.toISOString().split("T")[0];
+        // CRITICAL: Extract date key ONLY from the raw ISO string
+        // This is the ONLY way to guarantee no timezone conversion
+        if (!event._startTimeStr) {
+          console.warn('Event missing _startTimeStr:', event)
+          return
+        }
+        
+        // Extract date directly from ISO string: "2026-01-30T09:00:00Z" -> "2026-01-30"
+        // Split on 'T' and take first part - this is the UTC date as stored
+        let dateKey = event._startTimeStr.split('T')[0]
+        
+        // Handle case where there might be a space instead of T (some API formats)
+        if (!dateKey && event._startTimeStr.includes(' ')) {
+          dateKey = event._startTimeStr.split(' ')[0]
+        }
+        
+        // Validate the date key format (should be YYYY-MM-DD)
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) {
+          console.warn('Invalid date key format:', dateKey, 'from:', event._startTimeStr, 'event:', event)
+          return
+        }
+        
         if (!map[dateKey]) {
           map[dateKey] = [];
         }
@@ -938,30 +1036,73 @@ export default {
         list.sort((a, b) => a.startTime - b.startTime);
       });
 
+      // Debug: Log events by date (only first time)
+      if (Object.keys(map).length > 0 && !window._calendarEventsLogged) {
+        console.log('Calendar events by date:', map);
+        console.log('Total events:', expandedEvents.value.length);
+        window._calendarEventsLogged = true;
+      }
+
       return map;
     });
 
     const calendarDays = computed(() => {
-      const { startDate, endDate } = calendarRange.value;
+      const { start, end } = calendarRange.value;
       const month = currentMonth.value;
 
       const days = [];
-      const currentDate = new Date(startDate);
-
-      while (currentDate <= endDate) {
-        const dateKey = currentDate.toISOString().split("T")[0];
+      
+      // Work with pure year/month/day numbers - no Date object manipulation
+      let year = start.year;
+      let monthNum = start.month;
+      let day = start.day;
+      
+      const endYear = end.year;
+      const endMonth = end.month;
+      const endDay = end.day;
+      
+      // Loop through days using pure date math
+      while (true) {
+        // Build UTC date key directly from year/month/day - exactly like event date keys
+        const dateKey = `${year}-${String(monthNum + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        // Check if we've reached the end
+        if (year > endYear || 
+            (year === endYear && monthNum > endMonth) ||
+            (year === endYear && monthNum === endMonth && day > endDay)) {
+          break;
+        }
+        
         const dayEvents = eventsByDate.value[dateKey] || [];
+
+        // Compare dates for today using pure date comparison
+        const today = new Date();
+        const todayYear = today.getUTCFullYear();
+        const todayMonth = today.getUTCMonth();
+        const todayDay = today.getUTCDate();
+        
+        const isToday = year === todayYear && monthNum === todayMonth && day === todayDay;
 
         days.push({
           date: dateKey,
-          day: currentDate.getDate(),
-          isCurrentMonth: currentDate.getMonth() === month,
-          isToday: currentDate.toDateString() === new Date().toDateString(),
+          day: day, // Use the day we're tracking
+          isCurrentMonth: monthNum === currentMonth.value,
+          isToday: isToday,
           hasEvents: dayEvents.length > 0,
           events: dayEvents,
         });
 
-        currentDate.setDate(currentDate.getDate() + 1);
+        // Increment to next day using pure date math
+        const daysInMonth = new Date(Date.UTC(year, monthNum + 1, 0)).getUTCDate();
+        day++;
+        if (day > daysInMonth) {
+          day = 1;
+          monthNum++;
+          if (monthNum > 11) {
+            monthNum = 0;
+            year++;
+          }
+        }
       }
 
       return days;
@@ -970,7 +1111,12 @@ export default {
     const selectedDateEvents = computed(() => {
       if (!selectedDay.value) return [];
 
-      const dateKey = selectedDay.value.toISOString().split("T")[0];
+      // Build UTC date key directly from UTC components
+      const year = selectedDay.value.getUTCFullYear();
+      const month = String(selectedDay.value.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(selectedDay.value.getUTCDate()).padStart(2, '0');
+      const dateKey = `${year}-${month}-${day}`;
+      
       return eventsByDate.value[dateKey] || [];
     });
 
@@ -980,8 +1126,9 @@ export default {
 
     const selectDate = (day) => {
       if (!day.isCurrentMonth) return;
+      // day.date is a UTC date string (YYYY-MM-DD), create UTC date
       const [year, month, date] = day.date.split("-").map(Number);
-      selectedDay.value = new Date(year, month - 1, date);
+      selectedDay.value = new Date(Date.UTC(year, month - 1, date));
       
       // If the day has events, open the modal with the first event
       if (day.events && day.events.length > 0) {
@@ -1011,8 +1158,8 @@ export default {
 
     const resetToCurrentMonth = () => {
       const now = new Date();
-      currentMonth.value = now.getMonth();
-      currentYear.value = now.getFullYear();
+      currentMonth.value = now.getUTCMonth();
+      currentYear.value = now.getUTCFullYear();
       selectedDay.value = null;
     };
 

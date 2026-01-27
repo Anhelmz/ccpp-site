@@ -13,6 +13,20 @@
           Today
         </button>
         <button
+          v-if="oldEventsCount > 0"
+          @click="confirmDeleteOldEvents"
+          class="px-4 py-2 rounded-md border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-400 bg-white dark:bg-gray-800 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors font-medium shadow-sm"
+        >
+          Delete Old Events ({{ oldEventsCount }})
+        </button>
+        <button
+          v-if="events.length > 0"
+          @click="confirmDeleteAll"
+          class="px-4 py-2 rounded-md border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium shadow-sm"
+        >
+          Delete All Events
+        </button>
+        <button
           @click="openCreateModal()"
           class="px-6 py-3 bg-main text-white rounded-lg hover:opacity-90 transition-colors shadow-lg font-medium flex items-center space-x-2"
         >
@@ -95,20 +109,34 @@
             </span>
           </div>
           <div class="space-y-1">
-            <button
+            <div
               v-for="event in day.events.slice(0, 3)"
               :key="event.id"
-              type="button"
-              :class="[
-                'w-full text-left text-xs rounded-md px-2 py-1 truncate transition-colors',
-                day.isPast 
-                  ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600' 
-                  : 'bg-brand-blue/10 dark:bg-main/20 text-brand-blue dark:text-main hover:bg-brand-blue/20 dark:hover:bg-main/30'
-              ]"
-              @click.stop="openEditModal(event)"
+              class="flex items-center gap-1 group"
             >
-              {{ event.title }}
-            </button>
+              <button
+                type="button"
+                :class="[
+                  'flex-1 text-left text-xs rounded-md px-2 py-1 truncate transition-colors',
+                  day.isPast 
+                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600' 
+                    : 'bg-brand-blue/10 dark:bg-main/20 text-brand-blue dark:text-main hover:bg-brand-blue/20 dark:hover:bg-main/30'
+                ]"
+                @click.stop="openEditModal(event)"
+              >
+                {{ event.title }}
+              </button>
+              <button
+                type="button"
+                @click.stop="confirmDeleteEvent(event.id)"
+                class="opacity-0 group-hover:opacity-100 transition-opacity text-red-600 hover:text-red-800 p-1"
+                aria-label="Delete event"
+              >
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
             <div v-if="day.events.length > 3" :class="['text-xs', day.isPast ? 'text-gray-500 dark:text-gray-600' : 'text-gray-500 dark:text-gray-500']">+{{ day.events.length - 3 }} more</div>
           </div>
         </div>
@@ -177,16 +205,6 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-black mb-1">Summary</label>
-            <input
-              v-model="form.summary"
-              type="text"
-              class="w-full border border-gray-300 rounded-md px-3 py-2 text-black focus:ring-2 focus:ring-main focus:border-main"
-              placeholder="Short blurb"
-            />
-          </div>
-
-          <div>
             <label class="block text-sm font-medium text-black mb-1">Description</label>
             <textarea
               v-model="form.description"
@@ -200,33 +218,76 @@
             {{ formError }}
           </div>
 
-          <div class="flex justify-end gap-3 pt-3">
-            <button type="button" @click="closeModal" class="px-4 py-2 border border-gray-300 rounded-md text-black hover:bg-gray-50">
-              Cancel
-            </button>
+          <div class="flex justify-between gap-3 pt-3">
             <button
-              type="submit"
-              class="px-5 py-2 bg-main text-white rounded-md hover:opacity-90 transition-colors disabled:opacity-50"
-              :disabled="saving"
+              v-if="editingEvent"
+              type="button"
+              @click="confirmDeleteEvent(editingEvent.id)"
+              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
             >
-              {{ saving ? 'Saving...' : editingEvent ? 'Update Event' : 'Create Event' }}
+              Delete
             </button>
+            <div class="flex gap-3 ml-auto">
+              <button type="button" @click="closeModal" class="px-4 py-2 border border-gray-300 rounded-md text-black hover:bg-gray-50">
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="px-5 py-2 bg-main text-white rounded-md hover:opacity-90 transition-colors disabled:opacity-50"
+                :disabled="saving"
+              >
+                {{ saving ? 'Saving...' : editingEvent ? 'Update Event' : 'Create Event' }}
+              </button>
+            </div>
           </div>
         </form>
       </div>
     </div>
+
+    <!-- Confirmation Modals -->
+    <ConfirmationModal
+      v-if="showDeleteModal"
+      :show="showDeleteModal"
+      title="Delete Event"
+      message="Are you sure you want to delete this event? This action cannot be undone."
+      confirm-text="Delete Event"
+      @confirm="deleteEvent"
+      @cancel="cancelDelete"
+    />
+
+    <ConfirmationModal
+      v-if="showDeleteAllModal"
+      :show="showDeleteAllModal"
+      title="Delete All Events"
+      :message="`Are you sure you want to delete ALL ${events.length} events? This action cannot be undone.`"
+      confirm-text="Delete All"
+      @confirm="deleteAllEvents"
+      @cancel="cancelDeleteAll"
+    />
+
+    <ConfirmationModal
+      v-if="showDeleteOldModal"
+      :show="showDeleteOldModal"
+      title="Delete Old Events"
+      :message="`Are you sure you want to permanently delete ${oldEventsCount} old (soft-deleted) event(s)? This action cannot be undone.`"
+      confirm-text="Delete Old Events"
+      @confirm="deleteOldEvents"
+      @cancel="cancelDeleteOld"
+    />
   </AdminLayout>
 </template>
 
 <script>
 import { ref, computed, onMounted } from 'vue'
 import AdminLayout from '@/components/admin/AdminLayout.vue'
+import ConfirmationModal from '@/components/admin/ConfirmationModal.vue'
 import { eventService } from '@/services/eventService'
 
 export default {
   name: 'AdminCalendar',
   components: {
-    AdminLayout
+    AdminLayout,
+    ConfirmationModal
   },
   setup() {
     const events = ref([])
@@ -234,83 +295,279 @@ export default {
     const editingEvent = ref(null)
     const formError = ref('')
     const saving = ref(false)
+    const showDeleteModal = ref(false)
+    const showDeleteAllModal = ref(false)
+    const showDeleteOldModal = ref(false)
+    const eventToDelete = ref(null)
+    const deleting = ref(false)
+    const oldEventsCount = ref(0)
 
-    const currentMonth = ref(new Date().getMonth())
-    const currentYear = ref(new Date().getFullYear())
+    // Use UTC for month/year to ensure consistency
+    const currentMonth = ref(new Date().getUTCMonth())
+    const currentYear = ref(new Date().getUTCFullYear())
 
     const form = ref({
       title: '',
       start: '',
       end: '',
       location: '',
-      summary: '',
       description: ''
     })
 
     const weekdayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    const monthLabel = computed(() =>
-      new Date(currentYear.value, currentMonth.value, 1).toLocaleString('default', { month: 'long', year: 'numeric' })
-    )
+    const monthLabel = computed(() => {
+      // Use UTC date for month label to ensure consistency
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+      return `${months[currentMonth.value]} ${currentYear.value}`
+    })
+
+    const normalizeEvents = (apiEvents) => {
+      // Normalize events - CRITICAL: Extract date keys from raw API strings BEFORE any Date parsing
+      // This ensures no timezone conversion happens
+      return apiEvents.map((event) => {
+        // Get the raw string values from API response (these are ISO 8601 UTC strings)
+        // IMPORTANT: Use the raw string value, not a converted Date object
+        const startTimeStr = typeof event.startTime === 'string' 
+          ? event.startTime 
+          : (event.startTime ? event.startTime.toISOString() : (event.date || ''))
+        const endTimeStr = typeof event.endTime === 'string'
+          ? event.endTime
+          : (event.endTime ? event.endTime.toISOString() : startTimeStr)
+        
+        // Parse as Date objects ONLY for time operations (display, comparison)
+        // But for date key extraction, we ALWAYS use the raw string
+        const start = new Date(startTimeStr)
+        const end = endTimeStr ? new Date(endTimeStr) : start
+        
+        return {
+          ...event,
+          startTime: start,
+          endTime: end,
+          // CRITICAL: Keep original raw strings for date key extraction
+          // These are the UTC ISO strings from the API, e.g. "2026-01-30T09:00:00Z"
+          _startTimeStr: startTimeStr,
+          _endTimeStr: endTimeStr
+        }
+      })
+    }
 
     const loadEvents = async () => {
       try {
         const response = await eventService.getEvents(false)
-        events.value = response.events || []
+        events.value = normalizeEvents(response.events || [])
       } catch (err) {
         console.error('Failed to load events', err)
       }
     }
 
+    const loadOldEventsCount = async () => {
+      try {
+        const response = await eventService.getOldEvents()
+        oldEventsCount.value = response.count || 0
+      } catch (err) {
+        console.error('Failed to load old events count', err)
+        oldEventsCount.value = 0
+      }
+    }
+
     const toDateTimeLocal = (dateString) => {
       if (!dateString) return ''
+      
+      // If it's already in datetime-local format (YYYY-MM-DDTHH:mm), return as-is
+      if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(dateString)) {
+        return dateString
+      }
+      
+      // Parse the ISO string (e.g., "2026-01-30T09:00:00Z")
+      // Extract date and time parts directly from the string to avoid timezone conversion
+      if (dateString.includes('T')) {
+        const [datePart, timePart] = dateString.split('T')
+        // If it has timezone info (Z or +/-), extract just the time part before that
+        const timeOnly = timePart.split(/[Z+-]/)[0] // Gets "09:00:00" or "09:00"
+        const time = timeOnly.substring(0, 5) // Gets "09:00" (HH:mm)
+        return `${datePart}T${time}`
+      }
+      
+      // Fallback: parse as Date and extract UTC components
       const date = new Date(dateString)
-      const offset = date.getTimezoneOffset()
-      const local = new Date(date.getTime() - offset * 60000)
-      return local.toISOString().slice(0, 16)
+      const year = date.getUTCFullYear()
+      const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+      const day = String(date.getUTCDate()).padStart(2, '0')
+      const hours = String(date.getUTCHours()).padStart(2, '0')
+      const minutes = String(date.getUTCMinutes()).padStart(2, '0')
+      return `${year}-${month}-${day}T${hours}:${minutes}`
     }
 
     const calendarRange = computed(() => {
-      const firstDay = new Date(currentYear.value, currentMonth.value, 1)
-      const lastDay = new Date(currentYear.value, currentMonth.value + 1, 0)
-
-      const start = new Date(firstDay)
-      start.setDate(start.getDate() - start.getDay())
-
-      const end = new Date(lastDay)
-      end.setDate(end.getDate() + (6 - lastDay.getDay()))
-
-      return { start, end }
+      // Build calendar range using pure UTC date math - no Date object manipulation
+      // Calculate first and last day of month
+      const year = currentYear.value
+      const month = currentMonth.value
+      
+      // First day of month: year, month, 1
+      // Last day of month: year, month+1, 0 (day 0 of next month = last day of current month)
+      const firstDayOfMonth = { year, month, day: 1 }
+      const lastDayOfMonth = { year, month, day: new Date(Date.UTC(year, month + 1, 0)).getUTCDate() }
+      
+      // Calculate what day of week the first day falls on (0=Sunday, 6=Saturday)
+      const firstDayDate = new Date(Date.UTC(year, month, 1))
+      const firstDayOfWeek = firstDayDate.getUTCDay()
+      
+      // Start date is first day of month minus days to get to Sunday
+      let startYear = year
+      let startMonth = month
+      let startDay = 1 - firstDayOfWeek
+      
+      // Handle case where startDay goes negative (previous month)
+      if (startDay <= 0) {
+        startMonth--
+        if (startMonth < 0) {
+          startMonth = 11
+          startYear--
+        }
+        const daysInPrevMonth = new Date(Date.UTC(startYear, startMonth + 1, 0)).getUTCDate()
+        startDay = daysInPrevMonth + startDay
+      }
+      
+      // Calculate what day of week the last day falls on
+      const lastDayDate = new Date(Date.UTC(year, month, lastDayOfMonth.day))
+      const lastDayOfWeek = lastDayDate.getUTCDay()
+      
+      // End date is last day of month plus days to get to Saturday
+      let endYear = year
+      let endMonth = month
+      let endDay = lastDayOfMonth.day + (6 - lastDayOfWeek)
+      
+      // Handle case where endDay exceeds days in month (next month)
+      const daysInEndMonth = new Date(Date.UTC(endYear, endMonth + 1, 0)).getUTCDate()
+      if (endDay > daysInEndMonth) {
+        endDay = endDay - daysInEndMonth
+        endMonth++
+        if (endMonth > 11) {
+          endMonth = 0
+          endYear++
+        }
+      }
+      
+      return { 
+        start: { year: startYear, month: startMonth, day: startDay },
+        end: { year: endYear, month: endMonth, day: endDay }
+      }
     })
 
     const calendarDays = computed(() => {
       const days = []
       const { start, end } = calendarRange.value
-      const cursor = new Date(start)
-      while (cursor <= end) {
-        const dateKey = cursor.toISOString().split('T')[0]
+      
+      // Work with pure year/month/day numbers - no Date object manipulation
+      let year = start.year
+      let month = start.month
+      let day = start.day
+      
+      const endYear = end.year
+      const endMonth = end.month
+      const endDay = end.day
+      
+      // Loop through days using pure date math
+      while (true) {
+        // Build UTC date key directly from year/month/day - exactly like event date keys
+        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+        
+        // Check if we've reached the end
+        if (year > endYear || 
+            (year === endYear && month > endMonth) ||
+            (year === endYear && month === endMonth && day > endDay)) {
+          break
+        }
+        
         const dayEvents = events.value
-          .map((ev) => ({
-            ...ev,
-            startTime: ev.startTime || ev.start || ev.date,
-            endTime: ev.endTime || ev.end || ev.startTime || ev.date,
-            dateKey: (ev.startTime || ev.start || ev.date || '').split('T')[0]
-          }))
-          .filter((ev) => ev.dateKey === dateKey)
+          .map((ev) => {
+            // CRITICAL: Extract date key ONLY from the raw ISO string
+            // This is the ONLY way to guarantee no timezone conversion
+            if (!ev._startTimeStr) {
+              console.warn('Event missing _startTimeStr:', ev)
+              return null
+            }
+            
+            // Extract date directly from ISO string: "2026-01-30T09:00:00Z" -> "2026-01-30"
+            // Split on 'T' and take first part - this is the UTC date as stored
+            // IMPORTANT: Do NOT use Date object methods - only string manipulation
+            let eventDateKey = ev._startTimeStr.split('T')[0]
+            
+            // Handle case where there might be a space instead of T (some API formats)
+            if (!eventDateKey && ev._startTimeStr.includes(' ')) {
+              eventDateKey = ev._startTimeStr.split(' ')[0]
+            }
+            
+            // Validate the date key format (should be YYYY-MM-DD)
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(eventDateKey)) {
+              console.warn('Invalid date key format:', eventDateKey, 'from:', ev._startTimeStr, 'event:', ev)
+              return null
+            }
+            
+            // Debug: Log if date keys don't match
+            if (eventDateKey !== dateKey) {
+              // Only log once per mismatch to avoid spam
+              if (!window._dateKeyMismatchLogged) {
+                console.log('Date key mismatch - Calendar:', dateKey, 'Event:', eventDateKey, 'Event ISO:', ev._startTimeStr)
+                window._dateKeyMismatchLogged = true
+              }
+            }
+            
+            return {
+              ...ev,
+              dateKey: eventDateKey
+            }
+          })
+          .filter((ev) => ev && ev.dateKey === dateKey)
+        // Compare dates for today/past using pure date comparison
         const today = new Date()
-        today.setHours(0, 0, 0, 0)
-        const dayDate = new Date(cursor)
-        dayDate.setHours(0, 0, 0, 0)
-        const isPast = dayDate < today
+        const todayYear = today.getUTCFullYear()
+        const todayMonth = today.getUTCMonth()
+        const todayDay = today.getUTCDate()
+        
+        const isPast = year < todayYear ||
+          (year === todayYear && month < todayMonth) ||
+          (year === todayYear && month === todayMonth && day < todayDay)
+        
+        const isToday = year === todayYear && month === todayMonth && day === todayDay
+        
+        // CRITICAL: Ensure the displayed day number matches the date key
+        // Extract day from dateKey to guarantee they match
+        const dateKeyDay = parseInt(dateKey.split('-')[2], 10)
         
         days.push({
           date: dateKey,
-          day: cursor.getDate(),
-          isCurrentMonth: cursor.getMonth() === currentMonth.value,
-          isToday: cursor.toDateString() === new Date().toDateString(),
+          day: dateKeyDay, // Use day from dateKey to ensure it matches
+          isCurrentMonth: month === currentMonth.value,
+          isToday: isToday,
           isPast: isPast,
           events: dayEvents
         })
-        cursor.setDate(cursor.getDate() + 1)
+        
+        // Debug: Log if day number doesn't match date key
+        if (dateKeyDay !== day && !window._dayMismatchLogged) {
+          console.warn('⚠️ Day number mismatch!', {
+            dateKey: dateKey,
+            dateKeyDay: dateKeyDay,
+            trackedDay: day,
+            month: month,
+            year: year
+          })
+          window._dayMismatchLogged = true
+        }
+        
+        // Increment to next day using pure date math
+        const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate()
+        day++
+        if (day > daysInMonth) {
+          day = 1
+          month++
+          if (month > 11) {
+            month = 0
+            year++
+          }
+        }
       }
       return days
     })
@@ -321,7 +578,6 @@ export default {
         start: '',
         end: '',
         location: '',
-        summary: '',
         description: ''
       }
       formError.value = ''
@@ -331,24 +587,25 @@ export default {
       editingEvent.value = null
       resetForm()
       if (dateKey) {
-        const start = new Date(dateKey)
-        start.setHours(9, 0, 0, 0)
-        const end = new Date(dateKey)
-        end.setHours(10, 0, 0, 0)
-        form.value.start = toDateTimeLocal(start.toISOString())
-        form.value.end = toDateTimeLocal(end.toISOString())
+        // dateKey is already in format "YYYY-MM-DD" (UTC date from calendar)
+        // datetime-local inputs need the date/time in YYYY-MM-DDTHH:mm format
+        // Since dateKey is already correctly formatted, just append the time
+        // This represents the UTC date/time that will be stored
+        form.value.start = `${dateKey}T09:00`
+        form.value.end = `${dateKey}T10:00`
       }
       showModal.value = true
     }
 
     const openEditModal = (event) => {
       editingEvent.value = event
+      // CRITICAL: Use the raw ISO strings (_startTimeStr, _endTimeStr) to avoid any timezone conversion
+      // These are the exact UTC times as stored in the database
       form.value = {
         title: event.title,
-        start: toDateTimeLocal(event.startTime || event.start || event.date),
-        end: toDateTimeLocal(event.endTime || event.end || event.startTime || event.date),
+        start: toDateTimeLocal(event._startTimeStr || event.startTime || event.start || event.date),
+        end: toDateTimeLocal(event._endTimeStr || event.endTime || event.end || event.startTime || event.date),
         location: event.location || '',
-        summary: event.summary || '',
         description: event.description || ''
       }
       formError.value = ''
@@ -365,8 +622,46 @@ export default {
       formError.value = ''
       saving.value = true
 
-      const start = form.value.start ? new Date(form.value.start) : null
-      const end = form.value.end ? new Date(form.value.end) : null
+      // Parse datetime-local strings (which are in local timezone)
+      // and convert them to UTC for storage
+      // datetime-local format: "YYYY-MM-DDTHH:mm" (no timezone, interpreted as local)
+      let start = null
+      let end = null
+
+      if (form.value.start) {
+        // Parse datetime-local string directly - it's already in UTC format (YYYY-MM-DDTHH:mm)
+        // We treat it as UTC to preserve the exact date/time the user entered
+        const [datePart, timePart] = form.value.start.split('T')
+        const [year, month, day] = datePart.split('-').map(Number)
+        const [hours, minutes] = timePart.split(':').map(Number)
+        
+        // CRITICAL: Create UTC date with the exact values from the form
+        // This ensures the date stored matches exactly what the user entered
+        start = new Date(Date.UTC(year, month - 1, day, hours, minutes || 0, 0, 0))
+        
+        // Debug: Verify the date key will match
+        const storedDateKey = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+        const isoString = start.toISOString()
+        const extractedDateKey = isoString.split('T')[0]
+        if (storedDateKey !== extractedDateKey) {
+          console.error('❌ Date key mismatch on save!', {
+            formDateKey: storedDateKey,
+            isoDateKey: extractedDateKey,
+            isoString: isoString,
+            formInput: form.value.start,
+            year, month, day, hours, minutes
+          })
+        } else {
+          console.log('✅ Date key matches on save:', storedDateKey, '→', isoString)
+        }
+      }
+
+      if (form.value.end) {
+        const [datePart, timePart] = form.value.end.split('T')
+        const [year, month, day] = datePart.split('-').map(Number)
+        const [hours, minutes] = timePart.split(':').map(Number)
+        end = new Date(Date.UTC(year, month - 1, day, hours, minutes || 0, 0, 0))
+      }
 
       if (!start || !end || end < start) {
         formError.value = 'Please provide valid start and end times.'
@@ -376,7 +671,6 @@ export default {
 
       const payload = {
         title: form.value.title.trim(),
-        summary: form.value.summary.trim(),
         description: form.value.description.trim(),
         startTime: start.toISOString(),
         endTime: end.toISOString(),
@@ -420,12 +714,98 @@ export default {
 
     const resetToToday = () => {
       const now = new Date()
-      currentMonth.value = now.getMonth()
-      currentYear.value = now.getFullYear()
+      currentMonth.value = now.getUTCMonth()
+      currentYear.value = now.getUTCFullYear()
+    }
+
+    const confirmDeleteEvent = (id) => {
+      eventToDelete.value = id
+      showDeleteModal.value = true
+    }
+
+    const deleteEvent = async () => {
+      if (!eventToDelete.value) return
+      
+      deleting.value = true
+      const id = eventToDelete.value
+      showDeleteModal.value = false
+      
+      try {
+        await eventService.deleteEvent(id)
+        await loadEvents()
+        eventToDelete.value = null
+        // Close edit modal if we were editing the deleted event
+        if (editingEvent.value && editingEvent.value.id === id) {
+          closeModal()
+        }
+      } catch (err) {
+        console.error('Error deleting event:', err)
+        formError.value = err.message || 'Failed to delete event'
+        eventToDelete.value = null
+      } finally {
+        deleting.value = false
+      }
+    }
+
+    const cancelDelete = () => {
+      showDeleteModal.value = false
+      eventToDelete.value = null
+    }
+
+    const confirmDeleteAll = () => {
+      showDeleteAllModal.value = true
+    }
+
+    const deleteAllEvents = async () => {
+      deleting.value = true
+      showDeleteAllModal.value = false
+      
+      try {
+        await eventService.deleteAllEvents()
+        await loadEvents()
+        // Close any open modals
+        closeModal()
+      } catch (err) {
+        console.error('Error deleting all events:', err)
+        formError.value = err.message || 'Failed to delete all events'
+      } finally {
+        deleting.value = false
+      }
+    }
+
+    const cancelDeleteAll = () => {
+      showDeleteAllModal.value = false
+    }
+
+    const confirmDeleteOldEvents = () => {
+      showDeleteOldModal.value = true
+    }
+
+    const deleteOldEvents = async () => {
+      deleting.value = true
+      showDeleteOldModal.value = false
+      
+      try {
+        await eventService.deleteOldEvents()
+        await loadEvents()
+        await loadOldEventsCount()
+        // Close any open modals
+        closeModal()
+      } catch (err) {
+        console.error('Error deleting old events:', err)
+        formError.value = err.message || 'Failed to delete old events'
+      } finally {
+        deleting.value = false
+      }
+    }
+
+    const cancelDeleteOld = () => {
+      showDeleteOldModal.value = false
     }
 
     onMounted(() => {
       loadEvents()
+      loadOldEventsCount()
     })
 
     return {
@@ -436,13 +816,29 @@ export default {
       form,
       formError,
       saving,
+      deleting,
+      showDeleteModal,
+      showDeleteAllModal,
+      events,
+      editingEvent,
       openCreateModal,
       openEditModal,
       closeModal,
       saveEvent,
       previousMonth,
       nextMonth,
-      resetToToday
+      resetToToday,
+      confirmDeleteEvent,
+      deleteEvent,
+      cancelDelete,
+      confirmDeleteAll,
+      deleteAllEvents,
+      cancelDeleteAll,
+      oldEventsCount,
+      showDeleteOldModal,
+      confirmDeleteOldEvents,
+      deleteOldEvents,
+      cancelDeleteOld
     }
   }
 }

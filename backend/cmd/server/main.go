@@ -93,7 +93,7 @@ func main() {
 	}
 
 	// Auto migrate the schema (mime_type will be added as nullable if it doesn't exist)
-	if err := db.AutoMigrate(&models.User{}, &models.Contact{}, &models.ContactRequest{}, &models.Gallery{}, &models.Event{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Contact{}, &models.ContactRequest{}, &models.Gallery{}, &models.EventCalendar{}); err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
 
@@ -130,14 +130,14 @@ func main() {
 	contactRepo := infraRepos.NewContactRepository(db)
 	contactRequestRepo := infraRepos.NewContactRequestRepository(db)
 	galleryRepo := infraRepos.NewGalleryRepository(db)
-	eventRepo := infraRepos.NewEventRepository(db)
+	eventCalendarRepo := infraRepos.NewEventCalendarRepository(db)
 
 	// Initialize services
 	userService := infraServices.NewUserService(userRepo)
 	contactService := infraServices.NewContactService(contactRepo)
 	contactRequestService := infraServices.NewContactRequestService(contactRequestRepo, infraServices.NewEmailService())
 	galleryService := infraServices.NewGalleryService(galleryRepo)
-	eventService := infraServices.NewEventService(eventRepo)
+	eventCalendarService := infraServices.NewEventCalendarService(eventCalendarRepo)
 
 	// Setup Gin router
 	router := gin.Default()
@@ -160,7 +160,7 @@ func main() {
 	})
 
 	// Setup routes
-	routes.SetupRoutes(router, userService, contactService, contactRequestService, galleryService, eventService)
+	routes.SetupRoutes(router, userService, contactService, contactRequestService, galleryService, eventCalendarService)
 
 	// Get port from environment or use default
 	port := os.Getenv("PORT")

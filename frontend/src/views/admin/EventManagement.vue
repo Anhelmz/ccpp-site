@@ -204,17 +204,16 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
                 <span class="font-medium text-gray-700">Date:</span>
-                <span>{{ formatDate(event.date || event.startTime || event.start) }}</span>
+                <span>{{ formatDate(event._startDateStr || event.startDate) }}</span>
               </div>
               <div class="flex items-center gap-2 text-gray-600">
                 <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <span class="font-medium text-gray-700">Time:</span>
-                <span v-if="event.time">{{ event.time }}</span>
-                <span v-else-if="event.startTime || event.start">
-                  {{ formatTime(event.startTime || event.start) }}
-                  <span v-if="event.endTime || event.end"> - {{ formatTime(event.endTime || event.end) }}</span>
+                <span v-if="event.startDate">
+                  {{ formatTime(event.startDate) }}
+                  <span v-if="event.endDate"> - {{ formatTime(event.endDate) }}</span>
                 </span>
                 <span v-else class="text-gray-400">N/A</span>
               </div>
@@ -254,13 +253,12 @@
                     {{ event.title }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {{ formatDate(event.date || event.startTime || event.start) }}
+                    {{ formatDate(event._startDateStr || event.startDate) }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    <span v-if="event.time">{{ event.time }}</span>
-                    <span v-else-if="event.startTime || event.start">
-                      {{ formatTime(event.startTime || event.start) }}
-                      <span v-if="event.endTime || event.end"> - {{ formatTime(event.endTime || event.end) }}</span>
+                    <span v-if="event.startDate">
+                      {{ formatTime(event.startDate) }}
+                      <span v-if="event.endDate"> - {{ formatTime(event.endDate) }}</span>
                     </span>
                     <span v-else class="text-gray-400">N/A</span>
                   </td>
@@ -331,20 +329,11 @@
           <div class="flex-1 p-6 lg:pr-8">
             <h1 class="text-3xl font-bold text-gray-900 mb-6">{{ selectedEvent.title }}</h1>
             
-            <!-- Event Summary -->
-            <div v-if="selectedEvent.summary" class="mb-6">
-              <div class="bg-gray-50 rounded-lg border border-gray-200 p-6">
-                <p class="text-gray-900 text-base leading-relaxed">
-                  {{ selectedEvent.summary }}
-                </p>
-              </div>
-            </div>
-
-            <!-- Description -->
-            <div v-if="selectedEvent.description" class="prose max-w-none">
+            <!-- Details -->
+            <div v-if="selectedEvent.details" class="prose max-w-none">
               <div class="bg-gray-50 rounded-lg border border-gray-200 p-6">
                 <p class="text-gray-900 whitespace-pre-wrap text-base leading-relaxed">
-                  {{ selectedEvent.description }}
+                  {{ selectedEvent.details }}
                 </p>
               </div>
             </div>
@@ -361,9 +350,9 @@
             <div>
               <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date & Time</label>
               <p class="mt-1 text-sm text-gray-600">
-                {{ formatDate(selectedEvent.startTime || selectedEvent.start || selectedEvent.date) }}
-                <span v-if="selectedEvent.startTime || selectedEvent.start">
-                  at {{ formatTime(selectedEvent.startTime || selectedEvent.start) }}
+                {{ formatDate(selectedEvent._startDateStr || selectedEvent.startDate) }}
+                <span v-if="selectedEvent.startDate">
+                  at {{ formatTime(selectedEvent.startDate) }}
                 </span>
               </p>
             </div>
@@ -371,9 +360,9 @@
             <div>
               <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">End Date & Time</label>
               <p class="mt-1 text-sm text-gray-600">
-                <span v-if="selectedEvent.endTime || selectedEvent.end">
-                  {{ formatDate(selectedEvent.endTime || selectedEvent.end) }}
-                  at {{ formatTime(selectedEvent.endTime || selectedEvent.end) }}
+                <span v-if="selectedEvent.endDate">
+                  {{ formatDate(selectedEvent._endDateStr || selectedEvent.endDate) }}
+                  at {{ formatTime(selectedEvent.endDate) }}
                 </span>
                 <span v-else class="text-gray-500">N/A</span>
               </p>
@@ -444,18 +433,18 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Start <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Start Date & Time <span class="text-red-500">*</span></label>
             <input
-              v-model="eventForm.start"
+              v-model="eventForm.startDate"
               type="datetime-local"
               required
               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE]"
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">End <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">End Date & Time <span class="text-red-500">*</span></label>
             <input
-              v-model="eventForm.end"
+              v-model="eventForm.endDate"
               type="datetime-local"
               required
               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE]"
@@ -474,22 +463,12 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Summary</label>
-          <input
-            v-model="eventForm.summary"
-            type="text"
-            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE]"
-            placeholder="Short blurb"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Details</label>
           <textarea
-            v-model="eventForm.description"
+            v-model="eventForm.details"
             rows="3"
             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0089AE]"
-            placeholder="Full details"
+            placeholder="Event details"
           ></textarea>
         </div>
 
@@ -549,13 +528,10 @@ export default {
 
     const eventForm = ref({
       title: '',
-      summary: '',
-      description: '',
-      date: '',
-      time: '',
+      details: '',
       location: '',
-      start: '',
-      end: ''
+      startDate: '',
+      endDate: ''
     })
 
     const formatDate = (dateString) => {
@@ -591,47 +567,112 @@ export default {
     }
 
     const calendarRange = computed(() => {
-      const firstDay = new Date(currentYear.value, currentMonth.value, 1)
-      const lastDay = new Date(currentYear.value, currentMonth.value + 1, 0)
-
-      const start = new Date(firstDay)
-      start.setDate(start.getDate() - start.getDay())
-
-      const end = new Date(lastDay)
-      end.setDate(end.getDate() + (6 - lastDay.getDay()))
-
+      // Use UTC dates throughout to avoid timezone conversion issues
+      const year = currentYear.value
+      const month = currentMonth.value
+      
+      // First day of month in UTC
+      const firstDayOfMonth = new Date(Date.UTC(year, month, 1))
+      const firstDayOfWeek = firstDayOfMonth.getUTCDay()
+      
+      // Last day of month in UTC
+      const lastDayOfMonth = new Date(Date.UTC(year, month + 1, 0))
+      const lastDayOfWeek = lastDayOfMonth.getUTCDay()
+      
+      // Calculate start date (Sunday of the week containing first day)
+      const startDay = 1 - firstDayOfWeek
+      const start = new Date(Date.UTC(year, month, startDay))
+      
+      // Calculate end date (Saturday of the week containing last day)
+      const daysInMonth = lastDayOfMonth.getUTCDate()
+      const endDay = daysInMonth + (6 - lastDayOfWeek)
+      const end = new Date(Date.UTC(year, month, endDay))
+      
       return { start, end }
     })
 
     const calendarDays = computed(() => {
       const days = []
       const { start, end } = calendarRange.value
-      const cursor = new Date(start)
-      while (cursor <= end) {
-        const dateKey = cursor.toISOString().split('T')[0]
+      
+      // Use UTC dates throughout - iterate using UTC date components
+      let iterYear = start.getUTCFullYear()
+      let iterMonth = start.getUTCMonth()
+      let iterDay = start.getUTCDate()
+      const endYear = end.getUTCFullYear()
+      const endMonth = end.getUTCMonth()
+      const endDay = end.getUTCDate()
+      
+      // The month being displayed (for isCurrentMonth check)
+      const displayMonth = currentMonth.value
+      
+      while (
+        iterYear < endYear ||
+        (iterYear === endYear && iterMonth < endMonth) ||
+        (iterYear === endYear && iterMonth === endMonth && iterDay <= endDay)
+      ) {
+        // Generate date key using UTC components
+        const year = iterYear
+        const month = String(iterMonth + 1).padStart(2, '0')
+        const day = String(iterDay).padStart(2, '0')
+        const dateKey = `${year}-${month}-${day}`
+        
+        // Create a Date object for this UTC date for display purposes
+        const cursor = new Date(Date.UTC(iterYear, iterMonth, iterDay))
         const dayEvents = events.value
-          .map((ev) => ({
-            ...ev,
-            startTime: ev.startTime || ev.start || ev.date,
-            endTime: ev.endTime || ev.end || ev.startTime || ev.date,
-            dateKey: (ev.startTime || ev.start || ev.date || '').split('T')[0]
-          }))
-          .filter((ev) => ev.dateKey === dateKey)
+          .map((ev) => {
+            // CRITICAL: Extract date key from raw ISO string to avoid timezone conversion
+            // Use the stored raw string, or fallback to ISO string from Date object
+            let eventDateKey = ''
+            if (ev._startDateStr) {
+              // Extract date directly from ISO string: "2026-01-27T09:00:00Z" -> "2026-01-27"
+              eventDateKey = ev._startDateStr.split('T')[0]
+            } else if (ev.startDate) {
+              // Fallback: if no raw string, use UTC date components from Date object
+              const date = new Date(ev.startDate)
+              const year = date.getUTCFullYear()
+              const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+              const day = String(date.getUTCDate()).padStart(2, '0')
+              eventDateKey = `${year}-${month}-${day}`
+            }
+            
+            return {
+              ...ev,
+              dateKey: eventDateKey
+            }
+          })
+          .filter((ev) => ev && ev.dateKey === dateKey)
+        // Check if this is today using UTC comparison
         const today = new Date()
-        today.setHours(0, 0, 0, 0)
-        const dayDate = new Date(cursor)
-        dayDate.setHours(0, 0, 0, 0)
-        const isPast = dayDate < today
+        const todayYear = today.getUTCFullYear()
+        const todayMonth = today.getUTCMonth()
+        const todayDay = today.getUTCDate()
+        
+        const isToday = iterYear === todayYear && iterMonth === todayMonth && iterDay === todayDay
+        const isPast = iterYear < todayYear ||
+          (iterYear === todayYear && iterMonth < todayMonth) ||
+          (iterYear === todayYear && iterMonth === todayMonth && iterDay < todayDay)
         
         days.push({
           date: dateKey,
-          day: cursor.getDate(),
-          isCurrentMonth: cursor.getMonth() === currentMonth.value,
-          isToday: cursor.toDateString() === new Date().toDateString(),
+          day: iterDay, // Use UTC day directly
+          isCurrentMonth: iterMonth === displayMonth, // Compare with the month being displayed
+          isToday: isToday,
           isPast: isPast,
           events: dayEvents
         })
-        cursor.setDate(cursor.getDate() + 1)
+        
+        // Move to next day using UTC date math
+        iterDay++
+        const daysInMonth = new Date(Date.UTC(iterYear, iterMonth + 1, 0)).getUTCDate()
+        if (iterDay > daysInMonth) {
+          iterDay = 1
+          iterMonth++
+          if (iterMonth > 11) {
+            iterMonth = 0
+            iterYear++
+          }
+        }
       }
       return days
     })
@@ -642,7 +683,26 @@ export default {
       try {
         const upcoming = filterType.value === 'upcoming'
         const response = await eventService.getEvents(upcoming)
-        events.value = response.events || []
+        // Normalize events - store raw ISO strings to avoid timezone conversion issues
+        events.value = (response.events || []).map((event) => {
+          // Store the raw ISO strings from the API response
+          const startDateStr = typeof event.startDate === 'string' 
+            ? event.startDate 
+            : (event.startDate ? event.startDate.toISOString() : '')
+          const endDateStr = typeof event.endDate === 'string'
+            ? event.endDate
+            : (event.endDate ? event.endDate.toISOString() : '')
+          
+          return {
+            ...event,
+            // Keep Date objects for display purposes
+            startDate: startDateStr ? new Date(startDateStr) : null,
+            endDate: endDateStr ? new Date(endDateStr) : null,
+            // Store raw strings for date key extraction (critical for calendar)
+            _startDateStr: startDateStr,
+            _endDateStr: endDateStr
+          }
+        })
       } catch (err) {
         console.error('Error loading events:', err)
         error.value = err.message || 'Failed to load events'
@@ -663,8 +723,7 @@ export default {
         const query = searchQuery.value.toLowerCase()
         filtered = filtered.filter(event => 
           event.title.toLowerCase().includes(query) ||
-          (event.summary && event.summary.toLowerCase().includes(query)) ||
-          (event.description && event.description.toLowerCase().includes(query)) ||
+          (event.details && event.details.toLowerCase().includes(query)) ||
           (event.location && event.location.toLowerCase().includes(query))
         )
       }
@@ -673,14 +732,13 @@ export default {
       if (filterType.value === 'past') {
         const now = new Date()
         filtered = filtered.filter(event => {
-          const eventDate = event.date || event.startTime || event.start
-          return eventDate && new Date(eventDate) < now
+          return event.startDate && new Date(event.startDate) < now
         })
       }
 
       return filtered.sort((a, b) => {
-        const dateA = a.date || a.startTime || a.start || ''
-        const dateB = b.date || b.startTime || b.start || ''
+        const dateA = a._startDateStr || (a.startDate ? a.startDate.toISOString() : '')
+        const dateB = b._startDateStr || (b.startDate ? b.startDate.toISOString() : '')
         return new Date(dateA) - new Date(dateB)
       })
     })
@@ -697,30 +755,30 @@ export default {
       showCreateForm.value = true
       eventForm.value = {
         title: '',
-        summary: '',
-        description: '',
-        date: '',
-        time: '',
+        details: '',
         location: '',
-        start: '',
-        end: ''
+        startDate: '',
+        endDate: ''
       }
       
       if (dateKey) {
-        const start = new Date(dateKey)
-        start.setHours(9, 0, 0, 0)
-        const end = new Date(dateKey)
-        end.setHours(10, 0, 0, 0)
-        eventForm.value.start = toDateTimeLocal(start.toISOString())
-        eventForm.value.end = toDateTimeLocal(end.toISOString())
+        // dateKey is in format "YYYY-MM-DD", treat it as UTC date
+        const [year, month, day] = dateKey.split('-').map(Number)
+        // Create UTC date for 9:00 AM
+        const start = new Date(Date.UTC(year, month - 1, day, 9, 0, 0, 0))
+        const end = new Date(Date.UTC(year, month - 1, day, 10, 0, 0, 0))
+        eventForm.value.startDate = toDateTimeLocal(start.toISOString())
+        eventForm.value.endDate = toDateTimeLocal(end.toISOString())
       } else {
-        // If no dateKey provided, use today's date
-        const today = new Date()
-        today.setHours(9, 0, 0, 0)
-        const end = new Date(today)
-        end.setHours(10, 0, 0, 0)
-        eventForm.value.start = toDateTimeLocal(today.toISOString())
-        eventForm.value.end = toDateTimeLocal(end.toISOString())
+        // If no dateKey provided, use today's date in UTC
+        const now = new Date()
+        const year = now.getUTCFullYear()
+        const month = now.getUTCMonth()
+        const day = now.getUTCDate()
+        const start = new Date(Date.UTC(year, month, day, 9, 0, 0, 0))
+        const end = new Date(Date.UTC(year, month, day, 10, 0, 0, 0))
+        eventForm.value.startDate = toDateTimeLocal(start.toISOString())
+        eventForm.value.endDate = toDateTimeLocal(end.toISOString())
       }
       
       formError.value = ''
@@ -732,15 +790,16 @@ export default {
       showCreateForm.value = true
       selectedEvent.value = null
       
+      // Use raw ISO string if available, otherwise use Date object
+      const startDateStr = editingEvent.value._startDateStr || (editingEvent.value.startDate ? editingEvent.value.startDate.toISOString() : '')
+      const endDateStr = editingEvent.value._endDateStr || (editingEvent.value.endDate ? editingEvent.value.endDate.toISOString() : '')
+      
       eventForm.value = {
         title: editingEvent.value.title,
-        start: toDateTimeLocal(editingEvent.value.startTime || editingEvent.value.start || editingEvent.value.date),
-        end: toDateTimeLocal(editingEvent.value.endTime || editingEvent.value.end || editingEvent.value.startTime || editingEvent.value.date),
+        startDate: toDateTimeLocal(startDateStr),
+        endDate: toDateTimeLocal(endDateStr),
         location: editingEvent.value.location || '',
-        summary: editingEvent.value.summary || '',
-        description: editingEvent.value.description || '',
-        date: '',
-        time: ''
+        details: editingEvent.value.details || ''
       }
       
       formError.value = ''
@@ -758,23 +817,39 @@ export default {
       formError.value = ''
 
       try {
-        const start = eventForm.value.start ? new Date(eventForm.value.start) : null
-        const end = eventForm.value.end ? new Date(eventForm.value.end) : null
+        // Parse datetime-local strings and treat them as UTC to preserve the exact date/time
+        // datetime-local format: "YYYY-MM-DDTHH:mm" (no timezone, we treat as UTC)
+        let startDate = null
+        let endDate = null
 
-        if (!start || !end || end < start) {
-          formError.value = 'Please provide valid start and end times.'
+        if (eventForm.value.startDate) {
+          const [datePart, timePart] = eventForm.value.startDate.split('T')
+          const [year, month, day] = datePart.split('-').map(Number)
+          const [hours, minutes] = timePart.split(':').map(Number)
+          // Create UTC date with the exact values from the form
+          // This ensures the date stored matches exactly what the user entered
+          startDate = new Date(Date.UTC(year, month - 1, day, hours, minutes || 0, 0, 0))
+        }
+
+        if (eventForm.value.endDate) {
+          const [datePart, timePart] = eventForm.value.endDate.split('T')
+          const [year, month, day] = datePart.split('-').map(Number)
+          const [hours, minutes] = timePart.split(':').map(Number)
+          endDate = new Date(Date.UTC(year, month - 1, day, hours, minutes || 0, 0, 0))
+        }
+
+        if (!startDate || !endDate || endDate < startDate) {
+          formError.value = 'Please provide valid start and end dates.'
           saving.value = false
           return
         }
 
         const eventData = {
           title: eventForm.value.title.trim(),
-          summary: eventForm.value.summary.trim(),
-          description: eventForm.value.description.trim(),
-          startTime: start.toISOString(),
-          endTime: end.toISOString(),
-          location: eventForm.value.location.trim(),
-          recurrence: 'none'
+          details: eventForm.value.details.trim(),
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          location: eventForm.value.location.trim()
         }
 
         if (editingEvent.value) {

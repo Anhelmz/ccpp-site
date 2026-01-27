@@ -114,7 +114,7 @@
                     {{ formatDay(event.startTime) }}
                   </p>
                   <p class="text-xs uppercase tracking-[0.35em] text-white/70">
-                    {{ event.startTime.getFullYear() }}
+                    {{ event.startTime.getUTCFullYear() }}
                   </p>
                 </div>
                 <div
@@ -349,7 +349,8 @@ export default {
     const selectedEvent = ref(null);
 
     const formatDay = (date) => {
-      return date.getDate();
+      // Use UTC to ensure consistent date display regardless of timezone
+      return date.getUTCDate();
     };
 
     const formatMonth = (date) => {
@@ -367,7 +368,8 @@ export default {
         "Nov",
         "Dec",
       ];
-      return months[date.getMonth()];
+      // Use UTC to ensure consistent month display regardless of timezone
+      return months[date.getUTCMonth()];
     };
 
     const formatFullDate = (date) => {
@@ -385,7 +387,8 @@ export default {
         "November",
         "December",
       ];
-      return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+      // Use UTC to ensure consistent date display regardless of timezone
+      return `${months[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
     };
 
     const formatTimeRange = (start, end) => {
@@ -409,14 +412,14 @@ export default {
         // Convert API events to the format expected by the component
         events.value = apiEvents
           .map((event) => {
-            const start = new Date(event.startTime || event.date);
-            const end = event.endTime ? new Date(event.endTime) : start;
+            const start = new Date(event.startDate);
+            const end = event.endDate ? new Date(event.endDate) : start;
             return {
               id: event.id,
               title: event.title,
-              summary: event.summary || event.description || "",
-              content: event.description || event.summary || "",
-              description: event.description || "",
+              summary: event.details || "",
+              content: event.details || "",
+              description: event.details || "",
               startTime: start,
               endTime: end,
               timeRange: formatTimeRange(start, end),
