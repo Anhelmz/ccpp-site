@@ -760,7 +760,7 @@ import heroImageCommunity from "@/assets/background/about-bg.jpg";
 import heroImageTeaching from "@/assets/background/hero-bg.jpg";
 import heroImageServe from "@/assets/background/bg-hero2.jpg";
 import heroImageYouth from "@/assets/background/bg-hero3.jpg";
-import { videoStore } from "@/services/videoStore";
+import { videoService } from "@/services/videoService";
 
 export default {
   name: "Home",
@@ -1179,11 +1179,21 @@ export default {
       currentSlideIndex.value = 0;
     });
 
-    onMounted(() => {
-      storedVideos.value = videoStore.getAll();
-      if (currentVideoPage.value > totalVideoPages.value) {
-        currentVideoPage.value = 1;
+    const loadVideos = async () => {
+      try {
+        const response = await videoService.getVideos();
+        storedVideos.value = response.videos || [];
+        if (currentVideoPage.value > totalVideoPages.value) {
+          currentVideoPage.value = 1;
+        }
+      } catch (err) {
+        console.error("Error loading videos:", err);
+        storedVideos.value = [];
       }
+    };
+
+    onMounted(() => {
+      loadVideos();
     });
 
     watch(
@@ -1242,6 +1252,7 @@ export default {
       filteredVideos,
       performVideoSearch,
       clearVideoSearch,
+      loadVideos,
     };
   },
 };

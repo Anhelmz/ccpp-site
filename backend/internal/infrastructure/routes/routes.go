@@ -19,6 +19,7 @@ func registerAPIRoutes(
 	contactRequestHandler *handlers.ContactRequestHandler,
 	galleryHandler *handlers.GalleryHandler,
 	eventCalendarHandler *handlers.EventCalendarHandler,
+	videoHandler *handlers.VideoHandler,
 ) {
 	// Auth routes
 	auth := api.Group("/auth")
@@ -80,6 +81,15 @@ func registerAPIRoutes(
 		events.PUT("/:id", eventCalendarHandler.UpdateEvent)
 		events.DELETE("/:id", eventCalendarHandler.DeleteEvent)
 	}
+
+	videos := api.Group("/videos")
+	{
+		videos.POST("", videoHandler.CreateVideo)
+		videos.GET("", videoHandler.GetAllVideos)
+		videos.GET("/:id", videoHandler.GetVideoByID)
+		videos.PUT("/:id", videoHandler.UpdateVideo)
+		videos.DELETE("/:id", videoHandler.DeleteVideo)
+	}
 }
 
 func SetupRoutes(
@@ -89,21 +99,23 @@ func SetupRoutes(
 	contactRequestService services.ContactRequestService,
 	galleryService services.GalleryService,
 	eventCalendarService services.EventCalendarService,
+	videoService services.VideoService,
 ) {
 	userHandler := handlers.NewUserHandler(userService)
 	contactHandler := handlers.NewContactHandler(contactService)
 	contactRequestHandler := handlers.NewContactRequestHandler(contactRequestService)
 	galleryHandler := handlers.NewGalleryHandler(galleryService)
 	eventCalendarHandler := handlers.NewEventCalendarHandler(eventCalendarService)
+	videoHandler := handlers.NewVideoHandler(videoService)
 	authHandler := handlers.NewAuthHandler()
 
 	// Versioned API (existing)
 	apiV1 := router.Group("/api/v1")
-	registerAPIRoutes(apiV1, authHandler, userHandler, contactHandler, contactRequestHandler, galleryHandler, eventCalendarHandler)
+	registerAPIRoutes(apiV1, authHandler, userHandler, contactHandler, contactRequestHandler, galleryHandler, eventCalendarHandler, videoHandler)
 
 	// Unversioned API (go-vue-base compatibility)
 	api := router.Group("/api")
-	registerAPIRoutes(api, authHandler, userHandler, contactHandler, contactRequestHandler, galleryHandler, eventCalendarHandler)
+	registerAPIRoutes(api, authHandler, userHandler, contactHandler, contactRequestHandler, galleryHandler, eventCalendarHandler, videoHandler)
 
 	// Health check endpoint
 	router.GET("/health", func(c *gin.Context) {

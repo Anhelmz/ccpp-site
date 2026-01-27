@@ -92,8 +92,66 @@ func main() {
 		}
 	}
 
+	// Fix videos table column names if they were created with wrong naming (you_tube_url -> youtube_url)
+	if db.Migrator().HasTable(&models.Video{}) {
+		// Check if wrong column names exist and fix them
+		var hasWrongURL bool
+		var hasWrongID bool
+		var hasCorrectURL bool
+		var hasCorrectID bool
+		db.Raw(`
+			SELECT EXISTS (
+				SELECT 1 FROM information_schema.columns 
+				WHERE table_name = 'videos' AND column_name = 'you_tube_url'
+			)
+		`).Scan(&hasWrongURL)
+		db.Raw(`
+			SELECT EXISTS (
+				SELECT 1 FROM information_schema.columns 
+				WHERE table_name = 'videos' AND column_name = 'you_tube_id'
+			)
+		`).Scan(&hasWrongID)
+		db.Raw(`
+			SELECT EXISTS (
+				SELECT 1 FROM information_schema.columns 
+				WHERE table_name = 'videos' AND column_name = 'youtube_url'
+			)
+		`).Scan(&hasCorrectURL)
+		db.Raw(`
+			SELECT EXISTS (
+				SELECT 1 FROM information_schema.columns 
+				WHERE table_name = 'videos' AND column_name = 'youtube_id'
+			)
+		`).Scan(&hasCorrectID)
+		
+		// If both old and new columns exist, drop the old ones
+		if hasWrongURL && hasCorrectURL {
+			log.Println("Fixing videos table: dropping old you_tube_url column")
+			if err := db.Exec("ALTER TABLE videos DROP COLUMN IF EXISTS you_tube_url").Error; err != nil {
+				log.Printf("Warning: Error dropping you_tube_url: %v", err)
+			}
+		} else if hasWrongURL && !hasCorrectURL {
+			log.Println("Fixing videos table: renaming you_tube_url to youtube_url")
+			if err := db.Exec("ALTER TABLE videos RENAME COLUMN you_tube_url TO youtube_url").Error; err != nil {
+				log.Printf("Warning: Error renaming you_tube_url: %v", err)
+			}
+		}
+		
+		if hasWrongID && hasCorrectID {
+			log.Println("Fixing videos table: dropping old you_tube_id column")
+			if err := db.Exec("ALTER TABLE videos DROP COLUMN IF EXISTS you_tube_id").Error; err != nil {
+				log.Printf("Warning: Error dropping you_tube_id: %v", err)
+			}
+		} else if hasWrongID && !hasCorrectID {
+			log.Println("Fixing videos table: renaming you_tube_id to youtube_id")
+			if err := db.Exec("ALTER TABLE videos RENAME COLUMN you_tube_id TO youtube_id").Error; err != nil {
+				log.Printf("Warning: Error renaming you_tube_id: %v", err)
+			}
+		}
+	}
+
 	// Auto migrate the schema (mime_type will be added as nullable if it doesn't exist)
-	if err := db.AutoMigrate(&models.User{}, &models.Contact{}, &models.ContactRequest{}, &models.Gallery{}, &models.EventCalendar{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Contact{}, &models.ContactRequest{}, &models.Gallery{}, &models.EventCalendar{}, &models.Video{}); err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
 
@@ -131,6 +189,7 @@ func main() {
 	contactRequestRepo := infraRepos.NewContactRequestRepository(db)
 	galleryRepo := infraRepos.NewGalleryRepository(db)
 	eventCalendarRepo := infraRepos.NewEventCalendarRepository(db)
+	videoRepo := infraRepos.NewVideoRepository(db)
 
 	// Initialize services
 	userService := infraServices.NewUserService(userRepo)
@@ -138,6 +197,7 @@ func main() {
 	contactRequestService := infraServices.NewContactRequestService(contactRequestRepo, infraServices.NewEmailService())
 	galleryService := infraServices.NewGalleryService(galleryRepo)
 	eventCalendarService := infraServices.NewEventCalendarService(eventCalendarRepo)
+	videoService := infraServices.NewVideoService(videoRepo)
 
 	// Setup Gin router
 	router := gin.Default()
@@ -160,7 +220,7 @@ func main() {
 	})
 
 	// Setup routes
-	routes.SetupRoutes(router, userService, contactService, contactRequestService, galleryService, eventCalendarService)
+	routes.SetupRoutes(router, userService, contactService, contactRequestService, galleryService, eventCalendarService, videoService)
 
 	// Get port from environment or use default
 	port := os.Getenv("PORT")

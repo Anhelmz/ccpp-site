@@ -45,7 +45,17 @@
       </div>
 
       <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-      <div v-if="filteredVideos.length === 0" class="text-center py-12">
+      <!-- Loading State -->
+      <div v-if="loading" class="flex items-center justify-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0089AE]"></div>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 m-4">
+        <p class="text-sm text-red-800">{{ error }}</p>
+      </div>
+
+      <div v-else-if="filteredVideos.length === 0" class="text-center py-12">
         <svg
           class="mx-auto h-16 w-16 text-zinc-300 mb-4"
           fill="none"
@@ -341,7 +351,7 @@
 import { ref, computed, onMounted } from "vue";
 import AdminLayout from "@/components/admin/AdminLayout.vue";
 import ConfirmationModal from "@/components/admin/ConfirmationModal.vue";
-import { videoStore } from "@/services/videoStore";
+import { videoService } from "@/services/videoService";
 
 const extractYouTubeId = (input) => {
   const trimmed = (input || "").trim();
@@ -362,6 +372,8 @@ export default {
     const showCreateForm = ref(false);
     const editingVideo = ref(null);
     const videos = ref([]);
+    const loading = ref(false);
+    const error = ref("");
     const formError = ref("");
     const searchQuery = ref("");
     const showConfirmModal = ref(false);
@@ -374,8 +386,18 @@ export default {
       youtubeInput: "",
     });
 
-    const loadVideos = () => {
-      videos.value = videoStore.getAll();
+    const loadVideos = async () => {
+      loading.value = true;
+      error.value = "";
+      try {
+        const response = await videoService.getVideos();
+        videos.value = response.videos || [];
+      } catch (err) {
+        console.error("Error loading videos:", err);
+        error.value = err.message || "Failed to load videos";
+      } finally {
+        loading.value = false;
+      }
     };
 
     const filteredVideos = computed(() => {
@@ -431,7 +453,7 @@ export default {
       formError.value = "";
     };
 
-    const saveVideo = () => {
+    const saveVideo = async () => {
       formError.value = "";
       saving.value = true;
       const id = extractYouTubeId(videoForm.value.youtubeInput);
@@ -444,31 +466,36 @@ export default {
       const payload = {
         title: videoForm.value.title.trim(),
         description: videoForm.value.description.trim(),
-        youtubeId: id,
-        youtubeUrl: `https://www.youtube.com/watch?v=${id}`,
+        youtubeInput: videoForm.value.youtubeInput.trim(),
       };
 
-      if (editingVideo.value) {
-        videoStore.update(editingVideo.value.id, payload);
-      } else {
-        videoStore.add(payload);
-      }
+      try {
+        if (editingVideo.value) {
+          await videoService.updateVideo(editingVideo.value.id, payload);
+        } else {
+          await videoService.createVideo(payload);
+        }
 
-      loadVideos();
-      saving.value = false;
-      
-      // After saving, view the video if editing, or go back to list if creating
-      if (editingVideo.value) {
-        const updatedVideo = videoStore.getAll().find(v => v.id === editingVideo.value.id);
-        if (updatedVideo) {
-          selectedVideo.value = updatedVideo;
-          showCreateForm.value = false;
-          editingVideo.value = null;
+        await loadVideos();
+        
+        // After saving, view the video if editing, or go back to list if creating
+        if (editingVideo.value) {
+          const updatedVideo = videos.value.find(v => v.id === editingVideo.value.id);
+          if (updatedVideo) {
+            selectedVideo.value = updatedVideo;
+            showCreateForm.value = false;
+            editingVideo.value = null;
+          } else {
+            closeForm();
+          }
         } else {
           closeForm();
         }
-      } else {
-        closeForm();
+      } catch (err) {
+        console.error("Error saving video:", err);
+        formError.value = err.message || "Failed to save video";
+      } finally {
+        saving.value = false;
       }
     };
 
@@ -477,12 +504,25 @@ export default {
       showConfirmModal.value = true;
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
       if (!videoToDelete.value) return;
-      videoStore.remove(videoToDelete.value);
-      loadVideos();
+
+      const id = videoToDelete.value;
       showConfirmModal.value = false;
       videoToDelete.value = null;
+
+      try {
+        await videoService.deleteVideo(id);
+        await loadVideos();
+        // If the deleted video was selected, clear selection
+        if (selectedVideo.value && selectedVideo.value.id === id) {
+          selectedVideo.value = null;
+        }
+      } catch (err) {
+        console.error("Error deleting video:", err);
+        alert(`Failed to delete video: ${err.message}`);
+        videoToDelete.value = null;
+      }
     };
 
     const cancelDelete = () => {
@@ -499,6 +539,8 @@ export default {
       showCreateForm,
       editingVideo,
       videos,
+      loading,
+      error,
       formError,
       searchQuery,
       videoForm,
