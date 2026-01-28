@@ -28,8 +28,6 @@ WORKDIR /app
 # Copy the binary from builder stage
 COPY --from=builder /app/main .
 
-# Copy environment file
-COPY env.example .env
 
 # Expose port
 EXPOSE 8080
