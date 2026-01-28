@@ -18,9 +18,9 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "8081:8080"
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
     environment:
-      - PORT=8080
+      - BACKEND_PORT=8080
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_USER=postgres
